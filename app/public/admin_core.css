@@ -1,0 +1,237 @@
+/* ============================================================
+   ADMIN CORE CSS
+   Gemensamma stilar för hela adminmiljön
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. ROOT-VARIABLER – färger, tabelltema, badgefärger
+   ------------------------------------------------------------ */
+:root {
+    --tbl-border:        #e5e7eb;
+    --tbl-head-bg:       #d1f2f0;
+    --tbl-head-color:    #111;
+    --tbl-row-hover:     #f3f4f6;
+    --tbl-row-zebra:     #fafafa;
+
+    --badge-bg:          #f3f4f6;
+    --badge-color:       #374151;
+
+    --badge-used-bg:     #065f46;
+    --badge-used-color:  #fff;
+
+    --badge-deal-bg:     #1e3a8a;
+    --badge-deal-color:  #fff;
+
+    --badge-drop-bg:     #92400e;
+    --badge-drop-color:  #fff;
+
+    --badge-unpub-bg:    #9ca3af;
+    --badge-unpub-color: #111;
+
+    --badge-expired-bg:  #4b5563;
+    --badge-expired-color: #fff;
+
+    --badge-launch-bg:   #2563eb;
+    --badge-launch-color:#fff;
+
+    --badge-bundle-bg:   #9333ea;
+    --badge-bundle-color:#fff;
+
+    --badge-vmb-bg:      #6d28d9;
+    --badge-vmb-color:   #fff;
+
+    --badge-prio-bg:     #b91c1c;
+    --badge-prio-color:  #fff;
+
+    --badge-new-bg:      #10b981; 
+    --badge-new-color:   #fff;
+}
+
+/* ------------------------------------------------------------
+   2. TABELLTEMA
+   ------------------------------------------------------------ */
+.table-list {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.table-list th,
+.table-list td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--tbl-border);
+    vertical-align: middle;
+}
+
+.table-list thead th {
+    background: var(--tbl-head-bg);
+    color: var(--tbl-head-color);
+    font-weight: 700;
+    text-align: left;
+}
+
+.table-list tbody tr:nth-child(even) {
+    background: var(--tbl-row-zebra);
+}
+
+.table-list tbody tr:hover {
+    background: var(--tbl-row-hover);
+}
+
+.cat-head th {
+    background: #f3f4f6;
+    font-weight: 700;
+    border-top: 1px solid var(--tbl-border);
+}
+
+/* Summeringsrad */
+.summary-row td,
+.product-summary-row td {
+    background: #f3f4f6;
+    font-weight: 700;
+}
+
+/* ------------------------------------------------------------
+   3. GLOBALE BADGES
+   ------------------------------------------------------------ */
+.badges {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 700;
+    border-radius: 999px;
+    background: var(--badge-bg);
+    color: var(--badge-color);
+    border: 1px solid var(--tbl-border);
+}
+
+/* Särskilda badge-varianter */
+.badge-used {
+    background: var(--badge-used-bg);
+    color: var(--badge-used-color);
+    border: none;
+}
+
+.badge-deal {
+    background: var(--badge-deal-bg);
+    color: var(--badge-deal-color);
+    border: none;
+}
+
+.badge-drop {
+    background: var(--badge-drop-bg);
+    color: var(--badge-drop-color);
+    border: none;
+}
+
+.badge-unpub {
+    background: var(--badge-unpub-bg);
+    color: var(--badge-unpub-color);
+}
+
+.badge-expired {
+    background: var(--badge-expired-bg);
+    color: var(--badge-expired-color);
+}
+
+.badge-launch {
+    background: var(--badge-launch-bg);
+    color: var(--badge-launch-color);
+    border: none;
+}
+
+.badge-bundle {
+    background: var(--badge-bundle-bg);
+    color: var(--badge-bundle-color);
+}
+
+.badge-vmb {
+    background: var(--badge-vmb-bg);
+    color: var(--badge-vmb-color);
+}
+
+.badge-priority {
+    background: var(--badge-prio-bg);
+    color: var(--badge-prio-color);
+}
+
+.badge-new {
+    background: var(--badge-new-bg);
+    color: var(--badge-new-color);
+}
+
+/* Åldersbadgen (begagnat/fyndvara) */
+.badge-age {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 11px;
+    border: 1px solid var(--tbl-border);
+    background: #fff;
+    color: #111;
+}
+
+.badge-age.green  { background: #d1fae5; color:#065f46; }
+.badge-age.orange { background: #fef3c7; color:#92400e; }
+.badge-age.red    { background: #fee2e2; color:#991b1b; }
+
+/* ------------------------------------------------------------
+   4. COPY-PILLS / COPY-FIELDS
+   ------------------------------------------------------------ */
+.copy-num,
+.copy-code {
+    cursor: pointer;
+    padding: 0 4px;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+}
+
+.copy-num:hover,
+.copy-code:hover {
+    background: var(--tbl-row-hover);
+}
+
+/* ------------------------------------------------------------
+   5. GLOBALE KNAPPAR
+   ------------------------------------------------------------ */
+.btn-more,
+.edit-btn {
+    cursor: pointer;
+    font-size: 13px;
+    text-decoration: underline;
+    color: #2563eb;
+}
+
+.btn-more:hover,
+.edit-btn:hover {
+    color: #1d4ed8;
+}
+
+/* ------------------------------------------------------------
+   6. UTILITY-KLASSER
+   ------------------------------------------------------------ */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.nowrap      { white-space: nowrap; }
+
+.muted       { color: #6b7280; }
+
+/* ------------------------------------------------------------
+   7. GLOBALA LAYOUTDELAR
+   ------------------------------------------------------------ */
+.with-drawer-gutter {
+    margin-right: 8px;
+}
+
+.result-info {
+    margin: 6px 0 10px;
+    font-size: 13px;
+}
+

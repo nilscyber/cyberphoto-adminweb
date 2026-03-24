@@ -1,0 +1,12 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+# URL rewriting module activation
+RewriteEngine On
+
+# Sverige
+RewriteRule ^p$ dos_product.php [QSA,L]
+RewriteRule ^k$ dos_customer.php [QSA,L]
+RewriteRule ^o$ dos_order.php [QSA,L]
+
+</IfModule>

@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Split Flap</title>
+    <style>
+        .splitflap {
+            margin: 0 auto;
+
+            -webkit-perspective-origin: top center;
+            -moz-perspective-origin: top center;
+            -ms-perspective-origin: top center;
+            perspective-origin: top center;
+
+            -webkit-perspective: 900px;
+            -moz-perspective: 900px;
+            -ms-perspective: 900px;
+            perspective: 900px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="do-splitflap">Tamron AF SP 24-70/2,8</div>
+
+<script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="js/jquery/jquery.splitflap.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            $('.do-splitflap')
+                    .splitFlap();
+
+            var ratio = 0.5;
+            $('.resized-splitflap')
+                    .splitFlap({
+                        charWidth:  50 * ratio,
+                        charHeight: 100 * ratio,
+                        imageSize:  (2500 * ratio) + 'px ' + (100 * ratio) + 'px'
+                    });
+        });
+    })(jQuery);
+</script>
+
+</body>
+</html>

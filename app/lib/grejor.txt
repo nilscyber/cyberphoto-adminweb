@@ -1,0 +1,1530 @@
+fDibs - sending (new) customer to dibs interface
+Dibs - sending (new) customer to dibs interface
+ --- all predefined variables --- 
+Array
+(
+    [GLOBALS] => Array
+        (
+            [GLOBALS] => Array
+ *RECURSION*
+            [_ENV] => Array
+                (
+                    [TERM] => xterm
+                    [PATH] => /sbin:/usr/sbin:/bin:/usr/bin
+                    [PWD] => /
+                    [LANG] => C
+                    [SHLVL] => 2
+                    [_] => /usr/sbin/httpd
+                )
+
+            [HTTP_ENV_VARS] => Array
+                (
+                    [TERM] => xterm
+                    [PATH] => /sbin:/usr/sbin:/bin:/usr/bin
+                    [PWD] => /
+                    [LANG] => C
+                    [SHLVL] => 2
+                    [_] => /usr/sbin/httpd
+                )
+
+            [TERM] => xterm
+            [PATH] => /sbin:/usr/sbin:/bin:/usr/bin
+            [PWD] => /
+            [LANG] => C
+            [SHLVL] => 2
+            [_] => /usr/sbin/httpd
+            [newcust] => yes
+            [one_stop] => yes
+            [saveTempCustInfo] => yes
+            [sendOrder] => yes
+            [getAddress] => no
+            [new_personnr] => 881010-0514
+            [new_namn] => Rozhgar Abdulrahman
+            [new_co] => Äsperödsvägen 8 B Lgh 1102
+            [new_postnr] => 45134
+            [new_postadr] => Uddevalla
+            [new_mobilnr] => 0760856474
+            [new_email] => roshi__@hotmail.com
+            [foretag] => no
+            [new_nyhetsbreverbjudande] => yes
+            [new_telnr] => 
+            [userName] => 
+            [new_passw] => xz9v3
+            [new_discountCode] => Rabattkod
+            [new_kommentar] => 
+            [deliv] => fraktpost
+            [payment] => kort
+            [levvillkor] => yes
+            [PHPSESSID] => 63bead32eae6a081ba113f99765599fb
+            [LaVisitorNew] => Y
+            [LaSID] => 4ba3d4edc744df12518aa510906mBRkg
+            [websection] => mobil
+            [kundvagn] => grejor:runbox6_d1|1|fraktpost|1
+            [treemenu2] => none open
+            [_ga] => GA1.2.929579976.1418594098
+            [_gat] => 1
+            [LaVisitorId] => 4a2d0124cd9d11077827b505ddd10D1m
+            [REDIRECT_HTTPS] => on
+            [REDIRECT_SSL_TLS_SNI] => www.cyberphoto.se
+            [REDIRECT_STATUS] => 200
+            [HTTPS] => on
+            [SSL_TLS_SNI] => www.cyberphoto.se
+            [SSL_SERVER_S_DN_OU] => GT40744932
+            [SSL_SERVER_S_DN_OU_1] => See www.rapidssl.com/resources/cps (c)14
+            [SSL_SERVER_S_DN_OU_2] => Domain Control Validated - RapidSSL(R)
+            [SSL_SERVER_S_DN_CN] => www.cyberphoto.se
+            [SSL_SERVER_I_DN_C] => US
+            [SSL_SERVER_I_DN_O] => GeoTrust, Inc.
+            [SSL_SERVER_I_DN_CN] => RapidSSL CA
+            [SSL_VERSION_INTERFACE] => mod_ssl/2.2.15
+            [SSL_VERSION_LIBRARY] => OpenSSL/1.0.1e-fips
+            [SSL_PROTOCOL] => TLSv1
+            [SSL_SECURE_RENEG] => true
+            [SSL_COMPRESS_METHOD] => NULL
+            [SSL_CIPHER] => DHE-RSA-AES256-SHA
+            [SSL_CIPHER_EXPORT] => false
+            [SSL_CIPHER_USEKEYSIZE] => 256
+            [SSL_CIPHER_ALGKEYSIZE] => 256
+            [SSL_CLIENT_VERIFY] => NONE
+            [SSL_SERVER_M_VERSION] => 3
+            [SSL_SERVER_M_SERIAL] => 126F72
+            [SSL_SERVER_V_START] => Apr 26 23:54:56 2014 GMT
+            [SSL_SERVER_V_END] => May 29 19:06:17 2015 GMT
+            [SSL_SERVER_S_DN] => /serialNumber=LpSN6ooIlxNhe6xLTNM5P2AKsDL/I9c3/OU=GT40744932/OU=See www.rapidssl.com/resources/cps (c)14/OU=Domain Control Validated - RapidSSL(R)/CN=www.cyberphoto.se
+            [SSL_SERVER_I_DN] => /C=US/O=GeoTrust, Inc./CN=RapidSSL CA
+            [SSL_SERVER_A_KEY] => rsaEncryption
+            [SSL_SERVER_A_SIG] => sha1WithRSAEncryption
+            [SSL_SESSION_ID] => E41BE4D7776AF857B530C8F95BABDD4D335F6805A29D9E6D202E2CF04FBC8A64
+            [HTTP_HOST] => www.cyberphoto.se
+            [HTTP_CONNECTION] => keep-alive
+            [CONTENT_LENGTH] => 457
+            [HTTP_CACHE_CONTROL] => max-age=0
+            [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+            [HTTP_ORIGIN] => https://www.cyberphoto.se
+            [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36
+            [CONTENT_TYPE] => application/x-www-form-urlencoded
+            [HTTP_REFERER] => https://www.cyberphoto.se/kundvagn/checka-ut
+            [HTTP_ACCEPT_ENCODING] => gzip, deflate
+            [HTTP_ACCEPT_LANGUAGE] => sv-SE,sv;q=0.8,en-US;q=0.6,en;q=0.4
+            [HTTP_COOKIE] => PHPSESSID=63bead32eae6a081ba113f99765599fb; LaVisitorNew=Y; LaSID=4ba3d4edc744df12518aa510906mBRkg; websection=mobil; kundvagn=grejor:runbox6_d1%7C1%7Cfraktpost%7C1; treemenu2=none open; _ga=GA1.2.929579976.1418594098; _gat=1; LaVisitorId=4a2d0124cd9d11077827b505ddd10D1m
+            [SERVER_SIGNATURE] => 
+            [SERVER_SOFTWARE] => Apache
+            [SERVER_NAME] => www.cyberphoto.se
+            [SERVER_ADDR] => 192.168.100.60
+            [SERVER_PORT] => 443
+            [REMOTE_ADDR] => 83.252.24.65
+            [DOCUMENT_ROOT] => /home/www
+            [SERVER_ADMIN] => webmaster@cyberphoto.se
+            [SCRIPT_FILENAME] => /home/www/kundvagn/kundvagn.php
+            [REMOTE_PORT] => 60471
+            [REDIRECT_URL] => /kundvagn/checka-ut
+            [GATEWAY_INTERFACE] => CGI/1.1
+            [SERVER_PROTOCOL] => HTTP/1.1
+            [REQUEST_METHOD] => POST
+            [QUERY_STRING] => 
+            [REQUEST_URI] => /kundvagn/checka-ut
+            [SCRIPT_NAME] => /kundvagn/kundvagn.php
+            [PHP_SELF] => /kundvagn/kundvagn.php
+            [REQUEST_TIME] => 1419110493
+            [argv] => Array
+                (
+                )
+
+            [argc] => 0
+            [_POST] => Array
+                (
+                    [newcust] => yes
+                    [one_stop] => yes
+                    [saveTempCustInfo] => yes
+                    [sendOrder] => yes
+                    [getAddress] => no
+                    [new_personnr] => 881010-0514
+                    [new_namn] => Rozhgar Abdulrahman
+                    [new_co] => Äsperödsvägen 8 B Lgh 1102
+                    [new_postnr] => 45134
+                    [new_postadr] => Uddevalla
+                    [new_mobilnr] => 0760856474
+                    [new_email] => roshi__@hotmail.com
+                    [foretag] => no
+                    [new_nyhetsbreverbjudande] => yes
+                    [new_telnr] => Telefonnr
+                    [userName] => Användarnamn (valfritt)
+                    [new_passw] => 
+                    [new_discountCode] => Rabattkod
+                    [new_kommentar] => 
+                    [deliv] => fraktpost
+                    [payment] => kort
+                    [levvillkor] => yes
+                )
+
+            [HTTP_POST_VARS] => Array
+                (
+                    [newcust] => yes
+                    [one_stop] => yes
+                    [saveTempCustInfo] => yes
+                    [sendOrder] => yes
+                    [getAddress] => no
+                    [new_personnr] => 881010-0514
+                    [new_namn] => Rozhgar Abdulrahman
+                    [new_co] => Äsperödsvägen 8 B Lgh 1102
+                    [new_postnr] => 45134
+                    [new_postadr] => Uddevalla
+                    [new_mobilnr] => 0760856474
+                    [new_email] => roshi__@hotmail.com
+                    [foretag] => no
+                    [new_nyhetsbreverbjudande] => yes
+                    [new_telnr] => Telefonnr
+                    [userName] => Användarnamn (valfritt)
+                    [new_passw] => 
+                    [new_discountCode] => Rabattkod
+                    [new_kommentar] => 
+                    [deliv] => fraktpost
+                    [payment] => kort
+                    [levvillkor] => yes
+                )
+
+            [_GET] => Array
+                (
+                )
+
+            [HTTP_GET_VARS] => Array
+                (
+                )
+
+            [_COOKIE] => Array
+                (
+                    [PHPSESSID] => 63bead32eae6a081ba113f99765599fb
+                    [LaVisitorNew] => Y
+                    [LaSID] => 4ba3d4edc744df12518aa510906mBRkg
+                    [websection] => mobil
+                    [kundvagn] => grejor:runbox6_d1|1|fraktpost|1
+                    [treemenu2] => none open
+                    [_ga] => GA1.2.929579976.1418594098
+                    [_gat] => 1
+                    [LaVisitorId] => 4a2d0124cd9d11077827b505ddd10D1m
+                )
+
+            [HTTP_COOKIE_VARS] => Array
+                (
+                    [PHPSESSID] => 63bead32eae6a081ba113f99765599fb
+                    [LaVisitorNew] => Y
+                    [LaSID] => 4ba3d4edc744df12518aa510906mBRkg
+                    [websection] => mobil
+                    [kundvagn] => grejor:runbox6_d1|1|fraktpost|1
+                    [treemenu2] => none open
+                    [_ga] => GA1.2.929579976.1418594098
+                    [_gat] => 1
+                    [LaVisitorId] => 4a2d0124cd9d11077827b505ddd10D1m
+                )
+
+            [_SERVER] => Array
+                (
+                    [REDIRECT_HTTPS] => on
+                    [REDIRECT_SSL_TLS_SNI] => www.cyberphoto.se
+                    [REDIRECT_STATUS] => 200
+                    [HTTPS] => on
+                    [SSL_TLS_SNI] => www.cyberphoto.se
+                    [SSL_SERVER_S_DN_OU] => GT40744932
+                    [SSL_SERVER_S_DN_OU_1] => See www.rapidssl.com/resources/cps (c)14
+                    [SSL_SERVER_S_DN_OU_2] => Domain Control Validated - RapidSSL(R)
+                    [SSL_SERVER_S_DN_CN] => www.cyberphoto.se
+                    [SSL_SERVER_I_DN_C] => US
+                    [SSL_SERVER_I_DN_O] => GeoTrust, Inc.
+                    [SSL_SERVER_I_DN_CN] => RapidSSL CA
+                    [SSL_VERSION_INTERFACE] => mod_ssl/2.2.15
+                    [SSL_VERSION_LIBRARY] => OpenSSL/1.0.1e-fips
+                    [SSL_PROTOCOL] => TLSv1
+                    [SSL_SECURE_RENEG] => true
+                    [SSL_COMPRESS_METHOD] => NULL
+                    [SSL_CIPHER] => DHE-RSA-AES256-SHA
+                    [SSL_CIPHER_EXPORT] => false
+                    [SSL_CIPHER_USEKEYSIZE] => 256
+                    [SSL_CIPHER_ALGKEYSIZE] => 256
+                    [SSL_CLIENT_VERIFY] => NONE
+                    [SSL_SERVER_M_VERSION] => 3
+                    [SSL_SERVER_M_SERIAL] => 126F72
+                    [SSL_SERVER_V_START] => Apr 26 23:54:56 2014 GMT
+                    [SSL_SERVER_V_END] => May 29 19:06:17 2015 GMT
+                    [SSL_SERVER_S_DN] => /serialNumber=LpSN6ooIlxNhe6xLTNM5P2AKsDL/I9c3/OU=GT40744932/OU=See www.rapidssl.com/resources/cps (c)14/OU=Domain Control Validated - RapidSSL(R)/CN=www.cyberphoto.se
+                    [SSL_SERVER_I_DN] => /C=US/O=GeoTrust, Inc./CN=RapidSSL CA
+                    [SSL_SERVER_A_KEY] => rsaEncryption
+                    [SSL_SERVER_A_SIG] => sha1WithRSAEncryption
+                    [SSL_SESSION_ID] => E41BE4D7776AF857B530C8F95BABDD4D335F6805A29D9E6D202E2CF04FBC8A64
+                    [HTTP_HOST] => www.cyberphoto.se
+                    [HTTP_CONNECTION] => keep-alive
+                    [CONTENT_LENGTH] => 457
+                    [HTTP_CACHE_CONTROL] => max-age=0
+                    [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+                    [HTTP_ORIGIN] => https://www.cyberphoto.se
+                    [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36
+                    [CONTENT_TYPE] => application/x-www-form-urlencoded
+                    [HTTP_REFERER] => https://www.cyberphoto.se/kundvagn/checka-ut
+                    [HTTP_ACCEPT_ENCODING] => gzip, deflate
+                    [HTTP_ACCEPT_LANGUAGE] => sv-SE,sv;q=0.8,en-US;q=0.6,en;q=0.4
+                    [HTTP_COOKIE] => PHPSESSID=63bead32eae6a081ba113f99765599fb; LaVisitorNew=Y; LaSID=4ba3d4edc744df12518aa510906mBRkg; websection=mobil; kundvagn=grejor:runbox6_d1%7C1%7Cfraktpost%7C1; treemenu2=none open; _ga=GA1.2.929579976.1418594098; _gat=1; LaVisitorId=4a2d0124cd9d11077827b505ddd10D1m
+                    [PATH] => /sbin:/usr/sbin:/bin:/usr/bin
+                    [SERVER_SIGNATURE] => 
+                    [SERVER_SOFTWARE] => Apache
+                    [SERVER_NAME] => www.cyberphoto.se
+                    [SERVER_ADDR] => 192.168.100.60
+                    [SERVER_PORT] => 443
+                    [REMOTE_ADDR] => 83.252.24.65
+                    [DOCUMENT_ROOT] => /home/www
+                    [SERVER_ADMIN] => webmaster@cyberphoto.se
+                    [SCRIPT_FILENAME] => /home/www/kundvagn/kundvagn.php
+                    [REMOTE_PORT] => 60471
+                    [REDIRECT_URL] => /kundvagn/checka-ut
+                    [GATEWAY_INTERFACE] => CGI/1.1
+                    [SERVER_PROTOCOL] => HTTP/1.1
+                    [REQUEST_METHOD] => POST
+                    [QUERY_STRING] => 
+                    [REQUEST_URI] => /kundvagn/checka-ut
+                    [SCRIPT_NAME] => /kundvagn/kundvagn.php
+                    [PHP_SELF] => /kundvagn/kundvagn.php
+                    [REQUEST_TIME] => 1419110493
+                    [argv] => Array
+                        (
+                        )
+
+                    [argc] => 0
+                )
+
+            [HTTP_SERVER_VARS] => Array
+                (
+                    [REDIRECT_HTTPS] => on
+                    [REDIRECT_SSL_TLS_SNI] => www.cyberphoto.se
+                    [REDIRECT_STATUS] => 200
+                    [HTTPS] => on
+                    [SSL_TLS_SNI] => www.cyberphoto.se
+                    [SSL_SERVER_S_DN_OU] => GT40744932
+                    [SSL_SERVER_S_DN_OU_1] => See www.rapidssl.com/resources/cps (c)14
+                    [SSL_SERVER_S_DN_OU_2] => Domain Control Validated - RapidSSL(R)
+                    [SSL_SERVER_S_DN_CN] => www.cyberphoto.se
+                    [SSL_SERVER_I_DN_C] => US
+                    [SSL_SERVER_I_DN_O] => GeoTrust, Inc.
+                    [SSL_SERVER_I_DN_CN] => RapidSSL CA
+                    [SSL_VERSION_INTERFACE] => mod_ssl/2.2.15
+                    [SSL_VERSION_LIBRARY] => OpenSSL/1.0.1e-fips
+                    [SSL_PROTOCOL] => TLSv1
+                    [SSL_SECURE_RENEG] => true
+                    [SSL_COMPRESS_METHOD] => NULL
+                    [SSL_CIPHER] => DHE-RSA-AES256-SHA
+                    [SSL_CIPHER_EXPORT] => false
+                    [SSL_CIPHER_USEKEYSIZE] => 256
+                    [SSL_CIPHER_ALGKEYSIZE] => 256
+                    [SSL_CLIENT_VERIFY] => NONE
+                    [SSL_SERVER_M_VERSION] => 3
+                    [SSL_SERVER_M_SERIAL] => 126F72
+                    [SSL_SERVER_V_START] => Apr 26 23:54:56 2014 GMT
+                    [SSL_SERVER_V_END] => May 29 19:06:17 2015 GMT
+                    [SSL_SERVER_S_DN] => /serialNumber=LpSN6ooIlxNhe6xLTNM5P2AKsDL/I9c3/OU=GT40744932/OU=See www.rapidssl.com/resources/cps (c)14/OU=Domain Control Validated - RapidSSL(R)/CN=www.cyberphoto.se
+                    [SSL_SERVER_I_DN] => /C=US/O=GeoTrust, Inc./CN=RapidSSL CA
+                    [SSL_SERVER_A_KEY] => rsaEncryption
+                    [SSL_SERVER_A_SIG] => sha1WithRSAEncryption
+                    [SSL_SESSION_ID] => E41BE4D7776AF857B530C8F95BABDD4D335F6805A29D9E6D202E2CF04FBC8A64
+                    [HTTP_HOST] => www.cyberphoto.se
+                    [HTTP_CONNECTION] => keep-alive
+                    [CONTENT_LENGTH] => 457
+                    [HTTP_CACHE_CONTROL] => max-age=0
+                    [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+                    [HTTP_ORIGIN] => https://www.cyberphoto.se
+                    [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36
+                    [CONTENT_TYPE] => application/x-www-form-urlencoded
+                    [HTTP_REFERER] => https://www.cyberphoto.se/kundvagn/checka-ut
+                    [HTTP_ACCEPT_ENCODING] => gzip, deflate
+                    [HTTP_ACCEPT_LANGUAGE] => sv-SE,sv;q=0.8,en-US;q=0.6,en;q=0.4
+                    [HTTP_COOKIE] => PHPSESSID=63bead32eae6a081ba113f99765599fb; LaVisitorNew=Y; LaSID=4ba3d4edc744df12518aa510906mBRkg; websection=mobil; kundvagn=grejor:runbox6_d1%7C1%7Cfraktpost%7C1; treemenu2=none open; _ga=GA1.2.929579976.1418594098; _gat=1; LaVisitorId=4a2d0124cd9d11077827b505ddd10D1m
+                    [PATH] => /sbin:/usr/sbin:/bin:/usr/bin
+                    [SERVER_SIGNATURE] => 
+                    [SERVER_SOFTWARE] => Apache
+                    [SERVER_NAME] => www.cyberphoto.se
+                    [SERVER_ADDR] => 192.168.100.60
+                    [SERVER_PORT] => 443
+                    [REMOTE_ADDR] => 83.252.24.65
+                    [DOCUMENT_ROOT] => /home/www
+                    [SERVER_ADMIN] => webmaster@cyberphoto.se
+                    [SCRIPT_FILENAME] => /home/www/kundvagn/kundvagn.php
+                    [REMOTE_PORT] => 60471
+                    [REDIRECT_URL] => /kundvagn/checka-ut
+                    [GATEWAY_INTERFACE] => CGI/1.1
+                    [SERVER_PROTOCOL] => HTTP/1.1
+                    [REQUEST_METHOD] => POST
+                    [QUERY_STRING] => 
+                    [REQUEST_URI] => /kundvagn/checka-ut
+                    [SCRIPT_NAME] => /kundvagn/kundvagn.php
+                    [PHP_SELF] => /kundvagn/kundvagn.php
+                    [REQUEST_TIME] => 1419110493
+                    [argv] => Array
+                        (
+                        )
+
+                    [argc] => 0
+                )
+
+            [_FILES] => Array
+                (
+                )
+
+            [HTTP_POST_FILES] => Array
+                (
+                )
+
+            [_REQUEST] => Array
+                (
+                    [newcust] => yes
+                    [one_stop] => yes
+                    [saveTempCustInfo] => yes
+                    [sendOrder] => yes
+                    [getAddress] => no
+                    [new_personnr] => 881010-0514
+                    [new_namn] => Rozhgar Abdulrahman
+                    [new_co] => Äsperödsvägen 8 B Lgh 1102
+                    [new_postnr] => 45134
+                    [new_postadr] => Uddevalla
+                    [new_mobilnr] => 0760856474
+                    [new_email] => roshi__@hotmail.com
+                    [foretag] => no
+                    [new_nyhetsbreverbjudande] => yes
+                    [new_telnr] => Telefonnr
+                    [userName] => Användarnamn (valfritt)
+                    [new_passw] => 
+                    [new_discountCode] => Rabattkod
+                    [new_kommentar] => 
+                    [deliv] => fraktpost
+                    [payment] => kort
+                    [levvillkor] => yes
+                    [PHPSESSID] => 63bead32eae6a081ba113f99765599fb
+                    [LaVisitorNew] => Y
+                    [LaSID] => 4ba3d4edc744df12518aa510906mBRkg
+                    [websection] => mobil
+                    [kundvagn] => grejor:runbox6_d1|1|fraktpost|1
+                    [treemenu2] => none open
+                    [_ga] => GA1.2.929579976.1418594098
+                    [_gat] => 1
+                    [LaVisitorId] => 4a2d0124cd9d11077827b505ddd10D1m
+                )
+
+            [printview] => 
+            [frameless] => 1
+            [can_not_order] => 
+            [oldparams] => 
+            [fi] => 
+            [conn_my] => Resource id #16
+            [conn_ms] => Resource id #17
+            [conn_fi] => Resource id #17
+            [conn_master] => Resource id #18
+            [conn_standard] => Resource id #17
+            [conn_string] => host=localhost port=5432 dbname=adempiere user=adempiere password=cyber67shot 
+            [conn_ad] => Resource id #13
+            [web_adempiere] => CWebAdempiere Object
+                (
+                    [conn_my] => Resource id #14
+                    [conn_ad] => Resource id #13
+                )
+
+            [mobile] => CMobile Object
+                (
+                    [conn_my] => Resource id #74
+                    [conn_my2] => Resource id #75
+                )
+
+            [sub] => CCategories Object
+                (
+                )
+
+            [HTTP_SESSION_VARS] => Array
+                (
+                    [kundnrladdaom] => 
+                    [ordernrladdaom] => 
+                    [kundnrsave] => 957882
+                    [confirm] => 1
+                    [old_namn] => Rozhgar Abdulrahman
+                    [old_co] => Äsperödsvägen 8 B Lgh 1102
+                    [old_adress] => 
+                    [old_postnr] => 45134
+                    [old_postadr] => Uddevalla
+                    [old_land_id] => 46
+                    [old_email] => roshi__@hotmail.com
+                    [old_telnr] => 
+                    [old_orgnr] => 881010-0514
+                    [old_lnamn] => Rozhgar Abdulrahman
+                    [old_lco] => Äsperödsvägen 8 B Lgh 1102
+                    [old_ladress] => 
+                    [old_lpostnr] => 45134
+                    [old_lpostadr] => Uddevalla
+                    [old_lland_id] => 46
+                    [old_ltelnr] => 
+                    [old_lemail] => roshi__@hotmail.com
+                    [old_levadress] => 
+                    [old_faktadress] => 
+                    [old_land] => Sverige
+                    [old_land_fi] => Ruotsi
+                    [old_lland] => Sverige
+                    [old_lland_fi] => Ruotsi
+                    [old_faktura] => 
+                    [order_erref] => 
+                    [order_erordernr] => 
+                    [order_kommentar] => 
+                    [paketref] => 
+                    [betalsatt] => 
+                    [spara_uppgifter] => 
+                    [old_faktlev] => 
+                    [intern] => 
+                    [old_foretag] => 0
+                    [old_userName] => 
+                    [SesCc] => 
+                    [SesExpM] => 
+                    [SesExpY] => 
+                    [SesCcCode] => 
+                    [kortfax] => 
+                    [old_nyhetsbrev] => -1
+                    [CcName] => 
+                    [old_avtalskund] => 
+                    [old_mobilnr] => 0760856474
+                    [old_sms] => 0
+                    [old_nyhetsbreverbjudande] => -1
+                    [old_forsakringserbjudande] => 0
+                    [senasteLevsatt] => 0
+                    [senasteBetalsatt] => 0
+                    [pay] => kort
+                    [freight] => fraktpost
+                    [pallDelivery] => 
+                    [discountCode] => 
+                    [discountCodeStatus] => 
+                    [campaignNr] => 
+                    [campaignQuestionResult] => 
+                    [basketValue] => 4855.2
+                    [old_villkor_id] => 5
+                    [old_forsakring_new] => 0
+                    [old_choose_villkor] => 
+                    [old_firstName] => Rozhgar
+                    [old_lastName] => Abdulrahman
+                    [old_firstNameDel] => Rozhgar
+                    [old_lastNameDel] => Abdulrahman
+                    [old_email_test] => 
+                    [old_personnr] => 881010-0514
+                    [old_salary] => 0
+                    [old_avisera] => 0
+                    [old_splitOrder] => 
+                    [articles] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [0] => runbox6_d1
+                                    [1] => 1
+                                    [2] => 1000183
+                                    [3] => 336
+                                )
+
+                            [1] => Array
+                                (
+                                    [0] => fraktpost
+                                    [1] => 1
+                                    [2] => 80
+                                    [3] => 314
+                                )
+
+                        )
+
+                    [old_abbtype] => 
+                    [old_abbnumber] => 
+                    [old_simnumber] => 
+                    [old_preskort] => 0
+                    [old_preskortdel1] => 
+                    [old_preskortdel2] => 
+                    [old_preskortdel3] => 
+                    [old_preskortdel4] => 
+                    [old_presenkort] => 
+                    [old_giftcardrebate] => 0
+                    [old_operator] => 
+                    [old_one_stop] => -1
+                    [old_abbpersonnumber] => 
+                    [old_invoice_address] => 
+                    [old_delivery_address] => 
+                    [order_check] => 
+                    [currentLocale] => sv_SE
+                    [infoArtnr] => 
+                    [fliken] => 
+                    [MOB_FTG] => 0
+                    [MOB_PHONE] => runbox6_d1
+                    [MOB_OP] => 
+                    [MOB_TYPE] => 
+                    [MOB_AB] => 0
+                    [MOB_PLAN_ID] => 151
+                    [MOB_FMA] => 
+                    [MOB_PRICE] => 5990
+                    [MOB_DIFF] => 0
+                    [MOB_DIFF_COUNT] => -4791.2
+                    [giftCard] => 
+                    [giftCardReceiver] => 
+                    [CKreditor] => CSvea Object
+                        (
+                            [test] => 
+                            [sveaUserName] => CYBERPHOTOAB
+                            [sveaPassword] => fns43lk9rt
+                            [sveaAccountNo] => 76222
+                            [wsdlLink] => https://webservices.sveaekonomi.se/webpay/sveawebpay.asmx?WSDL
+                            [AddressSelector] => 1D74D1C778E6A7E3901CCBE8856C9D140EF7A3E9
+                            [BusinessType] => Person
+                            [sveaAddressObj] => 
+                            [lowestMonthlyAnnuityFactor] => 1000
+                            [SveaOrderId] => 
+                            [SveaAccepted] => 
+                            [SveaErrorMessage] => 
+                            [SveaResultCode] => 
+                            [SveaCampaignCode] => 
+                            [sveaInvoiceAddress] => Array
+                                (
+                                    [0] => stdClass Object
+                                        (
+                                            [LegalName] => Abdulrahman Rozhgar
+                                            [SecurityNumber] => 8810100514
+                                            [AddressLine2] => Ã„sperÃ¶dsvÃ¤gen 8 B Lgh 1102
+                                            [Postcode] => 45134
+                                            [Postarea] => Uddevalla
+                                            [BusinessType] => Person
+                                            [AddressSelector] => 1D74D1C778E6A7E3901CCBE8856C9D140EF7A3E9
+                                            [FirstName] => Rozhgar
+                                            [LastName] => Abdulrahman
+                                        )
+
+                                )
+
+                            [sveaReservedAmount] => 
+                            [sveaExpirationDate] => 
+                            [sveaCustomerIdentity] => 
+                            [sveaVerifiedAddress] => 1
+                            [pclass] => 
+                            [kreditor_result] => 
+                            [kreditor_result_text] => 
+                            [kreditor_status] => 
+                            [payment_period] => 
+                            [cust_pno] => 881010-0514
+                            [cust_addresses] => Array
+                                (
+                                    [0] => Array
+                                        (
+                                            [0] => Rozhgar
+                                            [1] => Abdulrahman
+                                            [2] => Äsperödsvägen 8 B Lgh 1102
+                                            [3] => 
+                                            [4] => 45134
+                                            [5] => Uddevalla
+                                            [6] => 
+                                            [7] => Äsperödsvägen 8 B Lgh 1102
+                                            [8] => Abdulrahman Rozhgar
+                                        )
+
+                                )
+
+                            [cust_ysalary] => 
+                            [incorrect_pno] => 
+                            [err_message] => 
+                            [trials] => 0
+                            [creditVerified] => 0
+                            [periodic_pay] => 
+                            [invoice_pay] => 
+                            [monthlyRate] => 0
+                            [orderId] => 0
+                            [conn_standard] => 
+                        )
+
+                    [dibs] => CDebiTech Object
+                        (
+                            [md5Key] => 92A1C0372A4FBCF9D98086475A96E6AA9E636F93
+                            [sha1Key] => D346F3325070D714EF5D61DC7CC1BAAE7A1E8CC1
+                            [sum] => 
+                            [currency] => 
+                            [reply] => 
+                            [verifyId] => 
+                            [referenceData] => 
+                            [returnUrl] => Array
+                                (
+                                    [FI] => https://www.cyberphoto.fi/kundvagn/check-out
+                                    [SE] => https://www.cyberphoto.se/kundvagn/checka-ut
+                                    [NO] => https://www.cyberphoto.no/kundvagn/sjekk-ut
+                                    [DEFAULT] => https://www.cyberphoto.se/kundvagn/checka-ut
+                                )
+
+                            [returnUrlRetry] => Array
+                                (
+                                    [FI] => https://www.cyberphoto.fi/kundvagn/minun-sivu
+                                    [SE] => https://www.cyberphoto.se/kundvagn/min-sida
+                                    [NO] => https://www.cyberphoto.no/kundvagn/min-side
+                                    [DEFAULT] => https://www.cyberphoto.se/kundvagn/min-sida
+                                )
+
+                            [returnUrlDirect] => Array
+                                (
+                                    [FI] => https://www.cyberphoto.fi/kundvagn/tilaukseni-tila
+                                    [SE] => https://www.cyberphoto.se/kundvagn/min-orderstatus
+                                    [NO] => https://www.cyberphoto.no/kundvagn/min-ordrestatus
+                                    [DEFAULT] => https://www.cyberphoto.se/kundvagn/min-orderstatus
+                                )
+
+                            [orderId] => 0
+                            [finalOrdernr] => 0
+                            [verified] => 
+                            [invoiceRows] => 
+                            [rounding] => 
+                            [external_reference] => 
+                            [errorMess] => 
+                            [payment_reference_id] => 
+                            [payment_method] => 
+                            [totalSum] => 
+                            [total] => 
+                            [totalTax] => 
+                            [payment_name] => 
+                            [address1] => 
+                            [city] => 
+                            [country_iso_code] => 
+                            [postal] => 
+                            [shipping_zipcode] => 
+                            [payment_phone] => 
+                            [payment_email] => 
+                            [payment_firstName] => 
+                            [payment_lastName] => 
+                            [status] => 
+                            [payment_date] => 
+                            [comment] => 
+                            [payment_address_confirmed] => 
+                            [return_url] => https://www.cyberphoto.se/?/kundvagn/kundvagn.php?site=desktop
+                        )
+
+                    [CBasket] => CBasket Object
+                        (
+                            [conn_ms] => 
+                            [conn_my] => 
+                            [conn_fi] => 
+                            [conn_master] => 
+                            [confirm] => 
+                            [kundnrsave] => 
+                            [ber_lev_datum] => 
+                            [prec] => 
+                            [completeOrder] => 
+                            [includedArticles] => 
+                            [freeFreight] => 
+                            [basketValue] => 4855.2
+                            [mobilabonnemang] => 
+                            [aldersgrans] => 
+                            [mobilabb] => 
+                            [abbtelia] => 
+                            [abbtele2] => 
+                            [abbhalebop] => 
+                            [check_extra_freight] => 
+                            [accept_canon] => 
+                            [isInsurable] => 
+                            [isGiftcard] => 
+                        )
+
+                )
+
+            [_SESSION] => Array
+                (
+                    [kundnrladdaom] => 
+                    [ordernrladdaom] => 
+                    [kundnrsave] => 957882
+                    [confirm] => 1
+                    [old_namn] => Rozhgar Abdulrahman
+                    [old_co] => Äsperödsvägen 8 B Lgh 1102
+                    [old_adress] => 
+                    [old_postnr] => 45134
+                    [old_postadr] => Uddevalla
+                    [old_land_id] => 46
+                    [old_email] => roshi__@hotmail.com
+                    [old_telnr] => 
+                    [old_orgnr] => 881010-0514
+                    [old_lnamn] => Rozhgar Abdulrahman
+                    [old_lco] => Äsperödsvägen 8 B Lgh 1102
+                    [old_ladress] => 
+                    [old_lpostnr] => 45134
+                    [old_lpostadr] => Uddevalla
+                    [old_lland_id] => 46
+                    [old_ltelnr] => 
+                    [old_lemail] => roshi__@hotmail.com
+                    [old_levadress] => 
+                    [old_faktadress] => 
+                    [old_land] => Sverige
+                    [old_land_fi] => Ruotsi
+                    [old_lland] => Sverige
+                    [old_lland_fi] => Ruotsi
+                    [old_faktura] => 
+                    [order_erref] => 
+                    [order_erordernr] => 
+                    [order_kommentar] => 
+                    [paketref] => 
+                    [betalsatt] => 
+                    [spara_uppgifter] => 
+                    [old_faktlev] => 
+                    [intern] => 
+                    [old_foretag] => 0
+                    [old_userName] => 
+                    [SesCc] => 
+                    [SesExpM] => 
+                    [SesExpY] => 
+                    [SesCcCode] => 
+                    [kortfax] => 
+                    [old_nyhetsbrev] => -1
+                    [CcName] => 
+                    [old_avtalskund] => 
+                    [old_mobilnr] => 0760856474
+                    [old_sms] => 0
+                    [old_nyhetsbreverbjudande] => -1
+                    [old_forsakringserbjudande] => 0
+                    [senasteLevsatt] => 0
+                    [senasteBetalsatt] => 0
+                    [pay] => kort
+                    [freight] => fraktpost
+                    [pallDelivery] => 
+                    [discountCode] => 
+                    [discountCodeStatus] => 
+                    [campaignNr] => 
+                    [campaignQuestionResult] => 
+                    [basketValue] => 4855.2
+                    [old_villkor_id] => 5
+                    [old_forsakring_new] => 0
+                    [old_choose_villkor] => 
+                    [old_firstName] => Rozhgar
+                    [old_lastName] => Abdulrahman
+                    [old_firstNameDel] => Rozhgar
+                    [old_lastNameDel] => Abdulrahman
+                    [old_email_test] => 
+                    [old_personnr] => 881010-0514
+                    [old_salary] => 0
+                    [old_avisera] => 0
+                    [old_splitOrder] => 
+                    [articles] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [0] => runbox6_d1
+                                    [1] => 1
+                                    [2] => 1000183
+                                    [3] => 336
+                                )
+
+                            [1] => Array
+                                (
+                                    [0] => fraktpost
+                                    [1] => 1
+                                    [2] => 80
+                                    [3] => 314
+                                )
+
+                        )
+
+                    [old_abbtype] => 
+                    [old_abbnumber] => 
+                    [old_simnumber] => 
+                    [old_preskort] => 0
+                    [old_preskortdel1] => 
+                    [old_preskortdel2] => 
+                    [old_preskortdel3] => 
+                    [old_preskortdel4] => 
+                    [old_presenkort] => 
+                    [old_giftcardrebate] => 0
+                    [old_operator] => 
+                    [old_one_stop] => -1
+                    [old_abbpersonnumber] => 
+                    [old_invoice_address] => 
+                    [old_delivery_address] => 
+                    [order_check] => 
+                    [currentLocale] => sv_SE
+                    [infoArtnr] => 
+                    [fliken] => 
+                    [MOB_FTG] => 0
+                    [MOB_PHONE] => runbox6_d1
+                    [MOB_OP] => 
+                    [MOB_TYPE] => 
+                    [MOB_AB] => 0
+                    [MOB_PLAN_ID] => 151
+                    [MOB_FMA] => 
+                    [MOB_PRICE] => 5990
+                    [MOB_DIFF] => 0
+                    [MOB_DIFF_COUNT] => -4791.2
+                    [giftCard] => 
+                    [giftCardReceiver] => 
+                    [CKreditor] => CSvea Object
+                        (
+                            [test] => 
+                            [sveaUserName] => CYBERPHOTOAB
+                            [sveaPassword] => fns43lk9rt
+                            [sveaAccountNo] => 76222
+                            [wsdlLink] => https://webservices.sveaekonomi.se/webpay/sveawebpay.asmx?WSDL
+                            [AddressSelector] => 1D74D1C778E6A7E3901CCBE8856C9D140EF7A3E9
+                            [BusinessType] => Person
+                            [sveaAddressObj] => 
+                            [lowestMonthlyAnnuityFactor] => 1000
+                            [SveaOrderId] => 
+                            [SveaAccepted] => 
+                            [SveaErrorMessage] => 
+                            [SveaResultCode] => 
+                            [SveaCampaignCode] => 
+                            [sveaInvoiceAddress] => Array
+                                (
+                                    [0] => stdClass Object
+                                        (
+                                            [LegalName] => Abdulrahman Rozhgar
+                                            [SecurityNumber] => 8810100514
+                                            [AddressLine2] => Ã„sperÃ¶dsvÃ¤gen 8 B Lgh 1102
+                                            [Postcode] => 45134
+                                            [Postarea] => Uddevalla
+                                            [BusinessType] => Person
+                                            [AddressSelector] => 1D74D1C778E6A7E3901CCBE8856C9D140EF7A3E9
+                                            [FirstName] => Rozhgar
+                                            [LastName] => Abdulrahman
+                                        )
+
+                                )
+
+                            [sveaReservedAmount] => 
+                            [sveaExpirationDate] => 
+                            [sveaCustomerIdentity] => 
+                            [sveaVerifiedAddress] => 1
+                            [pclass] => 
+                            [kreditor_result] => 
+                            [kreditor_result_text] => 
+                            [kreditor_status] => 
+                            [payment_period] => 
+                            [cust_pno] => 881010-0514
+                            [cust_addresses] => Array
+                                (
+                                    [0] => Array
+                                        (
+                                            [0] => Rozhgar
+                                            [1] => Abdulrahman
+                                            [2] => Äsperödsvägen 8 B Lgh 1102
+                                            [3] => 
+                                            [4] => 45134
+                                            [5] => Uddevalla
+                                            [6] => 
+                                            [7] => Äsperödsvägen 8 B Lgh 1102
+                                            [8] => Abdulrahman Rozhgar
+                                        )
+
+                                )
+
+                            [cust_ysalary] => 
+                            [incorrect_pno] => 
+                            [err_message] => 
+                            [trials] => 0
+                            [creditVerified] => 0
+                            [periodic_pay] => 
+                            [invoice_pay] => 
+                            [monthlyRate] => 0
+                            [orderId] => 0
+                            [conn_standard] => 
+                        )
+
+                    [dibs] => CDebiTech Object
+                        (
+                            [md5Key] => 92A1C0372A4FBCF9D98086475A96E6AA9E636F93
+                            [sha1Key] => D346F3325070D714EF5D61DC7CC1BAAE7A1E8CC1
+                            [sum] => 
+                            [currency] => 
+                            [reply] => 
+                            [verifyId] => 
+                            [referenceData] => 
+                            [returnUrl] => Array
+                                (
+                                    [FI] => https://www.cyberphoto.fi/kundvagn/check-out
+                                    [SE] => https://www.cyberphoto.se/kundvagn/checka-ut
+                                    [NO] => https://www.cyberphoto.no/kundvagn/sjekk-ut
+                                    [DEFAULT] => https://www.cyberphoto.se/kundvagn/checka-ut
+                                )
+
+                            [returnUrlRetry] => Array
+                                (
+                                    [FI] => https://www.cyberphoto.fi/kundvagn/minun-sivu
+                                    [SE] => https://www.cyberphoto.se/kundvagn/min-sida
+                                    [NO] => https://www.cyberphoto.no/kundvagn/min-side
+                                    [DEFAULT] => https://www.cyberphoto.se/kundvagn/min-sida
+                                )
+
+                            [returnUrlDirect] => Array
+                                (
+                                    [FI] => https://www.cyberphoto.fi/kundvagn/tilaukseni-tila
+                                    [SE] => https://www.cyberphoto.se/kundvagn/min-orderstatus
+                                    [NO] => https://www.cyberphoto.no/kundvagn/min-ordrestatus
+                                    [DEFAULT] => https://www.cyberphoto.se/kundvagn/min-orderstatus
+                                )
+
+                            [orderId] => 0
+                            [finalOrdernr] => 0
+                            [verified] => 
+                            [invoiceRows] => 
+                            [rounding] => 
+                            [external_reference] => 
+                            [errorMess] => 
+                            [payment_reference_id] => 
+                            [payment_method] => 
+                            [totalSum] => 
+                            [total] => 
+                            [totalTax] => 
+                            [payment_name] => 
+                            [address1] => 
+                            [city] => 
+                            [country_iso_code] => 
+                            [postal] => 
+                            [shipping_zipcode] => 
+                            [payment_phone] => 
+                            [payment_email] => 
+                            [payment_firstName] => 
+                            [payment_lastName] => 
+                            [status] => 
+                            [payment_date] => 
+                            [comment] => 
+                            [payment_address_confirmed] => 
+                            [return_url] => https://www.cyberphoto.se/?/kundvagn/kundvagn.php?site=desktop
+                        )
+
+                    [CBasket] => CBasket Object
+                        (
+                            [conn_ms] => 
+                            [conn_my] => 
+                            [conn_fi] => 
+                            [conn_master] => 
+                            [confirm] => 
+                            [kundnrsave] => 
+                            [ber_lev_datum] => 
+                            [prec] => 
+                            [completeOrder] => 
+                            [includedArticles] => 
+                            [freeFreight] => 
+                            [basketValue] => 4855.2
+                            [mobilabonnemang] => 
+                            [aldersgrans] => 
+                            [mobilabb] => 
+                            [abbtelia] => 
+                            [abbtele2] => 
+                            [abbhalebop] => 
+                            [check_extra_freight] => 
+                            [accept_canon] => 
+                            [isInsurable] => 
+                            [isGiftcard] => 
+                        )
+
+                )
+
+            [kundnrsave] => 957882
+            [confirm] => 1
+            [old_namn] => Rozhgar Abdulrahman
+            [old_co] => Äsperödsvägen 8 B Lgh 1102
+            [old_adress] => 
+            [old_postnr] => 45134
+            [old_postadr] => Uddevalla
+            [old_land_id] => 46
+            [old_email] => roshi__@hotmail.com
+            [old_telnr] => 
+            [old_orgnr] => 881010-0514
+            [old_lnamn] => Rozhgar Abdulrahman
+            [old_lco] => Äsperödsvägen 8 B Lgh 1102
+            [old_ladress] => 
+            [old_lpostnr] => 45134
+            [old_lpostadr] => Uddevalla
+            [old_lland_id] => 46
+            [old_ltelnr] => 
+            [old_lemail] => roshi__@hotmail.com
+            [old_levadress] => 
+            [old_faktadress] => 
+            [old_land] => Sverige
+            [old_land_fi] => Ruotsi
+            [old_lland] => Sverige
+            [old_lland_fi] => Ruotsi
+            [old_faktura] => 
+            [order_erref] => 
+            [order_erordernr] => 
+            [order_kommentar] => 
+            [paketref] => 
+            [betalsatt] => 
+            [spara_uppgifter] => 
+            [old_faktlev] => 
+            [intern] => 
+            [old_foretag] => 0
+            [old_userName] => 
+            [SesCc] => 
+            [SesExpM] => 
+            [SesExpY] => 
+            [SesCcCode] => 
+            [kortfax] => 
+            [old_nyhetsbrev] => -1
+            [CcName] => 
+            [old_avtalskund] => 
+            [old_mobilnr] => 0760856474
+            [old_sms] => 0
+            [old_nyhetsbreverbjudande] => -1
+            [old_forsakringserbjudande] => 0
+            [senasteLevsatt] => 0
+            [senasteBetalsatt] => 0
+            [pay] => kort
+            [freight] => fraktpost
+            [pallDelivery] => 
+            [discountCode] => 
+            [discountCodeStatus] => 
+            [campaignNr] => 
+            [campaignQuestionResult] => 
+            [basketValue] => 4855.2
+            [old_villkor_id] => 5
+            [old_forsakring_new] => 0
+            [old_choose_villkor] => 
+            [old_firstName] => Rozhgar
+            [old_lastName] => Abdulrahman
+            [old_firstNameDel] => Rozhgar
+            [old_lastNameDel] => Abdulrahman
+            [old_email_test] => 
+            [old_personnr] => 881010-0514
+            [old_salary] => 0
+            [old_avisera] => 0
+            [old_splitOrder] => 
+            [articles] => Array
+                (
+                    [0] => Array
+                        (
+                            [0] => runbox6_d1
+                            [1] => 1
+                            [2] => 1000183
+                            [3] => 336
+                        )
+
+                    [1] => Array
+                        (
+                            [0] => fraktpost
+                            [1] => 1
+                            [2] => 80
+                            [3] => 314
+                        )
+
+                )
+
+            [old_abbtype] => 
+            [old_abbnumber] => 
+            [old_simnumber] => 
+            [old_preskort] => 0
+            [old_preskortdel1] => 
+            [old_preskortdel2] => 
+            [old_preskortdel3] => 
+            [old_preskortdel4] => 
+            [old_presenkort] => 
+            [old_giftcardrebate] => 0
+            [old_operator] => 
+            [old_one_stop] => -1
+            [old_abbpersonnumber] => 
+            [old_invoice_address] => 
+            [old_delivery_address] => 
+            [order_check] => 
+            [currentLocale] => sv_SE
+            [infoArtnr] => 
+            [fliken] => 
+            [MOB_FTG] => 0
+            [MOB_PHONE] => runbox6_d1
+            [MOB_OP] => 
+            [MOB_TYPE] => 
+            [MOB_AB] => 0
+            [MOB_PLAN_ID] => 151
+            [MOB_FMA] => 
+            [MOB_PRICE] => 5990
+            [MOB_DIFF] => 0
+            [MOB_DIFF_COUNT] => -4791.2
+            [giftCard] => 
+            [giftCardReceiver] => 
+            [CKreditor] => CSvea Object
+                (
+                    [test] => 
+                    [sveaUserName] => CYBERPHOTOAB
+                    [sveaPassword] => fns43lk9rt
+                    [sveaAccountNo] => 76222
+                    [wsdlLink] => https://webservices.sveaekonomi.se/webpay/sveawebpay.asmx?WSDL
+                    [AddressSelector] => 1D74D1C778E6A7E3901CCBE8856C9D140EF7A3E9
+                    [BusinessType] => Person
+                    [sveaAddressObj] => 
+                    [lowestMonthlyAnnuityFactor] => 1000
+                    [SveaOrderId] => 
+                    [SveaAccepted] => 
+                    [SveaErrorMessage] => 
+                    [SveaResultCode] => 
+                    [SveaCampaignCode] => 
+                    [sveaInvoiceAddress] => Array
+                        (
+                            [0] => stdClass Object
+                                (
+                                    [LegalName] => Abdulrahman Rozhgar
+                                    [SecurityNumber] => 8810100514
+                                    [AddressLine2] => Ã„sperÃ¶dsvÃ¤gen 8 B Lgh 1102
+                                    [Postcode] => 45134
+                                    [Postarea] => Uddevalla
+                                    [BusinessType] => Person
+                                    [AddressSelector] => 1D74D1C778E6A7E3901CCBE8856C9D140EF7A3E9
+                                    [FirstName] => Rozhgar
+                                    [LastName] => Abdulrahman
+                                )
+
+                        )
+
+                    [sveaReservedAmount] => 
+                    [sveaExpirationDate] => 
+                    [sveaCustomerIdentity] => 
+                    [sveaVerifiedAddress] => 1
+                    [pclass] => 
+                    [kreditor_result] => 
+                    [kreditor_result_text] => 
+                    [kreditor_status] => 
+                    [payment_period] => 
+                    [cust_pno] => 881010-0514
+                    [cust_addresses] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [0] => Rozhgar
+                                    [1] => Abdulrahman
+                                    [2] => Äsperödsvägen 8 B Lgh 1102
+                                    [3] => 
+                                    [4] => 45134
+                                    [5] => Uddevalla
+                                    [6] => 
+                                    [7] => Äsperödsvägen 8 B Lgh 1102
+                                    [8] => Abdulrahman Rozhgar
+                                )
+
+                        )
+
+                    [cust_ysalary] => 
+                    [incorrect_pno] => 
+                    [err_message] => 
+                    [trials] => 0
+                    [creditVerified] => 0
+                    [periodic_pay] => 
+                    [invoice_pay] => 
+                    [monthlyRate] => 0
+                    [orderId] => 0
+                    [conn_standard] => 
+                )
+
+            [CBasket] => CBasket Object
+                (
+                    [conn_ms] => 
+                    [conn_my] => 
+                    [conn_fi] => 
+                    [conn_master] => 
+                    [confirm] => 
+                    [kundnrsave] => 
+                    [ber_lev_datum] => 
+                    [prec] => 
+                    [completeOrder] => 
+                    [includedArticles] => 
+                    [freeFreight] => 
+                    [basketValue] => 4855.2
+                    [mobilabonnemang] => 
+                    [aldersgrans] => 
+                    [mobilabb] => 
+                    [abbtelia] => 
+                    [abbtele2] => 
+                    [abbhalebop] => 
+                    [check_extra_freight] => 
+                    [accept_canon] => 
+                    [isInsurable] => 
+                    [isGiftcard] => 
+                )
+
+            [dibs] => CDebiTech Object
+                (
+                    [md5Key] => 92A1C0372A4FBCF9D98086475A96E6AA9E636F93
+                    [sha1Key] => D346F3325070D714EF5D61DC7CC1BAAE7A1E8CC1
+                    [sum] => 
+                    [currency] => 
+                    [reply] => 
+                    [verifyId] => 
+                    [referenceData] => 
+                    [returnUrl] => Array
+                        (
+                            [FI] => https://www.cyberphoto.fi/kundvagn/check-out
+                            [SE] => https://www.cyberphoto.se/kundvagn/checka-ut
+                            [NO] => https://www.cyberphoto.no/kundvagn/sjekk-ut
+                            [DEFAULT] => https://www.cyberphoto.se/kundvagn/checka-ut
+                        )
+
+                    [returnUrlRetry] => Array
+                        (
+                            [FI] => https://www.cyberphoto.fi/kundvagn/minun-sivu
+                            [SE] => https://www.cyberphoto.se/kundvagn/min-sida
+                            [NO] => https://www.cyberphoto.no/kundvagn/min-side
+                            [DEFAULT] => https://www.cyberphoto.se/kundvagn/min-sida
+                        )
+
+                    [returnUrlDirect] => Array
+                        (
+                            [FI] => https://www.cyberphoto.fi/kundvagn/tilaukseni-tila
+                            [SE] => https://www.cyberphoto.se/kundvagn/min-orderstatus
+                            [NO] => https://www.cyberphoto.no/kundvagn/min-ordrestatus
+                            [DEFAULT] => https://www.cyberphoto.se/kundvagn/min-orderstatus
+                        )
+
+                    [orderId] => 0
+                    [finalOrdernr] => 0
+                    [verified] => 
+                    [invoiceRows] => 
+                    [rounding] => 
+                    [external_reference] => 
+                    [errorMess] => 
+                    [payment_reference_id] => 
+                    [payment_method] => 
+                    [totalSum] => 
+                    [total] => 
+                    [totalTax] => 
+                    [payment_name] => 
+                    [address1] => 
+                    [city] => 
+                    [country_iso_code] => 
+                    [postal] => 
+                    [shipping_zipcode] => 
+                    [payment_phone] => 
+                    [payment_email] => 
+                    [payment_firstName] => 
+                    [payment_lastName] => 
+                    [status] => 
+                    [payment_date] => 
+                    [comment] => 
+                    [payment_address_confirmed] => 
+                    [return_url] => https://www.cyberphoto.se/?/kundvagn/kundvagn.php?site=desktop
+                )
+
+            [sv] => 1
+            [no] => 
+            [bask] => CBasket Object
+                (
+                    [conn_ms] => 
+                    [conn_my] => 
+                    [conn_fi] => 
+                    [conn_master] => 
+                    [confirm] => 
+                    [kundnrsave] => 
+                    [ber_lev_datum] => 
+                    [prec] => 
+                    [completeOrder] => 
+                    [includedArticles] => 
+                    [freeFreight] => 
+                    [basketValue] => 4855.2
+                    [mobilabonnemang] => 
+                    [aldersgrans] => 
+                    [mobilabb] => 
+                    [abbtelia] => 
+                    [abbtele2] => 
+                    [abbhalebop] => 
+                    [check_extra_freight] => 
+                    [accept_canon] => 
+                    [isInsurable] => 
+                    [isGiftcard] => 
+                )
+
+            [menu] => CMenu Object
+                (
+                )
+
+            [mostsold] => CMostSoldProducts Object
+                (
+                    [conn_my] => 
+                )
+
+            [departure] => CDeparture Object
+                (
+                    [conn_my] => Resource id #26
+                    [conn_my2] => Resource id #27
+                    [conn_ms] => Resource id #28
+                    [conn_my3] => Resource id #29
+                )
+
+            [start] => CCheckStart Object
+                (
+                    [conn_my] => Resource id #30
+                    [conn_my2] => Resource id #31
+                )
+
+            [front] => CMostSoldFront Object
+                (
+                    [conn_my] => 
+                )
+
+            [news] => CNews Object
+                (
+                )
+
+            [pricelist] => CPricelist Object
+                (
+                    [conn_my] => Resource id #32
+                )
+
+            [csearch] => CSearchLogg Object
+                (
+                    [conn_my] => Resource id #33
+                    [conn_my2] => Resource id #34
+                )
+
+            [price] => CPriceSelected Object
+                (
+                    [conn_my] => Resource id #35
+                )
+
+            [order] => CStatus Object
+                (
+                )
+
+            [blogg] => CBlogg Object
+                (
+                    [conn_my] => Resource id #36
+                    [conn_my2] => Resource id #37
+                    [conn_my3] => 
+                    [conn_fi] => 
+                )
+
+            [faq] => CFaq Object
+                (
+                    [conn_my] => Resource id #42
+                    [conn_my2] => Resource id #41
+                )
+
+            [campaign] => CCampaignCheck Object
+                (
+                    [conn_my] => Resource id #46
+                    [conn_ad] => Resource id #13
+                )
+
+            [style] => CStyleCode Object
+                (
+                    [conn_my] => Resource id #50
+                    [conn_ms] => Resource id #51
+                    [conn_fi] => Resource id #51
+                )
+
+            [product] => CProduct Object
+                (
+                )
+
+            [passwd] => PasswordEncryption Object
+                (
+                    [conn_master] => 
+                    [conn_standard] => 
+                    [executingPage] => /login/
+                    [passwd_life_length] => 1
+                    [max_trials] => 5
+                    [verified_customer] => 
+                    [error_mess] => 
+                    [passwd_recovery_id] => 
+                    [sourcePage] => 
+                    [Cinputvalue] => 
+                )
+
+            [newsletter] => CNewsLetter Object
+                (
+                    [conn_ms] => Resource id #53
+                    [conn_my] => Resource id #52
+                    [conn_master] => Resource id #54
+                )
+
+            [webkolli] => CWebKollinr Object
+                (
+                )
+
+            [products] => CProduct Object
+                (
+                )
+
+            [banners] => CBanners Object
+                (
+                )
+
+            [samsung_products] => CGetProducts Object
+                (
+                    [conn_my] => Resource id #55
+                )
+
+            [tech] => CTechnicalData Object
+                (
+                )
+
+            [posten] => CPosten Object
+                (
+                )
+
+            [message] => CMessage Object
+                (
+                )
+
+            [cms] => CCms Object
+                (
+                )
+
+            [to_launch_seconds] => -33
+            [to_launch_days] => -296
+            [to_launch_hours] => -6
+            [to_launch_minutes] => -22
+            [to_launch] => Nya sajten är lanserad
+            [protocol] => https
+            [host] => www.cyberphoto.se
+            [script] => /kundvagn/checka-ut
+            [currentUrl] => https://www.cyberphoto.se/kundvagn/checka-ut
+            [firstvariable] => ?
+            [q] => Sök här
+            [mobil] => 1
+            [hobby] => 
+            [batterier] => 
+            [cybairgun] => 
+            [logolinc] => mobiltelefoni
+            [section_linc_foto] => foto-video
+            [section_linc_mobil] => mobiltelefoni
+            [section_linc_batterier] => batterier
+            [section_linc_hobby] => jakt-fritid
+            [section_linc_cybairgun] => cybairgun
+            [headlinc] => http://www.cyberphoto.se/mobiltelefoni
+            [loginlinc] => https://www.cyberphoto.se/kundvagn/logga-in
+            [basketlinc] => https://www.cyberphoto.se/kundvagn/checka-ut
+            [pspn] => topp_pspn
+            [topp_panel] => topp_panel_foto
+            [pagetitle_name] => Kundvagnen - Checka ut
+            [pagetitle] => 
+            [kundv] => checka-ut
+            [thx_page] => tack-for-din-bestallning
+            [matches] => Array
+                (
+                    [0] => grejor:runbox6_d1|1|fraktpost|1
+                    [1] => grejor:
+                    [2] => runbox6_d1|1|fraktpost|1
+                )
+
+            [make_invoice_preselected] => 
+            [presentkort] => CPresentKort Object
+                (
+                    [conn_ms] => Resource id #77
+                    [conn_my] => Resource id #76
+                    [conn_fi] => Resource id #77
+                    [conn_my2] => Resource id #78
+                    [GiftCardOk] => 
+                    [conn_master] => Resource id #79
+                    [GiftCardUsed] => 
+                )
+
+            [kreditor] => CSvea Object
+                (
+                    [test] => 
+                    [sveaUserName] => CYBERPHOTOAB
+                    [sveaPassword] => fns43lk9rt
+                    [sveaAccountNo] => 76222
+                    [wsdlLink] => https://webservices.sveaekonomi.se/webpay/sveawebpay.asmx?WSDL
+                    [AddressSelector] => 1D74D1C778E6A7E3901CCBE8856C9D140EF7A3E9
+                    [BusinessType] => Person
+                    [sveaAddressObj] => 
+                    [lowestMonthlyAnnuityFactor] => 1000
+                    [SveaOrderId] => 
+                    [SveaAccepted] => 
+                    [SveaErrorMessage] => 
+                    [SveaResultCode] => 
+                    [SveaCampaignCode] => 
+                    [sveaInvoiceAddress] => Array
+                        (
+                            [0] => stdClass Object
+                                (
+                                    [LegalName] => Abdulrahman Rozhgar
+                                    [SecurityNumber] => 8810100514
+                                    [AddressLine2] => Ã„sperÃ¶dsvÃ¤gen 8 B Lgh 1102
+                                    [Postcode] => 45134
+                                    [Postarea] => Uddevalla
+                                    [BusinessType] => Person
+                 

@@ -1,0 +1,493 @@
+<%
+/*
+
+PHP login object
+author		Nils Kohlström
+version		2001-03-20
+
+functions included:
+login()
+customer_info()
+frakten()
+betalningen()
+
+*/
+
+// Salt, that will not be needed though
+$salt = '$2$%3sdfdf84Ff"@#';
+
+//Register login variables
+session_register("kundnrsave", "confirm", "namn", "fco", "fadress", "fpostnr", "fpostnr", "fpostadr", "fland_id", "femail", "ftelnr", "orgnr",
+"lanmn", "lco", "ladress", "lpostnr", "lpostadr", "lland_id", "erref", "erordernr", "ltelnr", "lemail", "betalsatt_id",
+"levadress", "faktadress", "leveranssätt", "leveranssatt_id", "villkor_id", "kommentar", "new_erordernr", "new_erref", "ändrat_betalsätt", 
+"fland", "lland");
+
+function login($kundnr, $passwd) {
+
+	/*
+	Gives variable "confirm" four possible
+	values. Input needed from variable "kundr" and 
+	variable "passwd". 
+	1 = login ok
+	2 = login incorrect
+	3 = too many trials (maximum of three)
+	4 = password missing
+	if confirm = '1' then $kundnrsave gets the value of $kundnr
+	*/
+
+	global $confirm, $salt, $kundnrsave;
+	include ("CConnect.php");
+
+	$select = "SELECT kundid, trials from Kund ";
+	$select .= "WHERE kundnr=$kundnr ";
+	$res = mysql_query($select);
+	if ($res)
+	extract(mysql_fetch_array($res));
+
+
+	// kolla så att kunden inte har missat sitt löseord för många gånger.
+	if ($trials <= 5)  {
+
+	// kontrollera om lösenordet är rätt
+
+		if ($passwd == $kundid ) {
+			if ($trials > '0') {
+				$update = "update Kund set trials=0";
+				mysql_db_query("cyberphoto", "$update");
+				}
+			$confirm='1';
+			$kundnrsave = $kundnr; 
+			}
+
+		else  {
+			$newtrials = $trials+1;
+			$update = "update Kund set trials=$newtrials";
+			mysql_db_query("cyberphoto", "$update");
+			$confirm='2';
+			}
+
+	}
+	else {
+		$confirm='3';
+		}
+}
+
+function customer_info() {
+
+	/*
+	Input:	$kundnrsave, $confirm, requires user to be loged in (i.e. $confirm == '1')
+	Output:	Customer information in variables below. 	 
+	*/
+	global $kundnrsave, $confirm, $namn, $fco, $fadress, $fpostnr, $fpostnr, $fpostadr, $fland_id, $femail, $ftelnr,
+	$orgnr, $lanmn, $lco, $ladress, $lpostnr, $lpostadr, $lland_id, $erref, $erordernr, $ltelnr, $lemail,
+	$betalsatt_id, $ordernr, $levadress, $faktadress, $leveranssätt, $leveranssatt_id, $villkor_id, $frakt, 
+	$fland, $lland;
+
+	if ($confirm == '1') {
+
+		// Kontrollera först om det finns en order i "nya" ordertabellen */
+		$select = "SELECT max(ordernr) as ordernr from Ordertabell WHERE kundnr = '$kundnrsave'";
+		$res = mysql_db_query("cyberphoto", "$select");
+		$row = mysql_fetch_object($res);
+
+		if (($row->ordernr) > '0') {
+			$ordernr = $row->ordernr;
+			$oldorders = 'yes'; # konstaterar att det finns gammal order
+			}
+		// Annars se om det finns en order i "gamla" ordertabellen
+		else {
+
+			$select = "SELECT max(ordernr) as ordernr from Ordertabell_gamla WHERE kundnr = '$kundnrsave'";
+			$res = mysql_db_query("cyberphoto", "$select");
+		    $row = mysql_fetch_object($res);
+		    if (($row->ordernr) > '0') {
+				$ordernr = $row->ordernr;
+				$oldorders = 'yes'; // konstaterar att det finns gammal order
+				$old = 'yes';	    // konstaterar att det är en order ur "gamla" ordertabellen
+				}
+
+			}
+
+		if (($old) && ($oldorders)) { // om det finns order och det är ur gamla tabellen
+
+		    $select  = "SELECT Kund.namn, Kund.co as fco, Kund.adress as fadress, Kund.postnr as fpostnr, Kund.postadr as fpostadr, ";
+			$select .= "Kund.land_id as fland_id, Kund.email as femail, Kund.telnr as ftelnr, orgnr, lnamn, lco, ";
+			$select .= "ladress, lpostnr, lpostadr, Ordertabell_gamla.land_id as lland_id, erref, erordernr, telefon as ltelnr, ";
+			$select .= "Ordertabell_gamla.email as lemail, betalsatt_id, leveranssatt_id, villkor_id FROM Kund, Ordertabell_gamla ";
+			$select .= "WHERE Kund.kundnr='$kundnrsave' && ordernr = '$ordernr' ";
+			echo "$ordernr $kundnrsave";
+			}
+		elseif ($oldorders) { // om senaste order är ur nya listan
+
+		    $select  = "SELECT Kund.namn, Kund.co as fco, Kund.adress as fadress, Kund.postnr as fpostnr, Kund.postadr as fpostadr, ";
+			$select .= "Kund.land_id as fland_id, Kund.email as femail, telnr as ftelnr, orgnr, lnamn, lco, ";
+			$select .= "ladress, lpostnr, lpostadr, Ordertabell.land_id as lland_id, erref, erordernr, telefon as ltelnr, ";
+			$select .= "Ordertabell.email as lemail, betalsatt_id, leveranssatt_id, villkor_id FROM Kund, Ordertabell ";
+			$select .= "WHERE Kund.kundnr='$kundnrsave' && ordernr = '$ordernr' ";
+			}
+		else {  // annars plocka bara ur kundregistret
+			$select  = "SELECT namn, Kund.co as fco, adress as fadress, postnr as fpostnr,  postadr as fpostadr, ";
+			$select .= "Kund.land_id as fland_id, Kund.email as femail, telnr as ftelnr, orgnr FROM Kund ";
+			$select .= "WHERE Kundnr = '$kundnrsave'";
+			}
+
+		// Plocka fram data för ovanstående fråga 
+		$res = mysql_db_query("cyberphoto", "$select");
+		$row = mysql_fetch_object($res);
+		echo $select;
+		$namn = $row->namn;
+		$fco = $row->fco;
+		$fadress = $row->fadress;
+		$fpostnr = $row->fpostnr;
+		$fpostadr = $row->fpostadr;
+		$femail = $row->femail;
+		$ftelnr = $row->ftelnr;
+		$orgnr = $row->orgnr;
+		$fland_id = $row->fland_id;
+
+		$select = "SELECT land from Land WHERE land_id = '$fland_id'";
+		$res = mysql_db_query("cyberphoto", "$select");
+		$row5 = mysql_fetch_object($res);
+		$fland = $row5->land;
+
+		
+		if ($oldorders) {
+
+		$betalsatt_id = $row->betalsatt_id;
+		$lnamn = $row->lnamn;
+		$lco = $row->lco;
+		$ladress = $row->ladress;
+		$lpostnr = $row->lpostnr;
+		$lpostadr = $row->lpostadr;
+		$lland_id = $row->lland_id;
+		$erref = $row->erref;
+		$erordernr = $row->erordernr;
+		$ltelnr = $row->ltelnr;
+		$lemail = $row->lemail;
+		$betalsatt_id = $row->betalsatt_id;
+		$leveranssatt_id = $row->leveranssatt_id;
+		$ltelnr = $row->ltelnr;
+		$villkor_id = $row->villkor_id;
+
+		$select = "SELECT land from Land WHERE land_id = '$lland_id'";
+		$res = mysql_db_query("cyberphoto", "$select");
+		$row2 = mysql_fetch_object($res);
+		$lland = $row2->land;
+
+		$leveranssätt = $row3->leveranssatt;
+
+		$levadress  = "$lnamn<br>";
+		$levadress .= "$lco<br>";
+		$levadress .= "$ladress<br>";
+		$levadress .= "$lpostnr $lpostadr<br>";
+		$levadress .= "$lland";
+		}
+
+		$select2 = "SELECT land from Land WHERE land_id = '$fland_id'";
+		$res2 = mysql_db_query("cyberphoto", "$select2");
+		$row2 = mysql_fetch_object($res2);
+		$fland = $row2->land;
+
+		$faktadress  = "$namn<br>";
+		$faktadress .= "$fco<br>";
+		$faktadress .= "$fadress<br>";
+		$faktadress .= "$fpostnr $fpostadr<br>";
+		$faktadress .= "$fland";
+
+		/* Det kan hända att leveranssätt och betalsätt är tomma
+		även om det är osannolikt. Som standard använder vi därför
+		postpaket mot postförskott */
+
+		if (empty($leveranssatt_id))
+		$leveranssatt_id = '3';
+
+		if (empty($betalsatt_id))
+		$betalsatt_id = '3';
+
+	}
+} # end customer_info
+
+function frakten() {
+	/* 
+	Input:	$changeFrakt (i.e. artnr for prechosen "leveranssätt")
+	Output:	$leveranssatt_id (i.e. type of delivery depending on which 
+		article frakt is chosen
+	*/
+
+	global $changeFrakt, $leveranssatt_id;
+
+	if (ereg("^fraktutlfp", $changeFrakt))
+	$leveranssatt_id = '2';
+	elseif (ereg("^fraktpost", $changeFrakt))
+	$leveranssatt_id = '3';
+	elseif (ereg("^frakthem", $changeFrakt))
+	$leveranssatt_id = '4';
+	elseif (ereg("^frakt1600", $changeFrakt))
+	$leveranssatt_id = '5';
+	elseif (ereg("^frakt16", $changeFrakt))
+	$leveranssatt_id = '1';
+	elseif (ereg("^frakt0900", $changeFrakt))
+	$leveranssatt_id = '6';
+	elseif (ereg("^fraktjetpaktoday", $changeFrakt))
+	$leveranssatt_id = '7';
+	elseif (ereg("^fraktbutik", $changeFrakt))
+	$leveranssatt_id = '7';
+
+}
+
+function leveransen() {
+	global $leveranssatt_id, $ett, $två, $tre, $fyra, $fem, $sex, $sju, $åtta, $frakt, $betalsatt_id;
+
+	/* 
+	Input:	$leveranssatt_id
+	Output:	one of variables $ett-$åtta is set to 'selected' (to make it possible to have the right
+	"frakt" prechosen. 
+	*/
+
+	if ($leveranssatt_id == '1') {
+	$ett = 'selected';
+	}
+	elseif ($leveranssatt_id == '2') {
+	$två = 'selected';
+	}
+	elseif ($leveranssatt_id == '3') {
+	$tre = 'selected';
+	}
+	elseif ($leveranssatt_id == '4') {
+	$fyra = 'selected';
+	}
+	elseif ($leveranssatt_id == '5') {
+	$fem = 'selected';
+	}
+	elseif ($leveranssatt_id == '6') {
+	$sex = 'selected';
+	}
+	elseif ($leveranssatt_id == '7') {
+	$sju = 'selected';
+	}
+	elseif ($leveranssatt_id == '8') {
+	$åtta = 'selected';
+	}
+
+
+if ($betalsatt_id == '3')
+$pfrakt = 'pf';
+else
+unset($pfrakt);
+
+}
+
+function betalningen() {
+
+	/*
+	Input: 	$betalsatt_id (type of payment)
+	Output:	one of variables $bet3-$bet7 set to 'selected' (to make it possible to have the right
+	payment method prechosen)
+
+	*/
+	global $betalsatt_id, $bet3, $bet4, $bet5, $bet7;
+
+
+	if ($betalsatt_id == '3')
+		$bet3 = "selected";
+	elseif ($betalsatt_id == '4')
+		$bet4 = "selected";
+
+	elseif ($betalsatt_id == '7')
+		$bet7 = "selected";
+
+	elseif ($betalsatt_id == '5')
+		$bet5 = "selected";
+
+}
+
+function viewItemsInBasket() {
+	global $kundvagn, $goodsvalue, $artnr, $count, $lagersaldo, $bestallt, $lev_datum, $lev_datum_normal, $bestallningsgrans;
+	$freight_check = NULL;
+
+	# Get the cookie kundvagn
+	$answers = $kundvagn;
+	
+	/*
+	Kolla om det finns något i kundvagnen, annars hoppa ur
+	
+	if (!(ereg ("^grejor", $answers)))
+	{
+	
+	// Print form head
+	//include ("/home/www/shop/viewEmptybasket.html");
+	
+	//exit;
+	  }
+	
+	else
+	
+	  {
+	
+	
+	
+	
+	
+	  }
+	
+	*/
+	if (ereg ("(grejor:)(.*)", $answers,$matches)) {
+		# Split the number of items and article id s into a list
+		$orderlista = $matches[2];
+		$argument = split ("\|", $orderlista);
+	}
+
+	$goodscounter=0;
+	$goodsvalue=0;
+	 
+	$n = count($argument);
+	for ($i=0; ($i < $n);  $i+=2) {
+
+		$arg = $argument[$i];        # Article id
+		$count = $argument[$i+1];    # Keeps track of the number of the same article
+
+		$select  = "SELECT artnr, beskrivning, kommentar, utpris, tillverkare, frakt, lagersaldo, bestallt, ";
+		$select .= "lev_datum, bestallningsgrans, lev_datum_normal FROM Artiklar ";
+		$select .= "LEFT JOIN Tillverkare ON Artiklar.tillverkar_id=Tillverkare.tillverkar_id ";
+		$select .= "WHERE artnr='$arg'";
+		
+		# Alla värden försvinner inte, så därför måste vi göra enligt nedan
+		$artnr = $description = $kommentar = $tillverkare = $beskrivning = $utpris = $frakt = $lagersaldo = $bestallt = $lev_datum = $bestallningsgrans = $lev_datum_normal = "";
+
+		$row = mysql_fetch_array(mysql_query ($select));
+		extract($row);
+		
+		$goodscounter += '1';
+		$goodsvalue += ($utpris*$count);
+		
+		if ($tillverkare != '.')
+			$description = $tillverkare . " ";
+		
+		$description .= $beskrivning . " " . $kommentar;
+// visa bara info om det inte är "frakt"
+#if (!(eregi("^frakt", $artnr))):
+%>
+
+		<tr>
+		  <td bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% echo $description; %></font></td>
+		  <td bgcolor="#ECECE6" align="right"><font face="Verdana, Arial" size="1"><% echo $count; %></font></td>
+		<td bgcolor="#ECECE6" align=right><font face="Verdana, Arial" size="1">
+<%		printf("%10d", $utpris);  %>
+
+		</font></td>
+		<td bgcolor="#ECECE6" align=right><font face="Verdana, Arial" size="1">
+<%		printf("%10d", $utpris*1.25); %>
+		</font></td>
+		<td bgcolor="#ECECE6" align="left"><font size="1" face="Verdana, Arial">
+<%		check_lager(); %>
+
+		</font></td>
+		<td bgcolor="#ECECE6">
+<%		if (!(eregi("^frakt", $artnr))): %>
+
+		<A HREF="javascript:modifyItemsInBasket('<% echo $artnr; %>', '1')">
+		<font face="Verdana, Arial" size="1"><img src="../pic/besantal.gif" width=62 height=8 border=0 alt="tryck för att ändra antal"></font></A>
+		<% else: %>
+		&nbsp;&nbsp;
+		<% endif; %>
+		</td>
+		</tr>
+		
+<%	}
+
+	
+}
+
+function check_lager() {
+	global $artnr, $count, $lagersaldo, $bestallt, $lev_datum, $lev_datum_normal, $package_stock, $bestallningsgrans, $queue, $est_delivery;
+
+	$package_stock = NULL;  # clear package check
+	# Make a check if freigt is already selected. 
+	if (ereg("^frakt", $artnr))
+		{ $freight_check = "1"; }
+
+	if (ereg("pac$", $artnr)) # kollar tillgången om det är ett paket
+		{   check_package();  }
+	if (!(ereg("frakt",$artnr))) {
+
+		if ($lagersaldo >= $count || ($package_stock == '1') )  { 
+			print "finns i lager"; 
+		}
+		else {
+
+			# Kolla hur många det finns på kö
+			# antal på köp visas i $queue, nollställes först. 
+			$queue = NULL;
+			check_queue();
+			$neededStock = $queue + $count;
+			if ($bestallt >= $neededStock) {
+				if ($lev_datum == '-' || ($lev_datum == ""))
+					{ print "ej fastställt"; }
+				else
+					{ print "beräknas in $lev_datum"; }
+			}
+
+			else  { 
+
+				if (ereg("pac$",$artnr))
+					{  print "produkten består av ett paket med flera artiklar, ring för info"; }        
+				elseif ($bestallningsgrans == '0') 
+					{  print "beställningsvara, normal leveranstid $lev_datum_normal"; }
+				else
+					{ print "tillfälligt slut, normal leveranstid $lev_datum_normal" ; }
+				}
+		}         
+	}
+}
+
+function check_package() {
+
+	global $artnr, $package_stock, $count;
+
+	$select = "SELECT lagersaldo, antal ";
+	$select .= "FROM Artiklar, Paketpriser WHERE Artiklar.artnr=Paketpriser.artnr_del ";
+	$select .= "AND Paketpriser.artnr_paket = '$artnr' ";
+
+	$res = mysql_query($select);
+	
+	unset ($check);
+
+	while ($row = mysql_fetch_array($res))
+	{
+	extract($row);
+
+	$check = $antal*$count;
+
+
+
+	  if ($check > $lagersaldo) {
+	    $package_stock = "";
+	  }
+	  else {
+	    $package_stock = "1";
+	  }
+	}
+
+}
+
+
+function check_queue() {
+	global $artnr, $queue;
+	
+	$select = "SELECT antal FROM Orderposter WHERE bokad = '0' && artnr = '$artnr'";
+	$res = mysql_query($select);
+	while ($row = mysql_fetch_array($res) )   {
+	extract ($row);
+		$queue += $antal;
+
+	}
+}
+
+function show_summary() {
+	global $goodsvalue;
+
+
+}
+
+%>
+

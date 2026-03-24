@@ -1,0 +1,286 @@
+/*
+margin:25px 50px 75px 100px;
+top margin is 25px
+right margin is 50px
+bottom margin is 75px
+left margin is 100px
+
+margin:25px 50px 75px;
+top margin is 25px
+right and left margins are 50px
+bottom margin is 75px
+
+margin:25px 50px;
+top and bottom margins are 25px
+right and left margins are 50px
+
+margin:25px;
+all four margins are 25px
+*/
+
+/* Useful */
+.align_center { text-align: center }
+.align_right { text-align: right }
+.align_left { text-align: left }
+.middle { vertical-align: middle }
+.align_justify { text-align: justify }
+.uppercase { text-transform: uppercase }
+.lowercase { text-transform: lowercase }
+.hidden, .collapsed, .block_hidden_only_for_screen {display: none;}
+.wrap { white-space: normal }
+.bold { font-weight: bold }
+.strike { text-decoration: line-through }
+.italic { font-style: italic }
+.top { vertical-align: top }
+.span_link { cursor: pointer }
+.span_link:hover { text-decoration: underline }
+.clear { clear: both }
+.floatleft { float: left; }
+.floatright { float: right; }
+.mark_black { color: black; }
+.mark_red { color: red; }
+.mark_green { color: green; }
+.mark_blue { color: blue; }
+.mark_white { color: white; }
+body { 
+	background-color: #ffffff; 
+	font-family: Verdana; font-size: 11px; 
+	margin: 0px; 
+}
+a {
+	text-decoration: none;
+	color: #000000;
+}
+h1 { 
+	font-family: Arial;
+	font-size: 12pt;
+	font-weight: bold;
+}
+h2 { 
+	font-family: Arial;
+	font-size: 16px;
+	font-weight: bold;
+	color:#000000;
+	padding: 10px 0px 2px 0px;
+}
+h3 { 
+	font-family: Arial;
+	font-size: 16px;
+	font-weight: bold;
+	color:#000000;
+	/* margin-top: -15px; */
+}
+.clock {
+	font-family: Verdana;
+	font-size: 60px;
+	/* color: #000000; */
+}
+.redmark {
+	color: #85000d;
+	font-weight: bold
+}
+#head_container {
+	width: 35%; 
+	margin-right: auto; 
+	margin-left: auto;
+}
+.container_grey {
+	background: #EEEEEE;
+	padding: 10px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	margin: 5px 0px 8px 0px;
+}
+.container_white {
+	background: #ffffff;
+	padding: 1px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	margin: 1px 0px 8px 0px;
+}
+.container_yellow {
+	background: #fffcc6;
+	padding: 1px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	margin: 1px 0px 8px 0px;
+}
+.container_orange {
+	background: #f27905;
+	padding: 1px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+}
+.container_blue {
+	background: #2196f3;
+	padding: 1px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+}
+.container_lightyellow {
+	background: #fff7dd;
+	padding: 10px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	margin: 5px 0px 8px 0px;
+}
+.container_orange_plain {
+	background: #f27905;
+	padding: 1px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+}
+.container_footer {
+	background: #EEEEEE;
+	padding: 5px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	margin: 0px 0px;
+}
+.container_flip {
+	margin-right: auto; 
+	margin-left: auto;
+	padding-top: 5px; 
+}
+.blink_text_red {
+
+    animation:2s blinker linear infinite;
+    -webkit-animation:2s blinker linear infinite;
+    -moz-animation:2s blinker linear infinite;
+     color: red;
+}
+.blink_text_blue {
+
+    animation:2s blinker linear infinite;
+    -webkit-animation:2s blinker linear infinite;
+    -moz-animation:2s blinker linear infinite;
+     color: blue;
+}
+.blink_text_black {
+
+    animation:2s blinker linear infinite;
+    -webkit-animation:2s blinker linear infinite;
+    -moz-animation:2s blinker linear infinite;
+     color: black;
+}
+.blink_text_green {
+
+    animation:2s blinker linear infinite;
+    -webkit-animation:2s blinker linear infinite;
+    -moz-animation:2s blinker linear infinite;
+     color: green;
+}
+.blink_text_white {
+
+    animation:2s blinker linear infinite;
+    -webkit-animation:2s blinker linear infinite;
+    -moz-animation:2s blinker linear infinite;
+     color: white;
+}
+
+@-moz-keyframes blinker {  
+     0% { opacity: 1.0; }
+     50% { opacity: 0.0; }
+     100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes blinker {  
+     0% { opacity: 1.0; }
+     50% { opacity: 0.0; }
+     100% { opacity: 1.0; }
+}
+
+@keyframes blinker {  
+	 0% { opacity: 1.0; }
+	 50% { opacity: 0.0; }
+	 100% { opacity: 1.0; }
+}
+
+.top_col {
+	padding: 0px;
+}
+#latest_product {
+	/* margin-top: -25px; */
+	/* margin-right: auto; */
+	/* margin-left: auto; */
+}
+.latest_p {
+	font-family: Verdana;
+	font-size: 60px;
+	color: #FFFFFF;
+}
+.first_col {
+	float: left;
+	width: 32%;
+	padding: 5px;
+	/* overflow: hidden; */
+	/* height: 880px; */
+}
+.second_col {
+	float: left;
+	width: 32%;
+	padding: 5px; 
+}
+.third_col {
+	float: left;
+	width: 32%;
+	padding: 5px; 
+}
+table tbody td {
+  font-size: 14px;
+}
+#begg_nu tr:nth-child(odd) {background: #d3e00a}
+#begg_tot tr:nth-child(odd) {background: #92f791}
+#begg_senaste tr:nth-child(odd) {background: #2de6de}
+#begg_booked tr:nth-child(odd) {background: #ffd6c6}
+#begg_saleready tr:nth-child(odd) {background: #b1b1b1}
+#begg_double tr:nth-child(odd) {background: #ea7fff}
+#begg_miss5555 tr:nth-child(odd) {background: #ffe500}
+#begg_misshelf tr:nth-child(odd) {background: #a983ec}
+#begg_missprice tr:nth-child(odd) {background: #f56d97}
+#begg_wishlist tr:nth-child(odd) {background: #18e40d}
+#nytt_senaste tr:nth-child(odd) {background: #6eb852}
+tr:nth-child(even) {background: #ffffff}
+
+.count_data {
+	font-size: 14px;
+	padding: 3px;
+}
+#update_box tr {
+	background: #ffffff;
+}
+
+.textbox_green {
+	padding: 0px 3px;
+	background: green;
+	font-size: 40px;
+	width: 120px;
+	text-align: center;
+	color: #ffffff;
+}
+.textbox_red {
+	padding: 0px 3px;
+	background: red;
+	font-size: 40px;
+	width: 120px;
+	text-align: center;
+	color: #ffffff;
+}

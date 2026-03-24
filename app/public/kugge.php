@@ -1,0 +1,1 @@
+<a href="/order/admin/"><img border="0" src="kugghjul.jpg" width="80" height="75"></a>

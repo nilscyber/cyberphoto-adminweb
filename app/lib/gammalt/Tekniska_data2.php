@@ -1,0 +1,220 @@
+<%
+
+$select = "SELECT * FROM Tekniska_data WHERE artnr = '$tekniska_data'";
+$res = @mysqli_query($select);
+
+$row = @mysqli_fetch_object($res)
+%>
+
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Bildsensor storlek</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->storlekccd); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Upplösning bildsensor (brutto)</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info2($row->ccd); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Upplösning bild (netto)</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->upplosning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Kompressions-<br>
+	standard</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->kompression); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Objektiv</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->objektiv); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Optisk
+	  zoom</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->optisk_zoom); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Digital
+	  zoom</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->dig_zoom); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Filterdiameter</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->filterdiam); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Fokusering</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->fokusering); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Närgräns</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->nargrans); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Minnestyp</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->minnestyp); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Minne som ingår</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->inkl_minneskort); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Minneskapacitet</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->minneskapacitet); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Optisk sökare</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->optisk_sokare); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Bildskärm</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->bildskarm); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Ljusmätning</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ljusmatning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Vitbalans</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->vitbalans); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Ljuskänslighet</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ljuskanslighet); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Slutartider</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->slutartider); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Exponering</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->exponering); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Exponerings-<br>
+	kompensation</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->exponeringskompensation); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Självutlösare</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->sjalvutlosare); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Blixt</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->blixt); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Blixtinställningar
+	</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->blixtinstalln); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Räckvidd blixt</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->blixt_rackvidd); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Sekvenstagning</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->sekvenstagning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Film</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->film); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Ljudinspelning</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ljudinspelning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Anslutningar</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana" size="1"><% show_info($row->anslutningar); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Batteri</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->batteri); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Övrigt</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ovrigt); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Mått</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->matt); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Vikt</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->vikt); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Medföljande
+	tillbehör</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana" size="1"><% show_info($row->medfolj_tillb); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Medföljande
+	  programvara</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana" size="1"><% show_info($row->medfolj_program); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Systemkrav</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana" size="1"><% show_info($row->systemkrav); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Bildexempel</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana" size="1"><% show_pic($row->bildexempel); %></font></td>
+</tr>
+
+
+<%
+
+function show_info() {
+
+$arg = func_get_arg (0);
+
+if (!(isset($arg)))
+echo "-";
+else
+echo $arg;
+
+}
+
+function show_info2() {
+
+$arg = func_get_arg (0);
+
+if (!(isset($arg)))
+	echo "-";
+	else {
+
+	$arg = number_format ($arg, 0, ",", " ");
+	echo $arg;
+	}
+
+}
+
+
+function show_pic() {
+
+$arg = func_get_arg (0);
+
+if (!(isset($arg))):
+echo "-";
+
+else:
+$newargument = split ("\|", $arg);
+$n = count($newargument);
+echo "\n";
+
+for ($i=0; $i<=$n; $i+=2) {
+
+	$link = $newargument[$i];
+	$name = $newargument[$i+1];
+echo <<<eof
+	<a href="$link">$name</a><br>\n
+eof;
+
+	}
+
+endif;
+
+}
+
+

@@ -1,0 +1,50 @@
+#treemenuadmin {
+	list-style-type: none;
+	padding-left: 5px;
+	margin: 0px;
+	font-family: Verdana;
+	font-size: 12px;
+	color: #3C3C3C;
+	margin-left: -9px;
+	font-weight: bold;
+}
+.treeview ul{ /*CSS for Simple Tree Menu*/
+	margin: 0;
+	padding: 0;
+}
+.treeview li{ /*Style for LI elements in general (excludes an LI that contains sub lists)*/
+	/*background: white url(list.gif) no-repeat left center;*/
+	list-style-type: none;
+	padding-left: 22px;
+	margin: 0px 0px;
+}
+
+.treeview li.submenu{ /* Style for LI that contains sub lists (other ULs). */
+	background: white url(closed.gif) no-repeat left 1px;
+	cursor: hand !important;
+	cursor: pointer !important;
+	margin-top: 10px;
+}
+.treeview li.submenu ul{ /*Style for ULs that are children of LIs (submenu) */
+	display: none; /*Hide them by default. Don't delete. */
+	margin-left: -35px;
+	margin-top: 5px;
+}
+.treeview .submenu ul li{ /*Style for LIs of ULs that are children of LIs (submenu) */
+	cursor: default;
+}
+
+#treemenuadmin ul li a {
+	background: transparent url("img/symbol.png") left center no-repeat; 
+	padding-left: 15px;
+	font-weight: normal;
+}
+#treemenuadmin ul li a:hover {
+	background: transparent url("img/symbol-over.png") left center no-repeat;
+}
+#treemenuadmin ul li a#current {
+	background: transparent url("img/symbol-active.png") left center no-repeat; 
+	color: #000000; 
+	text-decoration: underline;
+	font-style:italic;
+}

@@ -1,0 +1,6 @@
+dbdata/
+.env
+Thumbs.db
+app/public/banners/
+docker/cert/
+.claude/

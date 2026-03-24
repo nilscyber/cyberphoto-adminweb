@@ -1,0 +1,79 @@
+body {
+	background-image: url('green_bak2.gif');
+}
+#top-bar {
+	margin-top: 10px;
+	margin-bottom: 20px;
+	font-size: 33px;
+}
+#counters {
+	text-align: center;
+}
+#clock {
+	text-align: left;
+}
+.big-number {
+	font-size: 240px;
+	letter-spacing: -10px;
+	line-height: 0.9;
+}
+.blue-number-postnord {
+	color: #0a5b8a;
+	clear:left;
+}
+.blue-number-dark-postnord {
+	color: #043b5c;
+	clear:left;
+}
+.grey-number {
+	color: #AEAEAE;
+	clear:left;
+}
+.grey-number-dark {
+	color: #595959;
+	clear:left;
+}
+.big-number-instabox {
+	font-size: 240px;
+	letter-spacing: -10px;
+	line-height: 0.9;
+}
+.red-number-instabox {
+	color: #f0271a;
+	clear:left;
+}
+.red-number-dark-instabox {
+	color: #94120a;
+	clear:left;
+}
+.flagss {
+	font-size: 60px;
+	line-height: 1;
+	margin-top: 58px;
+}
+.flagss .glyphicon  {
+	font-size: 0.9em;
+}
+.flagss img {
+	vertical-align: baseline;
+	height: 45px;
+}
+.icon-container {
+	padding-top: 10px;
+	margin-left: 100px;
+	width: 80px;
+	height: 30px;
+	font-size: 50px;
+	display:block;
+	float:left;
+}
+.info-text {
+	padding-top: 100px;
+	text-align: center;
+	font-size: 120px;
+}
+.camera {
+	position: absolute;
+	left: 15px;
+	bottom: 15px;
+}

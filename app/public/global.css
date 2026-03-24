@@ -1,0 +1,1395 @@
+/*
+margin:25px 50px 75px 100px;
+top margin is 25px
+right margin is 50px
+bottom margin is 75px
+left margin is 100px
+
+margin:25px 50px 75px;
+top margin is 25px
+right and left margins are 50px
+bottom margin is 75px
+
+margin:25px 50px;
+top and bottom margins are 25px
+right and left margins are 50px
+
+margin:25px;
+all four margins are 25px
+*/
+/* Useful */
+.align_center { text-align: center }
+.align_right { text-align: right }
+.align_left { text-align: left }
+.middle { vertical-align: middle }
+.align_justify { text-align: justify }
+.uppercase { text-transform: uppercase }
+.hidden, .collapsed, .block_hidden_only_for_screen {display: none;}
+.wrap { white-space: normal }
+.bold { font-weight: bold }
+.strike { text-decoration: line-through }
+.italic { font-style: italic }
+.top { vertical-align: top }
+.span_link { cursor: pointer }
+.span_link:hover { text-decoration: underline }
+.span_blue {color: blue;}
+.span_green {color: #0AD20A;}
+.span_red {color: red;}
+.span_green2 {color: green;}
+
+/* Bra att ha */
+
+.floatleft {
+	float: left;
+}
+.floatright {
+	float: right;
+}
+.clear {
+	clear: both;
+}
+.top5 {
+	margin-top: 5px;
+}
+.bottom5 {
+	margin-bottom: 5px;
+}
+.top10 {
+	margin-top: 10px;
+}
+.bottom10 {
+	margin-bottom: 10px;
+}
+.top20 {
+	margin-top: 20px;
+}
+.bottom20 {
+	margin-bottom: 20px;
+}
+.left5 {
+	margin-left: 5px;
+}
+.left10 {
+	margin-left: 10px;
+}
+.left20 {
+	margin-left: 20px;
+}
+.right5 {
+	margin-right: 5px;
+}
+.right10 {
+	margin-right: 10px;
+}
+.right20 {
+	margin-right: 20px;
+}
+.container_grey {
+	background: #EEEEEE;
+	padding: 10px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	margin: 5px 0px 8px 0px;
+	max-width: 1250px;
+}
+.container_white {
+	background: #ffffff;
+	padding: 10px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	margin: 5px 0px 8px 0px;
+	max-width: 1250px;
+}
+
+h1 {
+	font-family: Verdana; 
+	font-size: 15px; 
+	text-decoration: none; 
+	color: #000000;
+}
+h2 {
+	font-family: Verdana; 
+	font-size: 14px; 
+	text-decoration: none; 
+	color: #000000; 
+	font-style: italic;
+}
+h3 {
+	color: #000000; 
+	font-family: Verdana; 
+	font-size: 10pt; 
+	text-decoration: none; 
+	font-weight: bold; 
+}
+h4 {
+	color: #8080FF; 
+	font-family: Verdana; 
+	font-size: 10px; 
+	text-decoration: none; 
+	font-weight: bold; 
+}
+h5 {
+	font-family: Verdana; 
+	font-size: 13px; 
+	text-decoration: none; 
+	color: #001AFF; 
+	font-style: italic;
+}
+h6 {
+	font-family: Verdana; 
+	font-size: 13px; 
+	text-decoration: none; 
+	color: #FF0000; 
+	font-style: italic;
+}
+body { 
+	background-image: url(img/bak.png); 
+	background-repeat: no-repeat; 
+	background-attachment:fixed; 
+	background-position:top center; 
+	background-color: #333333; 
+	font-family: Verdana; font-size: 11px; 
+	margin-top: 10px; 
+	margin-right: 0px; 
+	margin-bottom: 10px; 
+	margin-left: 0px; 
+}
+input { 
+	font-family: Verdana; 
+	font-size: 11px; 
+	text-decoration: none;
+}
+select { 
+	font-family: Verdana; 
+	font-size: 11px; 
+	text-decoration: none;
+}
+.button {
+    border: 1px solid #006;
+    background: #ccf;
+}
+.button:hover {
+    border: 1px solid #f00;
+    background: #eef;
+}
+.select_frontsite { 
+	font-family: Verdana; 
+	font-size: 14px; 
+	font-weight: bold; 
+	color: #8080FF; 
+	text-decoration: none;
+	width: 300px;
+}
+.select_frontsection { 
+	font-family: Verdana; 
+	font-size: 14px; 
+	font-weight: bold; 
+	color: #FF9933; 
+	text-decoration: none;
+	width: 300px;
+}
+th { 
+	font-family: Verdana, Arial, Helvetica; 
+	font-size: 11px;
+	text-align: left;
+}
+td { 
+	font-family: Verdana, Arial, Helvetica; 
+	font-size: 11px;
+}
+th.center {
+	text-align: center;
+}
+.tdsuplier {
+	background-color: #FFFF99;
+}
+a { 
+	font-family: Verdana; 
+	font-size: 11px; 
+	text-decoration: none; 
+	color: #1B1B1B;
+}
+a:hover { 
+	text-decoration: underline;
+}
+#menu_web {
+  list-style-type: none;
+  font-size: 14px;
+}
+#menu_web a {
+	font-size: 12px;
+	color: #004DFF;
+}
+.menusortOrder {
+	font-size: 12px;
+	color: #ff0000;
+}
+.txtAreaBox {
+	margin-bottom: 15px;
+}
+#centertop {
+	background-image: url(img/bak_top.png); 
+	background-repeat: no-repeat; 
+	width: 1500px; 
+	min-height: 15px;
+	margin-right: auto; 
+	margin-left: auto;
+}
+#centermiddle {
+	background-image: url(img/bak_middle.png); 
+	background-repeat: repeat-y; 
+	width: 1500px; 
+	margin-right: auto; 
+	margin-left: auto;
+}
+#centerbottom {
+	background-image: url(img/bak_bottom.png); 
+	background-repeat: no-repeat; 
+	width: 1500px; 
+	min-height: 15px;
+	margin-right: auto; 
+	margin-left: auto;
+}
+#content {
+	padding: 0px 14px 0px 10px; 
+}
+#sidhuvud {
+	background: transparent url("img/center.png") no-repeat; 
+	background-position: 5px 2px;
+	float: left;
+	padding: 5px; 
+	width: 600px;
+	min-height: 45px;
+	display: block; 
+}
+#sidfot {
+	background: transparent url("img/thumb.png") no-repeat; 
+	background-position: 596px 9px;
+	padding: 10px 0px 6px 0px; 
+	text-align: center; 
+	font-weight:bold;
+}
+.salespanel {
+	float: left;
+	width: 800px;
+}
+.salespanelsum {
+	float: right;
+	width: 300px;
+	text-align: center; 
+}
+.hr_gray {
+	border: 0;
+	color: #C0C0C0;
+	background-color: #C0C0C0;
+	height: 1px;
+	width: 100%;
+	text-align: center;
+}
+.hr_blue {
+	border: 0;
+	color: #0000FF;
+	background-color: #0000FF;
+	height: 3px;
+	width: 100%;
+	text-align: center;
+}
+.dateheading {
+	font-family:Verdana; 
+	font-size:11px; 
+	font-weight:bold; 
+	text-decoration: none; 
+	text-align: right; 
+	color:#000000;
+	padding: 5px; 
+}
+.ipnr {
+	color:#E60000;
+}
+.user_name {
+	color:#0000FF;
+}
+.login_info {
+	font-family: Verdana; 
+	font-size: 11px; 
+	text-decoration: none; 
+	color: #000000; 
+	font-weight:bold; 
+}
+#menypanel {
+	padding: 7px; 
+	float: left; 
+	width: 145px; 
+	background: #ffffff;
+}
+#mainpanel {
+	padding: 7px; 
+	float: left; 
+	min-height: 900px; 
+	background: #ffffff; 
+	border-left: 1px solid #999999;
+	width: 1300px;
+	max-width: 1300px;
+}
+/* CSS menymall */
+#meny {
+	margin-left: 4; 
+	padding-left: 0; 
+	list-style: none;
+}
+#menycontainer ul {
+	list-style-type: none;
+}
+#menycontainer ul li a {
+	background: transparent url("img/symbol.png") left center no-repeat; 
+	padding-left: 15px;
+}
+#menycontainer ul li a:hover {
+	background: transparent url("img/symbol-over.png") left center no-repeat;
+}
+#menycontainer ul li a#current {
+	background: transparent url("img/symbol-active.png") left center no-repeat; 
+	color: #000000; 
+	text-decoration: underline;
+	font-style:italic;
+}
+#xmlcat li {
+	color: #000000;
+	font-family: Arial;
+	font-size: 16px;
+}
+
+#xmlcat ul.tree {
+	list-style-type: none;
+	margin-left: 10px;
+	padding-left: 35px;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+#xmlcat a.treelink {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+#xmlcat a.navlink {
+	text-decoration: none;
+	color: Navy;
+}
+.rubrik   { 
+	font-family: Verdana; 
+	font-size:12px; 
+	font-weight:bold 
+}
+.noresult {
+	color: #99CCFF;
+	font-weight: bold;
+	font-style:italic;
+}
+.rubriklight   { font-family:Arial; font-size:10pt; font-weight:bold }
+.rubriklightred   { font-family:Arial; font-size:10pt; font-weight:bold; color: #CC0000; }
+.rubriklightgreen   { font-family:Arial; font-size:10pt; font-weight:bold; color: #339933; }
+.lagerrubrik   { font-family:Arial; font-size:50pt; font-weight:bold }
+.lagerrubrik2   { font-family:Arial; font-size:20pt; font-weight:bold }
+.rubrikred   { font-family:Arial; font-size:16pt; font-weight:bold; color: #CC0000; }
+.rubrikgreen   { font-family:Arial; font-size:16pt; font-weight:bold; color: #339933; }
+.rubrikblack   { font-family:Arial; font-size:16pt; font-weight:bold; color: #000000; }
+.rubrikorange   { font-family:Arial; font-size:16pt; font-weight:bold; color: #FF9900; }
+.underrubrik   { font-family:Arial; font-size:11pt; font-weight:bold }
+.copypostq   { font-family:Arial; font-size:13pt; font-weight:bold; color: #CC0000; }
+.copyposty   { font-family:Arial; font-size:13pt; font-weight:bold; color: #33CC33; }
+.copypostn   { font-family:Arial; font-size:13pt; font-weight:bold; color: #0000FF; }
+.pris   { font-family:Arial; font-size:15px; font-weight:bold }
+.firstrow { 
+	background-color: #FFCF9F;
+}
+.secondrow { 
+	background-color: #E8E8E8;
+}
+.alt_firstrow { 
+	background-color: #C9EFFF;
+}
+.alt_secondrow { 
+	background-color: #E8E8E8;
+}
+.chooserow  { 
+	background-color: #CCCCFF; 
+	font-weight:bold;
+}
+.chooserow2 { 
+	background-color: #FFFFFF; 
+	font-weight:bold;
+}
+.abbrubrik {font-family:Verdana; font-size:11px; font-weight:bold }
+.dateheadline   { font-family:Verdana; font-size:11px; font-weight:bold; color: #0000FF; }
+.dateheadline_zero   { font-family:Verdana; font-size:10px; font-weight:bold; color: #000000; }
+.wrongmess   { font-family:Arial; font-size:14px; font-weight:bold; color: #FF0000; }
+.lagerred   { font-family:Verdana; font-size:10px; color: #FF0000; }
+.lagerredbold   { font-family:Verdana; font-size:10px; font-weight:bold; color: #FF0000; }
+.lagergreen   { font-family:Verdana; font-size:10px; font-weight:bold; color: #009933; }
+.lagerblack   { font-family:Verdana; font-size:10px; color: #000000; }
+.notshowweb   { font-family:Verdana; font-size:10px; font-weight:bold; font-style:italic; color: #FF00FF; }
+#sjabotest {padding: 5px; float: left; width: 450; background: #ffffff;}
+
+#container_comment {
+	background: #FBFBFB;
+	width: 1200px;
+}
+.roundtop_comment {
+	background: #FFFFFF;
+}
+.roundbottom_comment {
+	background: #FFFFFF;
+}
+.r1_comment {
+	margin: 0 5px; 
+	height: 1px; 
+	overflow: hidden; 
+	background: #666666; 
+	border-left: 1px solid #85000d; 
+	border-right: 1px solid #666666;
+}
+.r2_comment {
+	margin: 0 3px; 
+	height: 1px; 
+	overflow: hidden; 
+	background: #FBFBFB; 
+	border-left: 1px solid #85000d; 
+	border-right: 1px solid #666666; 
+	border-width: 0 2px;
+}
+.r3_comment {
+	margin: 0 2px; 
+	height: 1px; 
+	overflow: hidden; 
+	background: #FBFBFB; 
+	border-left: 1px solid #85000d; 
+	border-right: 1px solid #666666;
+}
+.r4_comment {
+	margin: 0 1px; 
+	height: 2px; 
+	overflow: hidden; 
+	background: #FBFBFB; 
+	border-left: 1px solid #85000d; 
+	border-right: 1px solid #666666;
+}
+.content_comment {
+	padding: 5px; 
+	border-left: 1px solid #666666; 
+	border-right: 1px solid #666666; 
+}
+.framebox {
+	background: #E9ECC8;
+	padding: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-radius: 7px;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	box-shadow: 3px 3px 3px #888888;
+	-moz-box-shadow: 3px 3px 3px #888888;
+	-webkit-box-shadow: 3px 3px 3px #888888;
+	float: left;
+	width: 600px;
+	margin:2px 15px 2px 2px;
+	overflow: hidden;
+}
+.framebox2 {
+	background: #D9F3D6;
+	padding: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-radius: 7px;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	box-shadow: 3px 3px 3px #888888;
+	-moz-box-shadow: 3px 3px 3px #888888;
+	-webkit-box-shadow: 3px 3px 3px #888888;
+	float: right;
+	width: 600px;
+	margin:2px 15px 2px 2px;
+	overflow: hidden;
+}
+.framebox3 {
+	background: #FAEDFA;
+	padding: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-radius: 7px;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	box-shadow: 3px 3px 3px #888888;
+	-moz-box-shadow: 3px 3px 3px #888888;
+	-webkit-box-shadow: 3px 3px 3px #888888;
+	float: right;
+	width: 600px;
+	margin:2px 15px 2px 2px;
+	overflow: hidden;
+}
+.framebox4 {
+	background: #F1E273;
+	padding: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-radius: 7px;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	box-shadow: 3px 3px 3px #888888;
+	-moz-box-shadow: 3px 3px 3px #888888;
+	-webkit-box-shadow: 3px 3px 3px #888888;
+	float: right;
+	width: 600px;
+	margin:2px 15px 2px 2px;
+	overflow: hidden;
+}
+.imgborder { border: 1px solid #666666; }
+.imgnoborder { border-style:solid; border-width:0px; }
+.rubriken { font-family: Arial; font-size: 14pt; font-weight: bold; }
+.bloggtexten { font-family: Arial; font-size: 10pt;  }
+.pub { font-family: Arial; font-size: 8pt;color:#999999 }
+.ismobile { font-family: Arial; font-size: 8pt;color:#FF0000 }
+.bloggheader { font-family: Verdana; font-size: 10px; text-decoration:none; font-weight: bold; color:#0000FF; }
+.commentheader { font-family: Verdana; font-size: 8pt; color:#666666 }
+.commentname { font-family: Verdana; font-size: 10px; text-decoration:underline; font-weight: bold; }
+.commenttexten { font-family: Verdana; font-size: 10px;  }
+.commentttiden { font-family: Verdana; font-size: 10px; color:#666666 }
+.acceptlink { font-family: Verdana; font-size: 10px; text-decoration:none; font-weight: bold; color:#009933; }
+.denylink { font-family: Verdana; font-size: 10px; text-decoration:none; font-weight: bold; color:#CC0000; }
+.toplink { font-family: Verdana; font-size: 10px;text-decoration:none; color:#999999; }
+.filter { font-family: Verdana; font-size: 11px; }
+.filterText { font-family: Arial; font-size: 14px; font-weight: bold; color:#000000; }
+.filterTextActive { font-family: Arial; font-size: 14px; font-weight: bold; color:#DD0000; }
+.boldit {font-family: Verdana; font-size: 11px; font-weight: bold; color:#000000}
+.boldit_italic {font-family: Verdana; font-size: 11px; font-weight: bold; color:#000000; font-style:italic}
+.boldit_green {font-family: Verdana; font-size: 11px; font-weight: bold; color:#009933}
+.boldit_red {font-family: Verdana; font-size: 11px; font-weight: bold; color:#CC0000}
+.sup {
+	vertical-align: super;
+	font-style:italic;
+	font-size: 8px;
+	color:#CC3300;
+	margin-left: 3px;
+	font-weight: bold;
+}
+#maincontainer {
+	width: 750px;
+	margin-right: auto; 
+	margin-left: auto;
+}
+#incontainer {
+	background: #efefef; 
+	background-image: url(img/in.png); 
+	background-repeat: no-repeat; 
+	background-position: left; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-color:#999999;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	-webkit-text-shadow: 2px 2px #cccccc; /* for chrome */
+	-text-shadow: 2px 2px #cccccc; /* for all browser*/
+	-ms-text-shadow: 2px 2px #cccccc; /* for ie 9+ */
+	-moz-text-shadow: 2px 2px #cccccc; /* for firefox */
+	-o-text-shadow: 2px 2px #cccccc; /* for opera */
+	-khtml-text-shadow: 2px 2px #cccccc; /* for gecko based browser*/
+	text-shadow: 2px 2px #cccccc; /* same as above*/
+}
+#outcontainer {
+	background: #efefef; 
+	background-image: url(img/in.png); 
+	background-repeat: no-repeat; 
+	background-position: right; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-color:#999999;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	text-shadow: 2px 2px #cccccc;
+}
+#greencontainer {
+	background: #efefef; 
+	background-image: url(img/arr_green.png); 
+	background-repeat: no-repeat; 
+	background-position: right; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-color:#999999;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	text-shadow: 2px 2px #cccccc;
+}
+#redcontainer {
+	background: #efefef; 
+	background-image: url(img/arr_red.png); 
+	background-repeat: no-repeat; 
+	background-position: right; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-color:#999999;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	text-shadow: 2px 2px #cccccc;
+}
+.plaincontainer {
+	background: #efefef; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border-style:solid;
+	border-width:1px;
+	border-color:#999999;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	text-shadow: 2px 2px #cccccc;
+}
+.chat {
+	background-image: url(/order/chat.png); 
+	background-repeat: no-repeat; 
+	background-position:top left; 
+	padding-left: 20px;
+	font-weight:bold;
+	margin-top: 20px;
+}
+.notmarked_container {
+	padding: 3px; 
+}
+.marked_container {
+	background: #65DD41;
+	padding: 3px; 
+}
+.tech_row {
+	padding-left: 5px;
+	padding-right: 10px;
+	text-align: left;
+}
+.turnover_head {
+	color: #000000; 
+	font-family: Verdana; 
+	font-size: 14px; 
+	text-decoration: none; 
+	font-weight: bold; 
+	width: 60px;
+}
+.turnover_head_totti {
+	color: #133AD5; 
+	font-family: Verdana; 
+	font-size: 14px; 
+	text-decoration: none; 
+	font-weight: bold; 
+}
+.turnover_head_amount {
+	color: #000000; 
+	font-family: Verdana; 
+	font-size: 14px; 
+	text-decoration: none; 
+	font-weight: bold; 
+	width: 150px;
+}
+.container_loggin {
+	float: left;
+	background: #FDF6BF;
+	padding: 10px; 
+	color: #000000; 
+	border: #B8B8B8 solid 1px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	margin: 5px 0px 8px 0px;
+	max-width: 1250px;
+}
+.not_loggin {
+	color: #000000; 
+	font-size: 18px; 
+	text-decoration: none; 
+	font-weight: bold; 
+	font-style: italic;
+}
+#begg_div table tbody td {
+  font-size: 14px;
+}
+#begg_nu tr:nth-child(odd) {background: #d3e00a}
+#begg_tot tr:nth-child(odd) {background: #92f791}
+#begg_senaste tr:nth-child(odd) {background: #2de6de}
+#begg_booked tr:nth-child(odd) {background: #ffd6c6}
+#begg_saleready tr:nth-child(odd) {background: #b1b1b1}
+#begg_double tr:nth-child(odd) {background: #ea7fff}
+#begg_miss5555 tr:nth-child(odd) {background: #ffe500}
+#begg_misshelf tr:nth-child(odd) {background: #a983ec}
+#begg_missprice tr:nth-child(odd) {background: #f56d97}
+#begg_wishlist tr:nth-child(odd) {background: #18e40d}
+tr:nth-child(even) {background: #ffffff}
+
+.stat-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+}
+.stat-table th,
+.stat-table td {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+}
+.stat-table th {
+    background-color: #97e9e5;
+}
+.marination-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px;font-size:14px}
+.marination-table thead th{background:#f9fafb;border-bottom:2px solid #e5e7eb;padding:8px;text-align:left}
+.marination-table td{border-bottom:1px solid #eee;padding:8px}
+
+/* Grupp-rad – färga själva cellerna för att slå igenom all annan CSS */
+.marination-group td{background:#e5e7eb !important; font-weight:700}
+
+/* Zebra & hover endast på datarader */
+.marination-table tbody tr.data-row:nth-child(even){background:#f9fafb}
+.marination-table tbody tr.data-row:hover{background:#eef2ff}
+
+/* Placera tajt ovanför menyn */
+.quick-search{
+  width:150px;
+  margin:2px 0 3px 0;
+}
+.quick-search form{ margin-top: 2px; }
+.quick-search input[type="text"]{
+  width:130px;
+  padding:1px 2px;
+  font-size:11px;
+  border:1px solid #cfd6e0;
+  border-radius:4px;
+}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .18s ease;z-index:9998}
+.drawer{
+  position:fixed;
+  top:0;
+  right:0;
+  height:100vh;
+  width:640px;
+  max-width:94vw;
+  background:#fff;
+  box-shadow:-6px 0 16px rgba(0,0,0,.2);
+  transform:translateX(100%);
+  transition:transform .22s ease;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  border-left:1px solid #e5e7eb;
+  font-size:14px
+}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #eee;background:#f9fafb}
+.drawer-content{padding:14px;overflow:auto}
+.drawer--open{transform:translateX(0)}
+.drawer-backdrop--open{opacity:1;pointer-events:auto}
+
+.btn-more{display:inline-block;padding:4px 8px;border:1px solid #cfd6e0;border-radius:4px;text-decoration:none;background:#f3f6fa}
+.btn-more:hover{background:#e8eef7}
+
+/* Slimma headern (lägg detta EFTER dina nuvarande drawer-regler) */
+.drawer-header{
+  padding: 3px 10px;   /* var 10px 14px */
+  min-height: 32px;    /* säkerhetsnät: precis över krysset */
+}
+
+.drawer-header h1{
+  font-size: 18px;
+  line-height: 1;
+  margin: 0;
+}
+
+/* Krysset kompakt och centrerat */
+#drawer-close{
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+}
+
+/* (valfritt) lite mindre innerpadding i innehållet */
+.drawer-content{ padding: 12px; }
+
+/* ===== Standard tabelltema (grått) ===== */
+:root{
+  --tbl-header-bg: #97e9e5;   /* rubrikrad bakgrund */
+  --tbl-header-fg: #111827;
+  --tbl-zebra-odd:  #fbfbfc;
+  --tbl-zebra-even: #f1f3f5;  /* starkare randning */
+  --tbl-hover:      #e7ebf3;  /* hover highlight */
+  --tbl-border:     #d1d5db;
+}
+
+.with-drawer-gutter{ padding-right:150px; } /* lämna luft för slidern */
+
+.table-list{
+  width:100%; border-collapse:separate; border-spacing:0;
+}
+.table-list thead th{
+  position:sticky; top:0;
+  background:var(--tbl-header-bg); color:var(--tbl-header-fg);
+  font-weight:600; border-bottom:1px solid var(--tbl-border);
+  padding:6px 8px; z-index:1;
+}
+.table-list tbody td{ padding:6px 8px; border-bottom:1px solid var(--tbl-border); }
+.table-list tbody tr:nth-child(odd){  background:var(--tbl-zebra-odd); }
+.table-list tbody tr:nth-child(even){ background:var(--tbl-zebra-even); }
+.table-list tbody tr:hover{ background:var(--tbl-hover); }
+
+.text-right{ text-align:right; }
+.text-center{ text-align:center; }
+
+/* Produktlänk = ren text-länk (öppnar drawer) */
+.drawer-link.btn-more{
+  background:transparent; border:0; padding:0; display:inline;
+  color:#0b57d0; text-decoration:none; cursor:pointer;
+}
+.drawer-link.btn-more:hover{ text-decoration:underline; }
+
+/* Penna-knapp (popup) */
+.edit-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; border:1px solid #cfd6e0; border-radius:6px;
+  background:#fff; text-decoration:none; font-size:14px;
+}
+.edit-btn:hover{ background:#f2f6ff; border-color:#b7c4da; }
+.edit-btn svg{ width:14px; height:14px; }
+
+.badge{display:inline-block;padding:2px 6px;border-radius:6px;border:1px solid #d1d5db;background:#f3f4f6;color:#374151;font-size:12px;font-weight:600;margin-left:6px}
+.badge-soon{background:#d1fae5;border-color:#a7f3d0;color:#065f46}
+.badge-unpub{background:#fef3c7;border-color:#fde68a;color:#92400e}
+/* Nya: */
+.badge-used{background:#111827;border-color:#111827;color:#fff}         /* Begagnad */
+.badge-deal{background:#ede9fe;border-color:#ddd6fe;color:#4c1d95}       /* Fyndvara (lila) */
+.badge-drop{
+  background:#2563eb;     /* blå-600 */
+  border-color:#1e40af;   /* blå-800 kant */
+  color:#fff;
+}
+
+
+.cat-head { background:#f3f4f6; font-weight:700; }
+.cat-head th { padding:8px 10px; font-size:13px; color:#111; text-align:left; }
+.qty-badge{display:inline-block;min-width:28px;padding:2px 6px;border-radius:10px;border:1px solid #d1d5db;text-align:center;font-weight:700}
+.qty-ok{background:#e6f6ea;border-color:#b7e2c4;color:#065f46}
+.qty-bad{background:#fde2e1;border-color:#f5b5b3;color:#7f1d1d}
+.tfoot-sum td{background:#fafafa;border-top:2px solid #e5e7eb;font-weight:700}
+.badge-expired{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:12px;
+  background:#dc2626;   /* röd */
+  color:#fff;           /* vit text */
+  border:1px solid #b91c1c;
+}
+/* === Global, scoped till modalen === */
+.pref-modal{
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.40); z-index:2147483647;
+}
+.pref-modal.show{ display:flex; }
+
+/* Inre lådan */
+.pref-modal .pref-dialog{
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+  min-width:320px; max-width:420px; padding:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  /* isolera från globala resets */
+  font: inherit;
+}
+.pref-modal *{ box-sizing:border-box; font: inherit; }
+
+/* Header */
+.pref-modal .pref-head{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:8px;
+}
+.pref-modal .pref-close{
+  border:1px solid #cfd6e0; background:#fff; border-radius:8px;
+  width:28px; height:28px; line-height:26px; text-align:center; cursor:pointer;
+}
+.pref-modal .pref-close:hover{ background:#f2f6ff; border-color:#b7c4da; }
+
+/* Body: en inställning per rad */
+.pref-modal .pref-body{ padding:6px 2px; }
+.pref-modal .pref-row{
+  display:flex; align-items:center; gap:8px;
+  margin:6px 0;  /* ? gör att checkrutorna hamnar på varsin rad */
+}
+
+/* Footer */
+.pref-modal .pref-foot{ display:flex; justify-content:flex-end; margin-top:10px; gap:8px; }
+.pref-modal .pref-btn{
+  padding:6px 12px; border:1px solid #cfd6e0; border-radius:8px; background:#fff; cursor:pointer;
+}
+.pref-modal .pref-btn:hover{ background:#f2f6ff; border-color:#b7c4da; }
+
+/* === Kundsök: gör namnlänken identisk med produktsök === */
+.table-list .col-name a.drawer-link{
+  color:#0b66d6 !important;
+  text-decoration:none;
+  line-height:1.35;
+  display:inline;
+}
+.table-list .col-name a.drawer-link:hover{
+  text-decoration:underline;
+  text-underline-offset:1px;
+  text-decoration-thickness:1px;
+}
+.table-list .col-name a.drawer-link:visited{ color:#0b66d6 !important; }
+.table-list .col-name .badge-group{ margin-left:8px; vertical-align:baseline; }
+.table-list .col-name .copy-num{ color:inherit; margin-left:6px; }
+.table-list tbody tr:hover td{ background:#f8fbff; }
+
+/* Layout för försäljningsdashboard */
+.sales-dashboard{
+    margin-top: 8px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.sales-panel-left{
+    flex: 1 1 0;
+}
+
+.sales-panel-right{
+    flex: 0 0 340px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.panel-title{
+    font-size: 18px;
+    font-weight: 700;
+    margin: 8px 0 8px 0;
+}
+
+/* Filterrad (datum + detaljer) */
+.sales-filter-bar{
+    margin-bottom: 4px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+}
+
+.sales-filter-bar form{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filter-group{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-label{
+    font-weight: 600;
+    color: #111827;
+}
+
+.filter-input{
+    padding: 3px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.filter-link{
+    font-size: 12px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.filter-link:hover{
+    text-decoration: underline;
+}
+
+.filter-checkbox-label{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #374151;
+}
+
+.filter-actions{
+    margin-left: auto;
+}
+
+.filter-button{
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.filter-button:hover{
+    background: #f3f4f6;
+}
+
+/* Kort / sammanfattning */
+.sales-summary-card{
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.06);
+    font-size: 13px;
+}
+
+.summary-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.summary-total{
+    padding-top: 2px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 4px;
+}
+
+.summary-avg{
+    padding-top: 6px;
+}
+
+.summary-label{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    color: #111827;
+}
+
+.summary-label-total{
+    font-weight: 600;
+}
+
+/* Grundboll – används överallt */
+.summary-dot{
+    display:inline-block;
+    width:8px;
+    height:8px;
+    border-radius:9999px;
+    background:#9ca3af;      /* default grå */
+    margin-right:6px;
+    vertical-align:middle;
+}
+
+/* Färgkoder – samma som tidigare kort */
+.summary-dot-total{
+    background:#111827;      /* mörk för "Totalt" */
+}
+
+.summary-dot-ship{
+    background:#2563eb;      /* blå – speditör */
+}
+
+.summary-dot-store{
+    background:#ea580c;      /* orange – lagershop */
+}
+
+.summary-dot-avg{
+    background:#6b7280;      /* neutral grå – snittorder */
+}
+
+.sales-detail-table td .summary-dot{
+    margin-right:6px;
+    vertical-align:middle;
+}
+
+
+.summary-value{
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.summary-count{
+    font-weight: 500;
+    color: #374151;
+}
+
+.summary-amount{
+    font-weight: 600;
+    color: #111827;
+}
+
+.summary-divider{
+    border-top: 1px dashed #e5e7eb;
+    margin: 6px 0;
+}
+
+/* Detaljtabell */
+.sales-details-card{
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.06);
+    font-size: 12px;
+}
+
+.no-data{
+    margin: 4px 0;
+    color: #6b7280;
+}
+
+.sales-detail-table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.sales-detail-table th,
+.sales-detail-table td{
+    padding: 6px 6px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.sales-detail-table thead th{
+    background: #f3f4f6;
+    font-weight: 600;
+}
+
+.sales-detail-table .text-right{
+    text-align: right;
+}
+
+.comparison-table-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 18px 0 24px 0;
+    box-shadow: 0 2px 8px rgba(15,23,42,0.06);
+    border: 1px solid #e5e7eb;
+    font-size: 13px;
+}
+
+.comparison-table-card h3{
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.comparison-table th,
+.comparison-table td{
+    padding: 6px 4px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.comparison-table thead th{
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+}
+
+/* Diff-kolumnen */
+.diff-cell{
+    font-weight: 700;
+}
+
+.diff-positive{
+    color:#16a34a; /* grön */
+}
+
+.diff-negative{
+    color:#dc2626; /* röd */
+}
+
+.diff-neutral{
+    color:#6b7280; /* grå */
+}
+
+/* Bollar i tabellen (återanvänds från summary-kortet) */
+.comparison-table td .summary-dot{
+    margin-right:6px;
+    vertical-align:middle;
+}
+
+/* Om du vill ha en separat färg för 'Totalt' */
+.summary-dot-total{
+    /* kan vara samma som summary-dot, eller egen färg */
+}
+
+.comparison-table .diff-positive { color: #16a34a; } /* grön */
+.comparison-table .diff-negative { color: #dc2626; } /* röd */
+
+
+/* KPI-kort + donut-gauge – som du redan har, men för tydlighet */
+.kpi-card{
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px 18px 18px 18px;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+    max-width: 320px;
+    font-family: inherit;
+    border: 1px solid #e5e7eb;
+}
+
+.kpi-header{
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.kpi-amount{
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.kpi-amount.gauge-positive{
+    color: #15803d;
+}
+
+.kpi-amount.gauge-negative{
+    color: #b91c1c;
+}
+
+.kpi-percent{
+    font-size: 13px;
+    font-weight: 400;
+    color: #4b5563;
+    margin-left: 4px;
+}
+
+.kpi-subtitle{
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+.gauge-donut{
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+}
+
+.gauge-svg{
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.gauge-track{
+    fill: none;
+    stroke: #e5e7eb;
+    stroke-linecap: round;
+}
+
+.gauge-progress{
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease-out;
+}
+
+.gauge-progress.gauge-positive{
+    stroke: #22c55e;
+}
+
+.gauge-progress.gauge-negative{
+    stroke: #f97316;
+}
+
+.gauge-center{
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+}
+
+.gauge-label{
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
+.gauge-value{
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.1;
+}
+
+.gauge-scale{
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.gauge-legend{
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 6px;
+}
+
+.gauge-card.gauge-positive{
+    border-top: 3px solid #22c55e;
+}
+
+.gauge-card.gauge-negative{
+    border-top: 3px solid #f97316;
+}
+.kpi-link-date{
+    color:#2563eb;
+    text-decoration:none;
+    font-weight:600;
+}
+
+.kpi-link-date:hover{
+    text-decoration:underline;
+}

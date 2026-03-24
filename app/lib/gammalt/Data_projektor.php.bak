@@ -1,0 +1,114 @@
+<%
+include ("CTekniska_data.php");
+include ("CConnect.php");
+
+$select = "SELECT * FROM Data_projektor WHERE artnr = '$tekniska_data'";
+$res = @mysql_query ($select);
+
+$row = @mysql_fetch_object($res)
+%>
+
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Visningsteknik </font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->visningsteknik); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Bildformat</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->bildformat); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Upplösning</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->upplosning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Ljusstyrka</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ljusstyrka); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Ljusjämnhet</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ljusjamnhet); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Ljuskälla</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ljuskalla); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Räckvidd</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->rackvidd); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Bildstorlek</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->bildstorlek); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Zoomkvot</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->zoomkvot); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Avståndsinställning</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->avstandsinstallning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Kontrast</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->kontrast); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Keystone</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->keystone); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Frekvens</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->frekvens); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Datoringång</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->datoringang); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Ljudingång</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ljudingang); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">S-videoingång</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->svideoingang); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Kompositvideoingång</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->kompositvideoingang); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Videoljudingång</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->videoljudingang); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Linjeutgång för ljud</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->linjeutgang_ljud); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Musanslutning</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->musanslutning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Fjärrkontroll</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->fjarrkontroll); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Mått</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->matt); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Vikt</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->vikt); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Energiförbrukning</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->energiforbrukning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Strömförsöjrning</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->stromforsorjning); %></font></td>
+</tr>
+<tr>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1">Ljudnivå</font></td>
+	<td valign="top" bgcolor="#ECECE6"><font face="Verdana, Arial" size="1"><% show_info($row->ljudniva); %></font></td>
+</tr>

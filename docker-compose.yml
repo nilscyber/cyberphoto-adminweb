@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./app:/var/www/html
+      - ./docker/cert:/etc/ssl/app:ro
+    env_file:
+      - .env

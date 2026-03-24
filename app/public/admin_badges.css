@@ -1,0 +1,292 @@
+/* ===========================================
+   Badge-layout (container)
+   =========================================== */
+
+/* Vanlig badges-container i listan */
+.badges {
+  margin-left: 8px;
+  display: inline-flex;
+  gap: 6px;
+  vertical-align: middle;
+}
+
+/* Wrapper i drawer/lista när vi vill kunna radbryta */
+.badges-wrap,
+.dw-badges {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px; /* luft nedåt i drawer */
+}
+
+/* ===========================================
+   Grundbadge
+   =========================================== */
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+/* ===========================================
+   Produkttyper / status
+   =========================================== */
+
+.badge-used {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.badge-deal {
+  background: #c2410c;
+  border-color: #9a3412;
+  color: #fff;
+}
+
+/* Dropship / fjärrlager */
+.badge-drop {
+  background: #2563eb;
+  border-color: #1e40af;
+  color: #fff;
+}
+
+/* Ej publicerad */
+.badge-unpub {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+/* Utgången */
+.badge-expired {
+  background: #ef4444;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+/* “Lanseras snart” */
+.badge-launch {
+  background: #e0e7ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+}
+
+/* “Säljstart Nd” */
+.badge-soon {
+  background: #d1fae5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+/* Eget paket */
+.badge-bundle {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  background: #a8b335;
+  color: #fff;
+  border: 1px solid #919f07;
+}
+
+/* Priority (spec_13 = Y) */
+.badge-priority {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #f59e0b;    /* amber-500 */
+  background: #fff7ed;          /* amber-50 */
+  color: #7c2d12;               /* amber-900-ish */
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* VMB – moms 0 % på begagnat */
+.badge-vmb {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #53255b;
+  background: #9C27B0;
+  color: #f9fafb;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Nyhet (lanserad inom X dagar) */
+.badge-new {
+  background: #07c93b;
+  color: #fffa21;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.badge-notweb {
+    background: #3948bb;
+    border-color: #dedfd3;
+    color: #dddddd;
+}
+
+
+
+/* ===========================================
+   Ålders-badge (dagar sedan säljstart)
+   =========================================== */
+
+.badge-age {
+  display: inline-block;
+  min-width: 2.2em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 20px;
+}
+
+.badge-age.green {   /* 0–60d */
+  background: #00af5d;
+  border-color: #a7f3d0;
+  color: #e4f3ef;
+}
+
+.badge-age.orange {  /* 61–90d */
+  background: #b76904;
+  border-color: #fde68a;
+  color: #e4f3ef;
+}
+
+.badge-age.red {     /* >90d */
+  background: #991b1b;
+  border-color: #fecaca;
+  color: #e4f3ef;
+}
+
+/* ===========================================
+   Lager-badge (grön/röd)
+   =========================================== */
+
+.badge-stock {
+  display: inline-block;
+  min-width: 2.2em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.badge-stock.ok {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.badge-stock.bad {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+/* ===========================================
+   Grupp-badges (kundtyper, partnergrupper)
+   =========================================== */
+
+.badge-group {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #eef2ff;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1f2937;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+.badge-group--leverantor    { background:#fff7ed; border-color:#fed7aa; }
+.badge-group--foretagskund  { background:#ecfeff; border-color:#a5f3fc; }
+.badge-group--aterforsaljare{ background:#f0fdf4; border-color:#bbf7d0; }
+.badge-group--konsult       { background:#fef2f2; border-color:#fecaca; }
+.badge-group--anstalld      { background:#f5f5f5; border-color:#e5e7eb; }
+
+/* ===========================================
+   Kopierbart kundnummer / kod-pill
+   =========================================== */
+
+.copy-num {
+  cursor: pointer;
+  user-select: none;
+  padding: 0 2px;
+  border-radius: 4px;
+}
+
+.copy-num:hover {
+  text-decoration: underline dotted;
+}
+
+.copy-num.copied {
+  background: #ecfdf5;
+  box-shadow: inset 0 0 0 1px #34d399;
+}
+
+/* ===========================================
+   Lista-badges (kompabilitet mot äldre markup)
+   =========================================== */
+
+.b-used   { background:#111;    color:#fff;      border-color:#111; }
+.b-deal   { background:#c2410c; color:#fff;      border-color:#9a3412; }
+.b-ship   { background:#2563eb; color:#fff;      border-color:#1e40af; }
+.b-unpub  { background:#fef3c7; color:#92400e;  border-color:#fde68a; }
+.b-bundle { background:#e0e7ff; color:#3730a3;  border-color:#c7d2fe; }
+.b-disc   { background:#ef4444; color:#fff;      border-color:#dc2626; }
+.b-soon   { background:#ecfdf5; color:#065f46;  border-color:#a7f3d0; }
+
+/* ===========================================
+   Drawer-specifika badges (om de fortfarande används)
+   =========================================== */
+
+.dw-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.dw-badge-soon {
+  background: #d1fae5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.dw-badge-launch {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.dw-badge-unpub {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}

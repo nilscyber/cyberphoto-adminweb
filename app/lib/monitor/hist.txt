@@ -1,0 +1,1000 @@
+   46  tail -200 log.192.168.1.1.27 | less
+   47  tail -200 log.192.168.1.127 | less
+   48  yum list installed | grep -i samba
+   49  /usr/bin/smbclient
+   50  which smbclint
+   51  locate smbclient
+   52  which smbclient
+   53  yum install samba-client
+   54  smbclient -L localhost
+   55  smbclient -L localhost -U work
+   56  smbpasswd work
+   57  smbclient -L localhost -U work
+   58  man smbcllient
+   59  man smbclient
+   60  smbclient -L localhost -U work --max-protocol=SMB2
+   61  smbclient -L localhost -U work 
+   62  smbclient -L localhost -U work --option='client min protocol=NT2'
+   63  smbclient -L localhost -U work --option='client min protocol=SMB2'
+   64  man smbclient
+   65  smbclient -N localhost -U work --option='client min protocol=SMB2'
+   66  man smbclient
+   67  smbclient localhost -U work --option='client min protocol=SMB2'
+   68  man smbclient
+   69  smbclient -L localhost -U work -m SMB2
+   70  vi /etc/samba/smb.conf
+   71  systemctl restart smb nmb
+   72  smbclient -L localhost -U work
+   73  vi /etc/samba/smb.conf
+   74  testparm 
+   75  systemctl restart smb nmb
+   76  ls
+   77  tail -f log.192.168.1.127 
+   78  smbclient -L localhost -U work
+   79  smbclient -L localhost -U work -m SMB3
+   80  systemctl status smb
+   81  tail -f log.192.168.1.127 
+   82  vi /etc/samba/smb.conf
+   83  systemctl restart smb nmb
+   84  tail -f log.192.168.1.127 
+   85  cd /home/www/
+   86  ls -lah Ny*
+   87  ls -lahtr
+   88  tail -f log.192.168.1.119
+   89  exit
+   90  cd /var/log/samba/
+   91  tail -f log.192.168.1.119
+   92  man smbclient
+   93  smbclient -m SMB2 -U work -L localhost
+   94  smbclient -m SMB2 -U work -L 127.0.0.1
+   95  exit
+   96  tail -f /var/log/samba/log.192.168.1.119
+   97  exit
+   98  tail -f /var/log/samba/log.192.168.1.119
+   99  vi /etc/samba/smb.conf
+  100  tail -f /var/log/samba/log.192.168.1.89
+  101  tail -f /var/log/samba/log.192.168.1.119
+  102  tail -f /var/log/samba/log.192.168.1.89
+  103  vi /etc/samba/smb.conf
+  104  cd /home/www/
+  105  vi .htaccess 
+  106  vi search.php 
+  107  vi search_v30.php 
+  108  cp -a search_v30.php search_v31.php 
+  109  vi search.php
+  110  vi search_v31.php 
+  111  vi /home/phplib/CArticleFunctions.php 
+  112  vi /home/phplib/CArticleFunctions_v16.php 
+  113  vi search_v31.php 
+  114  vi search.php 
+  115  vi /home/phplib/CArticleFunctions_v16.php 
+  116  exit
+  117  cd /home/phplib/
+  118  vi std_instore.php 
+  119  vi std_instore_v20.php 
+  120  vi std_sortby.php 
+  121  vi std_sortby_v14.php 
+  122  vi SortPricelist.php 
+  123  vi SortPricelist_v25.php 
+  124  vi NewPriceList.php 
+  125  vi NewPriceList_v72.php 
+  126  vi std_instore_v20.php 
+  127  vi NewPriceList.php 
+  128  vi NewPriceList_v72.php 
+  129  vi ping web40
+  130  ping web40
+  131  ping web20
+  132  exit
+  133  cd /usr/share/check-mk-agent/
+  134  ls
+  135  cd custom/
+  136  ls
+  137  cd ..
+  138  cd plugins/
+  139  ls
+  140  cd ..
+  141  cd local/
+  142  ls
+  143  ls -lah
+  144  ./mk_verifylitiumwwww 
+  145  host www.cyberphoto.se 8.8.8.8
+  146  host ns1.namesystem.se
+  147  host www.cyberphoto.se 195.238.76.18
+  148  host www.cyberphoto.se 1.1.1.1
+  149  exit
+  150  cd /var/lib/
+  151  du -h --max-depth=1
+  152  du -hs --max-depth=1
+  153  du -h --max-depth=1
+  154  exit
+  155  mysql-p
+  156  mysql -p
+  157  cd /var/lib/mysql
+  158  ls
+  159  cd ..
+  160  ls
+  161  ls -lah
+  162  systemctl stop mysqld
+  163  systemctl start mysqld
+  164  mysql -p
+  165  cp -a mysql mysql.bak
+  166  systemctl status mysqld
+  167  systemctl stop mysqld
+  168  systemctl start mysqld
+  169  mysql -p
+  170  ls -lah
+  171  ls -lahtr
+  172  du -h --max-depth=1
+  173  mysql -p
+  174  exit
+  175  mysql -p
+  176  exit
+  177  cat /etc/crontab 
+  178  cd /home/phplib/
+  179  locate currencyUPdate
+  180  locate currencyUpdate
+  181  cd /home/www/order/
+  182  php -f currencyUpdate.php EUR
+  183  ls -lahtr currency*
+  184  php -f currencyUpdateSEB.php EUR
+  185  php -f currencyUpdateN.php EUR
+  186  vi currencyUpdateSEB.php 
+  187  php -f currencyUpdateSEB.php EUR
+  188  php -f currencyUpdateSEB.php 
+  189  php -f currencyUpdateSEB.php JPY
+  190  php -f currencyUpdateSEB.php GBP
+  191  php -f currencyUpdateSEB.php AUD
+  192  php -f currencyUpdateSEB.php NZD
+  193  php -f currencyUpdateSEB.php DKK
+  194  php -f currencyUpdateSEB.php NOK
+  195  vi /etc/crontab 
+  196  whereis php
+  197  /user/bin/php -f currencyUpdateSEB.php NOK
+  198  /usr/bin/php -f currencyUpdateSEB.php NOK
+  199  vi /etc/crontab 
+  200  tail -f /var/log/cron
+  201  vi currencyUpdateSEB.php 
+  202  vi /etc/crontab 
+  203  tail -f /var/log/cron
+  204  /usr/bin/php -f currencyUpdateSEB.php NOK
+  205  vi /etc/crontab 
+  206  pwd
+  207  vi /etc/crontab 
+  208  tail -f /var/log/cron
+  209  vi /etc/crontab 
+  210  exit
+  211  systemctl status smb
+  212  systemctl restart smb
+  213  systemctl status smb
+  214  telnet localhost 139
+  215  tail -f /var/log/messages
+  216  systemctl status httpd
+  217  systemctl stop httpd
+  218  systemctl status httpd
+  219  systemctl start httpd
+  220  ping web60
+  221  vi /etc/crontab 
+  222  systemctl status httpd
+  223  mysql -p
+  224  cd /home/www/redirect
+  225  ls
+  226  ls -lah
+  227  vi index.php 
+  228  cd ..
+  229  vi redirect2/index.html 
+  230  cd /etc/httpd/conf.d
+  231  ls -lah
+  232  grep -i *.conf 'redirect'
+  233  grep -i 'redirect' *.conf
+  234  vi 003-sites.conf
+  235  systemctl restart httpd
+  236  vi 003-sites.conf
+  237  systemctl restart httpd
+  238  systemctl status httpd
+  239  ls
+  240  ls -lah *.conf
+  241  vi ssl.conf
+  242  vi 001-default-ssl.conf
+  243  vi 000-default.conf 
+  244  grep ls -lah
+  245  ls -lah
+  246  grep -i 'cyberphoto.no' *
+  247  grep -i 'cyberphoto.fi' *
+  248  vi /etc/sysconfig/httpd 
+  249  vi 000-default.conf 
+  250  ls -lah
+  251  vi 003-sites.conf
+  252  vi /etc/sysconfig/httpd 
+  253  vi 003-sites.conf
+  254  systemctl restart httpd
+  255  tail -f /var/log/httpd/*
+  256  grep -i 'cyberphoto.no' *
+  257  vi 003-sites.conf
+  258  ls
+  259  ls -lah *.conf
+  260  vi 001-default-ssl.conf
+  261  vi 003-sites.conf
+  262  vi 000-default.conf 
+  263  vi /etc/resolv.conf 
+  264  vi /etc/hosts
+  265  ping www.cyberphoto.no
+  266  vi /etc/hosts
+  267  ping www.cyberphoto.no
+  268  systemctl restart httpd
+  269  ping 192.168.1.60
+  270  ping 192.168.1.61
+  271  ls -lah
+  272  grep -i 'cyberphoto.fi' ./*
+  273  vi 002-default2-ssl 
+  274  vi 003-sites.conf
+  275  vi 000-default.conf 
+  276  grep 'Listen' ./*
+  277  vi 000-default.conf 
+  278  vi 003-sites.conf
+  279  vi 000-default.conf 
+  280  vi /etc/sysconfig/httpd 
+  281  vi 000-default.conf 
+  282  grep -i 'www.cyberphoto.se' *.conf
+  283  vi 003-sites.conf
+  284  systemctl restart httpd
+  285  systemctl status httpd
+  286  vi /etc/sysconfig/httpd 
+  287  vi 003-sites.conf
+  288  vi /etc/hosts
+  289  systemctl restart httpd
+  290  vi 000-default.conf 
+  291  systemctl restart httpd
+  292  cd /var/log/httpd/
+  293  ls -lahtr
+  294  tail access_log 
+  295  tail -f access_log 
+  296  vi /etc/httpd/conf.d/000-default.conf 
+  297  vi /etc/httpd/conf.d/003-sites.conf
+  298  systemctl restart httpd
+  299  ls -lahtr
+  300  grep -i www2.cyberphoto.se *.conf
+  301  grep -i www2.cyberphoto.se /etc/httpd/conf.d/*.conf
+  302  tail -f access_www2.log-230614-12_00_00 
+  303  ls
+  304  ls -lahtr
+  305  tail -f access_se.log-230614-12_00_00 
+  306  tail -f access_www2.log-230614-12_00_00 
+  307  cd /etc/httpd/conf.d
+  308  l
+  309  ls
+  310  grep -i 'access_se' *
+  311  vi 003-sites.conf
+  312  vi 001-default-ssl.conf
+  313  systemctl restart httpd
+  314  ls -lahtr /var/log/httpd/
+  315  tail -f /var/log/httpd/access_se-ssl.log-230614-12_00_00 
+  316  systemctl status httpd
+  317  ls -lahtr /var/log/httpd/
+  318  cd /var/log/httpd/
+  319  ls -lahtr
+  320  tail -f access_log 
+  321  grep 'access_log' /etc/httpd/conf./*
+  322  grep 'access_log' /etc/httpd/conf.d/*
+  323  grep 'access_log' /etc/httpd/conf/*
+  324  vi /etc/httpd/conf/*
+  325  vi /etc/httpd/conf/httpd.conf
+  326  ls -lahtr
+  327  tail -f *
+  328  tail -f * | grep 192.168.1.7
+  329  tail -f * | grep 192.168.1.8
+  330  ls
+  331  ls -lahtr
+  332  tail access.log 
+  333  tail -f access.log 
+  334  tail -f access_se-ssl.log-230614-12_00_00 
+  335  tail -f ssl_request_log-230614-12_00_00 
+  336  ping -a 192.168.1.120
+  337  ssh 192.168.1.120
+  338  tail -f ssl_request_log-230614-12_00_00 
+  339  ls -lahtr
+  340  tail access_log 
+  341  tail -f access_log 
+  342  tail -f access.log 
+  343  ls -lahtr
+  344  tail -f access_se-ssl.log-230614-12_00_00 
+  345  grep 'access_se-ssl' /etc/httpd/conf.d/*
+  346  ls -lah /etc/httpd/conf.d/
+  347  grep 'cyberphoto.no' /etc/httpd/conf.d/*
+  348  vi /etc/httpd/conf.d/003-sites.conf
+  349  systemctl status httpd
+  350  vi /etc/httpd/conf.d/000-default.conf 
+  351  systemctl restart httpd
+  352  ls -lahtr
+  353  tail -f access_se-ssl.log-230614-12_00_00 
+  354  grep 'access_se-ssl' /etc/httpd/conf.d/*
+  355  vi /etc/httpd/conf.d/001-default-ssl.conf
+  356  apachectl -S
+  357  apachectl -S | less
+  358  apachectl -S 
+  359  man apachctl
+  360  man apachectl
+  361  apachectl 
+  362  apachectl -h
+  363  apachectl -t -D DUMP_VHOSTS
+  364  apachectl -h
+  365  systemctl status httpd
+  366  systemctl status httpd -l
+  367  apachectl -D DUMP_VHOSTS
+  368  grep 'server-info' /etc/httpd/conf.d/*
+  369  grep 'server-info' /etc/httpd/conf/*
+  370  vi /etc/httpd/conf.d/003-sites.conf
+  371  systemctl restart httpd
+  372  pwd
+  373  ls -lahtr
+  374  vi /home/www/redirect/index.php 
+  375  exit
+  376  su postgres -
+  377  exit
+  378  tail -f /home/www/order/php_error.log
+  379  cd /home/phplib/
+  380  vi Swish.php 
+  381  vi Swish_v9.php +80
+  382  locate Swish.java
+  383  tail -f /home/www/order/php_error.log
+  384  java -version
+  385  yum list installed | grep -i java
+  386  yum update java-1.8.0-openjdk
+  387  vi Swish_v9.php 
+  388  openssl -in /home/phplib/swish/swish4.pfx -noout -enddate
+  389  openssl x509 -in /home/phplib/swish/swish4.pfx -noout -enddate
+  390  cat /home/phplib/swish/swish4.pfx 
+  391  :q
+  392  ls
+  393  openssl x509 -in /home/phplib/swish/swish4.pfx -noout -enddate
+  394  cd /home/phplib/swish/
+  395  pwd
+  396  openssl x509 -in swish4.pfx -noout -enddate
+  397  ls
+  398  openssl req -new -newkey rsa:4096-nodes -keyout swish5.key -out swish5.csr 
+  399  ls -lahtr
+  400  vi swish5.csr 
+  401  vi swish5.pem
+  402  -----BEGIN CERTIFICATE-----
+  403  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
+  433  -----END CERTIFICATE-----
+  434  -----BEGIN CERTIFICATE-----
+  435  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
+  467  -----END CERTIFICATE-----
+  468  -----BEGIN CERTIFICATE---
+  469  MIIFvjCCA6agAwIBAgIJAJ0BfF/2dXw1MA0GCSqGSIb3DQEBDQUAMEsxFDASBgNV
+  470  BAoMC0dldHN3aXNoIEFCMRgwFgYDVQQLDA9Td2lzaCBNZW1iZXIgQ0ExGTAXBgNV
+  471  BAMMEFN3aXNoIFJvb3QgQ0EgdjIwHhcNMTgwNDA1MTExOTU5WhcNMzgwMzMxMTEx
+  472  OTU5WjB3MQswCQYDVQQGEwJTRTEoMCYGA1UECgwfU3ZlbnNrYSBIYW5kZWxzYmFu
+  473  a2VuIEFCIChwdWJsKTERMA8GA1UEBRMISEFORFNFU1MxKzApBgNVBAMMIkhhbmRl
+  474  bHNiYW5rZW4gUm9vdCBDQSB2MiBmb3IgU3dpc2gwggIiMA0GCSqGSIb3DQEBAQUA
+  475  A4ICDwAwggIKAoICAQDh1X2vexD1/W0BoCNaGS1CaPiiZWjw3K9lyRzH42mvHZL/
+  476  KqF2PfMyDcJBH/c7ntrqRZDGHVoetOZSsn1DYPuv9NmQB0bSBF5XnWqgpiU6iEe4
+  477  xgOVJ368nuBZtffW+qAz8B1HtDjEE+XS623BxpiIYHL0S4hsJnGO6ydjSF5mVagh
+  478  KlU7Dpb5Ln+LBfNnsjirdVuveCIAjQASazFZLkKy9mRrJIo1wCLVMnPhJ0boOFW8
+  479  CApZnt18vHtyQYwgC+5/nGupL9FkrXbnEd39b77vu9YuieN5HPLEDdzEFXHE8P8i
+  480  uUtmJVtJArj612cbAzBWlRw3LtBldfeHAkzbaD9fCrbObiplf1oAs2tUt/UeH1uy
+  481  fkpKwBwuoB64m1+Qlih3IcjhGxtDoUxJC/8W24EO4bjsc7/q6aVoCxPKarX13Y3W
+  482  tmX6idd4u3otIaI9wrNCQHehMPMJ5PaJbkZ2J3RvycZq9T5acyExlsqetGLBioJv
+  483  jqUDthpm3kSqIgGuAgt6mrexZ6gdol/R07JoOgsHI+nX61F3LlocEBZiQmXHmDIC
+  484  EznhsAFqUt/yL4Kr6c97D5xcVnREJt1Ri/L6fFsp3zMmlvmHN03C39IQq0JviCkW
+  485  aL/odJs+dECLlHPGC4MmL4CEJ1VDnVlxQZaIsfpdnfhTu2pOP7CO3WhmyZEmhQID
+  486  AQABo3kwdzAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4E
+  487  FgQUXYwAn7/I6RC3uz+6zTilcVk8lwgwHwYDVR0jBBgwFoAUfApAsra7hXo8u0T6
+  488  9LnAnKs5CTgwFAYDVR0gBA0wCzAJBgcqhXCBbQEBMA0GCSqGSIb3DQEBDQUAA4IC
+  489  AQAfNmWfYeuYcJUuTKIUK0zbzoQVKKSTu2ykAQ9fZFuEbyWITmE99BQyC/ob3FAM
+  490  0PtAPo9Xt099pkY+dsfLkrFbwS7TUJQWUKh3/VY/CmcYZ1f9W8pd7D5s6JqkPFxj
+  491  ZFfY3bDliusiEW5I2WczQwLwbg6OldeRHHvKuJm9VyKIkhC2v9GOPrnkIth5I+8v
+  492  V1/Abo3OU2IAnOAt4V4Gs/mpI+uTRD07845+0xLCiERgJAtiusArDnx3djGcQbmh
+  493  TXiyO6buXTAzuFOK597IySVR1X6gLIhjle61pHesKw5928YxMwqEO6IgGL66xtgk
+  494  FEsmnQROKWKX6e71yho98+vr8WevK340ZIRRTyD7IgX6IcsvPweTHzdG9BMbHKjZ
+  495  FGiqFADNIgj5xhnrdeBThg3JEHUzwlH8ySeiDpInjOJH/LMZ6xTHkmNIdZbPEsMM
+  496  1GxZLD+UMgplsq5ztGDgudcLPr53hbDtb5lS1Lkpw5D+GFZXLEZ6LtsE+QsoIYv+
+  497  qOJDZM7IDmXMu9Iu60XRaqU9ewciRey1wxrbiHOup2R+Mqb05E096mp0P51fcvet
+  498  soMP51Zl7DeMpCe1oNDoGjgoQluv4PkOVpgSQj7v
+  499  5117dztpZInUw697FFbRugU9r
+  500  openssl pkcs12 -export -in swish5.pem -inkey swish5.key -out swish5.pfx
+  501  openssl pkcs12 -info -in swish5.pfx 
+  502  pwd
+  503  locate Swish.php
+  504  cd ..
+  505  cp -a Swish_v9.php Swish_v10.php
+  506  vi Swish_v10.php 
+  507  vi Swish.php 
+  508  tail -f /home/www/order/php_error.log
+  509  vi Swish.php 
+  510  vi Swish_v10.php 
+  511  grep -i swish4.pfx ./*
+  512  ls -lah Swish*
+  513  vi Swish.php 
+  514  systemctl restart httpd
+  515  tail -f /home/www/order/php_error.log
+  516  exit
+  517  cd /var/log/httpd/
+  518  ls -lahtr
+  519  tail error_log 
+  520  tail -500 error_log  | less
+  521  yum list installed | grep -i ssh
+  522  yum update openssh 
+  523  systemctl restart httpd
+  524  tail -f error.log 
+  525  tail -f error_log 
+  526  yum list installed | grep -i php
+  527  yum update php
+  528  systemctl restart httpd
+  529  tail -f error_log 
+  530  exit
+  531  history > hist6.txt
+  532  vi hist6.txt 
+  533  ssh nils@192.168.1.108
+  534  ssh nils@192.168.1.136
+  535  ssh nils@192.168.1.108
+  536  cat /etc/crontab 
+  537  php -f /home/www/order/currencyUpdateSEB.php USD
+  538  cd /home/www/order
+  539  vi currencyUpdateSEB.php 
+  540  php -f /home/www/order/currencyUpdateSEB.php USD
+  541  vi currencyUpdateSEB.php 
+  542  vi currencyUpdateSEB.php EUR
+  543  php -f /home/www/order/currencyUpdateSEB.php EUR
+  544  vi currencyUpdateSEB.php
+  545  php -f /home/www/order/currencyUpdateSEB.php EUR
+  546  vi currencyUpdateSEB.php
+  547  php -f /home/www/order/currencyUpdateSEB.php EUR
+  548  vi currencyUpdateSEB.php
+  549  php -f /home/www/order/currencyUpdateSEB.php EUR
+  550  vi currencyUpdateSEB.php
+  551  systemctl status mariadb
+  552  cd /var/lib/mysql
+  553  ls -lah
+  554  ls -lahtr
+  555  mv ibdata1 ibdata1.bak3
+  556  mv ib_logfile0 ib_logfile0.bak
+  557  mv ib_logfile1 ib_logfile1.bak
+  558  ls -lah 
+  559  mv aria_log_control aria_log_control.bak
+  560  exit
+  561  df -h
+  562  systemctl status httpd
+  563  systemctl start httpd
+  564  systemctl status httpd
+  565  systemctl status mysql
+  566  systemctl status mysqld
+  567  systemctl start mariadb
+  568  systemctl status mysqld
+  569  systemctl status mysqld -l
+  570  systemctl restart mariadb
+  571  systemctl status mysqld -l
+  572  systemctl restart mariadb
+  573  systemctl status mysqld -l
+  574  netstat -ntlp
+  575  netstat -tulipn
+  576  netstat -ntlp
+  577  netstat -ntlp | grep 3306
+  578  systemctl stop mariadb
+  579  netstat -ntlp | grep 3306
+  580  ps aux | grep 3306
+  581  kill -TERM 14039
+  582  netstat -ntlp | grep 3306
+  583  systemctl status mysqld -l
+  584  netstat -lp | grep 3306
+  585  systemctl start mariadb
+  586  systemctl status mysqld
+  587  lsof -i TCP:3306
+  588  netstat -lp | grep 3306
+  589  netstat -ntlp | grep 3306
+  590  ps aux | grep 5760
+  591  kill -TERM 5760
+  592  ps aux | grep 5760
+  593  systemctl start mariadb
+  594  systemctl status mysqld
+  595  systemctl status httpd
+  596  exit
+  597  cat /etc/crontab 
+  598  cd /usr/local/include/
+  599  cd /usr/local/bin/
+  600  ls
+  601  top
+  602  systemctl restart httpd
+  603  systemctl restart mysqld
+  604  cat /etc/crontab 
+  605  exit
+  606  mysql -p
+  607  top
+  608  exit
+  609  cd /
+  610  df -h
+  611  ds 
+  612  man du
+  613  du -cshx --max-depth=1  /
+  614  du -chx --max-depth=1  /
+  615  cd var/
+  616  ls
+  617  du -chx --max-depth=1  /
+  618  du -chx --max-depth=1  /var/
+  619  cd lib
+  620  ls
+  621  du -chx --max-depth=1  /var/lib/
+  622  ls -lah
+  623  ls -lahSr
+  624  df -h
+  625  rm ib_logfile*
+  626  df -h
+  627  ls -lahSr
+  628  du -chx --max-depth=1  /var/lib/
+  629  mv ./mysql.bak /home/backup/
+  630  df -h
+  631  man du
+  632  cd ..
+  633  du -chx --max-depth=1  ./
+  634  cd ..
+  635  du -chx --max-depth=1  ./
+  636  cd install/
+  637  ls
+  638  ls -lah
+  639  rm dumpfile*
+  640  df -h
+  641  du -Sh
+  642  du -sh
+  643  cd ..
+  644  cd /
+  645  du -chx --max-depth=1  ./
+  646  cd /backup/
+  647  ls
+  648  ls -lah
+  649  cd ..
+  650  ls -lah /home/backup/
+  651  mv /backup/* /home/backup/
+  652  ls /home/install/
+  653  cd /install/tmp/
+  654  ls
+  655  ls -lah
+  656  cd /
+  657  top
+  658  mv /install/* /home/install/
+  659  exit
+  660  mysql -p
+  661  exit
+  662  yum install dnf
+  663  dnf update
+  664  dnf update php
+  665  man dnf
+  666  dnf list --upgrades > upgr.txt
+  667  vi upgr.txt 
+  668  dnf update
+  669  vi upgr.txt 
+  670  dnf update
+  671  exit
+  672  cd /etc/httpd/ssl/
+  673  ls -lahtr
+  674  openssl x509 -in cyber_23.crt 
+  675  ssh cyber_23* 192.168.1.39:/home/nils/
+  676  ssh cyber_23* nils@192.168.1.39:/home/nils/
+  677  scp cyber_23* nils@192.168.1.39:/home/nils/
+  678  ls
+  679  ls -lahtr
+  680  scp cyberphoto_23.pfx  nils@192.168.1.39:/home/nils/
+  681  exit
+  682  cd /var/log/
+  683  ls -lah maillog*
+  684  cat maillog-20230903 | grep -i 'smultronstigen@bson.st'
+  685  exit
+  686  cat /etc/crontab 
+  687  vi /etc/crontab 
+  688  ssh 192.168.1.49
+  689  cd 
+  690  cd .ssh/
+  691  ls
+  692  ls -la
+  693  ls -lah
+  694  vi id_dsa.pub 
+  695  ssh 192.168.1.49
+  696  vi id_dsa.pub 
+  697  ls -lah
+  698  ssh-keygen
+  699  ls -lahtr
+  700  vi id_rsa.pub 
+  701  ssh 192.168.1.49
+  702  vi /etc/crontab 
+  703  rsync -avzuh -e ssh  --delete  /home/phplib root@192.168.1.49:/volume1/NetBackup/webserver/
+  704  cat /etc/crontab 
+  705  rsync -avzuh -e ssh  --delete --exclude 'www/bildexempel' /home/www root@192.168.1.49:/volume1/NetBackup/webserver/
+  706  cat /etc/crontab 
+  707  vi /etc/crontab 
+  708  exit
+  709  cd  /home/www/order/
+  710  ls -lah *tree*
+  711  ls
+  712  cd admin
+  713  ls
+  714  ls -lah *tree*
+  715  vi simpletree.css 
+  716  grep -i simpletree ./*
+  717  vi header.php 
+  718  vi header_v11.php 
+  719  grep -i simpletree ./* -R
+  720  grep -i simpletree /home/phplib/* -R
+  721  vi /home/phplib/test.html 
+  722  ls -lah *kateg*
+  723  ls -lah *cat*
+  724  vi categories.php 
+  725  vi categories_v4.php .
+  726  vi categories_v4.php 
+  727  cp -a categories_v4.php categories_all.php
+  728  vi categories_all.php 
+  729  cd /home/phplib/
+  730  locate Item.php
+  731  cd /home/www/order/admin/
+  732  vi categories_all.php 
+  733  vi items_class.php 
+  734  vi categories_all.php 
+  735  exit
+  736  cd /home/phplib/
+  737  locate dmarc
+  738  clear
+  739  locate dmarc
+  740  locate dmarc | less
+  741  exit
+  742  yum list installed | grep vim
+  743  exiot
+  744  exut
+  745  vi hist.txt
+  746  exit
+  747  cd /home/phplib/
+  748  vi items_class.php 
+  749  vi /home/www/order/admin/categories_all.php 
+  750  cd /home/
+  751  ls
+  752  cd /home/www/order/
+  753  ls -lahtr
+  754  tail php_error.log
+  755  vi /etc/php.ini
+  756  systemctl restart httpd
+  757  tail -f php_error.log
+  758  vi /etc/php.ini
+  759  systemctl restart httpd
+  760  tail -f php_error.log
+  761  vi /etc/php.ini
+  762  systemctl restart httpd
+  763  tail -f php_error.log
+  764  cd 
+  765  cd .ssh/
+  766  s
+  767  ls
+  768  cd 
+  769  tail -f /home/www/order/php_error
+  770  tail -f /home/www/order/php_error.log
+  771  cd /home/www/
+  772  vi info.php 
+  773  vi info_v67.php 
+  774  vi info.php 
+  775  vi info_v65.php 
+  776  cp -a info_v65.php info_v68.php
+  777  vi info.php 
+  778  vi info_v68.php 
+  779  cd /home/phplib/
+  780  vi Db.php 
+  781  vi Db_v6.php 
+  782  exit
+  783  cd  /install/
+  784  ls
+  785  ls -lah
+  786  df -h
+  787  cd /backup/
+  788  ls
+  789  cd ..
+  790  cd /home/
+  791  ls
+  792  ls -lah
+  793  du -sh --max-depth=1
+  794  du -Sh --max-depth=1
+  795  cd /install/
+  796  mysql < dumpfile.sql -p
+  797  ls -lah
+  798  cat dumpfile.sql | less
+  799  mysql < dumpfile.sql -p
+  800  cat dumpfile.sql | less
+  801  cd /var/lib/mysql
+  802  ls
+  803  systemctl stop mariadb
+  804  ls
+  805  mkdir ../bk
+  806  mv BPELSE_USER_DB ../bk/
+  807  mv cyberadmin ../bk/
+  808  mv cyberborsen ../bk/
+  809  mv cyberorder ../bk/
+  810  mv cyberphoto ../bk/
+  811  mv dmarc ../bk/
+  812  mv pacsoft ../bk/
+  813  mv phplist ../bk/
+  814  mv piwigo ../bk/
+  815  mysql -p
+  816  systemctl start mariadb
+  817  ls -lahtr
+  818  tail -f web80.err 
+  819  mysql -p
+  820  mysql -p < /install/dumpfile.sql 
+  821  ls
+  822  cd ../bk/
+  823  ls
+  824  mv * ../mysql/
+  825  systemctl restart mariadb
+  826  cd  ../mysql/
+  827  ls -lahtr
+  828  mysql -p
+  829  mysql -p < /install/dumpfile.sql 
+  830  cat /install/dumpfile.sql | less
+  831  ls
+  832  mv BPELSE_USER_DB ../bk/
+  833  systemctl restart mariadb
+  834  tail -f web80.err 
+  835  mysql -p < /install/dumpfile.sql 
+  836  yum install pv
+  837  cd /home/install/
+  838  cd /install/
+  839  ls
+  840  pv ./dumpfile.sql | mysql -p
+  841  mysql -p
+  842  mysql_upgrade -p
+  843  exit
+  844  tail -f /var/log/mariadb/mariadb.log.rpmsave 
+  845  cd /var/lib/mysql
+  846  ls
+  847  ls -lahtr
+  848  tail -f relay-log.info 
+  849  cat master.info
+  850  ls
+  851  ls -lah
+  852  ls -lahtr
+  853  tail web80-relay-bin.000059 
+  854  tail -f web80-relay-bin.000059 
+  855  ls -lahtr
+  856  mysql -o
+  857  mysql -p
+  858  ls -lahtr
+  859  tail -f web80.err 
+  860  ls -lahtr
+  861  tail -f web80.err 
+  862  mysql -p
+  863  exit
+  864  mysql -p
+  865  exit
+  866  mysql -p
+  867  cd /var/lib/bk/
+  868  ls
+  869  cd BPELSE_USER_DB/
+  870  ls
+  871  ls -lah
+  872  cd ..
+  873  cd mysql
+  874  ls -lah
+  875  tail -f web80.err 
+  876  mysql -p
+  877  mv cyberadmin ../bk/
+  878  ls -lah
+  879  tail -f web80.err 
+  880  cd ..
+  881  ls lah
+  882  ls -lah
+  883  ls -lahtr
+  884  cd mysql
+  885  ls lahtr
+  886  ls -lahtr
+  887  tail -f relay-log.info 
+  888  tail -f web80-relay-bin.000010 
+  889  exit
+  890  mysql -p
+  891  exit
+  892  cd /var/lib/mysql/mysql/
+  893  mv innodb_table_stats.ibd ../
+  894  mv slave_worker_info.ibd ../
+  895  systemctl restart mariadb
+  896  exit
+  897  cd /var/lib/mysql
+  898  ls
+  899  ls -lahtr
+  900  ls -lah *slave*
+  901  locate slave_master_info
+  902  cd /var/lib/mysql
+  903  cd mysql/
+  904  ls
+  905  ls -lah
+  906  mv slave_master_info.frm slave_master_info.frm.bak
+  907  mv slave_master_info.ibd slave_master_info.ibd.bak
+  908  systemctl restart mariadb
+  909  ls -lahtr
+  910  ls -lah slave_master_info.*
+  911  cd ..
+  912  ls
+  913  locate slave_relay_log_info
+  914  cd mysql/
+  915  ls -lah slave_relay_log_info.*
+  916  mv slave_relay_log_info.frm slave_relay_log_info.frm.bak
+  917  mv slave_relay_log_info.ibd slave_relay_log_info.ibd.bak
+  918  systemctl restart mariadb
+  919  mysql_upgrade -p
+  920  mysql_upgrade -p --force
+  921  ls -lah *innodb_index_stats*
+  922  ls -lah innodb_index_stats.*
+  923  mv innodb_index_stats.frm innodb_index_stats.frm.bak
+  924  mv innodb_index_stats.ibd innodb_index_stats.ibd.bak
+  925  systemctl restart mariadb
+  926  tail -f ../web80.err 
+  927  exit
+  928  cd /home/www/
+  929  vi incl_class.php 
+  930  vi incl_class_v34.php 
+  931  vi product_variables_v38.php 
+  932  vi product_variables.php 
+  933  cp -a product_variables_v38.php product_variables_v39.php
+  934  ls
+  935  vi product_variables_v39.php 
+  936  mysql -p
+  937  vi /etc/my.cnf
+  938  vi /etc/my.cnf.d/client.cnf 
+  939  vi /etc/my.cnf.d/enable_encryption.preset 
+  940  vi /etc/my.cnf.d/server.cnf 
+  941  systemctl restart httpd
+  942  systemctl restart mariadb
+  943  exit
+  944  cd /home/phplib/
+  945  cd /home/www/order/ad
+  946  cd /home/www/order/admin/
+  947  vi item.php 
+  948  vi items_class.php 
+  949  exit
+  950  check_mk_agent | grep -i slave
+  951  check_mk_agent > checkmk.txt
+  952  vi checkmk.txt 
+  953  whereis check_mk_agent
+  954  updatedb 
+  955  locate available-plugins
+  956  vi /etc/check-mk-agent/mysql.cfg 
+  957  pwd
+  958  whereis check-mk-agent
+  959  cd /usr/share/check-mk-agent/
+  960  ls
+  961  cd plugins
+  962  ls
+  963  lks -lah
+  964  ls -lah
+  965  vi mk_logins 
+  966  vi mk_inventory 
+  967  cd ..
+  968  check_mk_agent > output.txt
+  969  vi output.txt 
+  970  exit
+  971  cd /home/www/order/admin/
+  972  ls
+  973  vi salesreport.php 
+  974  vi salesreport_v5.php 
+  975  vi top.php 
+  976  vi top_v15.php 
+  977  vi header.php 
+  978  vi header_v11.php 
+  979  vi top_v15.php 
+  980  vi header_v11.php 
+  981  grep -i '<title>' ./*
+  982  grep -i '<title>F' ./*
+  983  grep -i '<title>F' ./* -r
+  984  vi salesreport.php 
+  985  grep -i 'global.css' ./* -r
+  986  vi header.php 
+  987  vi header_v11.php 
+  988  vi menu.php 
+  989  vi menu_v8.php 
+  990  vi top_v15.php 
+  991  grep -i 'addtitle' ./* -r
+  992  grep -i 'addtitle' ./* -r | less
+  993  vi top_v15.php 
+  994  grep -i 'stylesheet' ./* -r | less
+  995  grep -i 'global.css' ./* -r
+  996  vi header_v11.php 
+  997  vi top_v15.php 
+  998  exit
+  999  df -h
+ 1000  exit
+ 1001  cd /home/phplib/
+ 1002  ls
+ 1003  cd monitor/
+ 1004  ls
+ 1005  ls -lah
+ 1006  whereis check_mk
+ 1007  cd /usr/share/check
+ 1008  cd /usr/share/check_mk/
+ 1009  ls
+ 1010  cd agents/
+ 1011  ls
+ 1012  cd ..
+ 1013  cd check-mk-agent/
+ 1014  ls
+ 1015  cd custom/
+ 1016  ls
+ 1017  vi mk_testcheck 
+ 1018  cd ..
+ 1019  ls
+ 1020  cd plugins/
+ 1021  ls
+ 1022  ls -lah
+ 1023  ls
+ 1024  ls -lah
+ 1025  vi mk_mysql 
+ 1026  vi mk_postgres 
+ 1027  vi apache_status 
+ 1028  vi mk_inventory 
+ 1029  cd ..
+ 1030  ls
+ 1031  vi output.txt 
+ 1032  ls -lah
+ 1033  ls -lah /home/phplib/monitor/
+ 1034  cd /home/phplib/
+ 1035  ls
+ 1036  cd monitor/
+ 1037  ls
+ 1038  ls -lah
+ 1039  cat verify_litium_web_v2.php 
+ 1040  php -f verify_litium_web_v2.php 
+ 1041  php -f verify_litium_web_v2.php web01
+ 1042  vi verify_litium_web_v2.php 
+ 1043  php -f verify_litium_web_v2.php web04
+ 1044  php -f verify_litium_web_v2.php www
+ 1045  history > hist.txt

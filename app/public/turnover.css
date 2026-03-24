@@ -1,0 +1,76 @@
+select { font-family: Verdana; font-size: 9px; height: 18px; text-decoration: none }
+h1 { font-family: Verdana; font-size: 12px; color: #000000; font-weight: bold;margin: 0px; }
+h2 { font-family: Verdana; font-size: 28px; color: #000000; font-weight: bold;margin: 0px; }
+td { font-family: Verdana, Arial, Helvetica; font-size: 11px }
+
+#centrering {width: 93%; margin-right: auto; margin-left: auto;}
+#leftpanel {padding: 1px; float: left; width: 50%; background: #ffffff;}
+#rightpanel {padding: 1px; float: right; width: 48%; background: #ffffff;}
+#sidhuvud {padding: 5px;}
+#sidhuvud2 {padding: 5px; left: 5px; top: 5px; position: absolute; visibility: visible;}
+#sidhuvud3 {padding: 5px; float: right;}
+#systemkamcontainer {background: #F7F7F7;}
+#filtercontainer {padding: 1px; background: #ffffff;}
+#maincontainer {float: left; width: 62%; background: #FFFFD9;}
+#toplistcontainer {padding: 1px; background: #ffffff;}
+#infocontainer {float: right; width: 35%; background: #ffffff;}
+#stdlist {padding: 1px;}
+#infolist {padding: 2px;}
+#siddelare {padding: 1px; clear: both;}
+.roundtop {background: #ffffff;}
+.roundbottom {background: #ffffff;}
+
+.r1{margin: 0 5px; height: 1px; overflow: hidden; background: #c0c0c0; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+.r2{margin: 0 3px; height: 1px; overflow: hidden; background: #FFFFD9; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0; border-width: 0 2px;}
+.r3{margin: 0 2px; height: 1px; overflow: hidden; background: #FFFFD9; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+.r4{margin: 0 1px; height: 2px; overflow: hidden; background: #FFFFD9; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+
+.infor1{margin: 0 5px; height: 1px; overflow: hidden; background: #c0c0c0; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+.infor2{margin: 0 3px; height: 1px; overflow: hidden; background: #ffffff; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0; border-width: 0 2px;}
+.infor3{margin: 0 2px; height: 1px; overflow: hidden; background: #ffffff; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+.infor4{margin: 0 1px; height: 2px; overflow: hidden; background: #ffffff; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+
+.sykam1{margin: 0 5px; height: 1px; overflow: hidden; background: #c0c0c0; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+.sykam2{margin: 0 3px; height: 1px; overflow: hidden; background: #F7F7F7; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0; border-width: 0 2px;}
+.sykam3{margin: 0 2px; height: 1px; overflow: hidden; background: #F7F7F7; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+.sykam4{margin: 0 1px; height: 2px; overflow: hidden; background: #F7F7F7; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+
+.toplist1{margin: 0 5px; height: 1px; overflow: hidden; background: #85000d; border-left: 1px solid #85000d; border-right: 1px solid #85000d;}
+.toplist2{margin: 0 3px; height: 1px; overflow: hidden; background: #ffffff; border-left: 1px solid #85000d; border-right: 1px solid #85000d; border-width: 0 2px;}
+.toplist3{margin: 0 2px; height: 1px; overflow: hidden; background: #ffffff; border-left: 1px solid #85000d; border-right: 1px solid #85000d;}
+.toplist4{margin: 0 1px; height: 2px; overflow: hidden; background: #ffffff; border-left: 1px solid #85000d; border-right: 1px solid #85000d;}
+
+.content {padding: 5px; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0; }
+.content22 {padding: 1px; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0; }
+.contenttoplist {padding: 5px; border-left: 1px solid #85000d; border-right: 1px solid #85000d; }
+
+#pricecontainer {background: #ffe88a; clear: both;}
+.priceroundtop {background: #ffffff;}
+.priceroundbottom {background: #ffffff;}
+.pricer1{margin: 0 5px; height: 1px; overflow: hidden; background: #c0c0c0; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+.pricer2{margin: 0 3px; height: 1px; overflow: hidden; background: #ffe88a; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0; border-width: 0 2px;}
+.pricer3{margin: 0 2px; height: 1px; overflow: hidden; background: #ffe88a; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+.pricer4{margin: 0 1px; height: 2px; overflow: hidden; background: #ffe88a; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0;}
+
+.pricecontent {padding: 5px; border-left: 1px solid #c0c0c0; border-right: 1px solid #c0c0c0; }
+
+.toplistheading {font-family:Arial; font-size:12px; font-weight:bold; text-decoration: none }
+.confirmheading {font-family:Arial; font-size:14pt; font-weight:bold }
+.kop {padding: 4px; font-family:Arial; font-size:12px; font-weight:bold }
+.abbrubrik {font-family:Verdana; font-size:11px; font-weight:bold }
+.abbrubrik2 { font-family:Verdana; font-size: 14px; color:#0000FF; font-weight:bold }
+.abbtext {font-family:Verdana; font-size:10px;  }
+.abbprice { color: #000000; font-family: Arial; font-size: 12pt; font-weight:bold }
+.abbpriceNew { color: #85000d; font-family: Arial; font-size: 12pt; font-weight:bold }
+.linku { color: #000000; font-family: Verdana; font-size: 10px; text-decoration: underline }
+
+.addon { font-size: 12px; color:#000000; text-decoration:underline }
+.linkex { font-size: 10px; color:#0000FF; text-decoration:none }
+.showpack { font-size: 16px; color:#000000;margin: 0px }
+.showpackbig { font-family:Arial; font-size: 300pt; color:#000000; margin: 0px; text-align: center; }
+.showprintbig { font-family:Arial; font-size: 300pt; color:#999999; margin: 0px; text-align: center; }
+#meny{margin-left: 4; padding-left: 0; list-style: none;}
+#meny li {padding-left: 15px; padding-bottom: 10; background: url('/pic/li.gif') no-repeat left top;}
+
+#choosecontainer {float: left; width: 64%;}
+#picturecontainer {float: right; width: 34%;}

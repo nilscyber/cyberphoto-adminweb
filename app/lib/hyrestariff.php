@@ -1,0 +1,1 @@
+<?php $aktuell_tariff = 0.0358; ?>

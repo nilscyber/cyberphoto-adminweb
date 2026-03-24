@@ -1,0 +1,53 @@
+args: length: 14
+Starting
+Running paymentrequest
+doPaymentRequst(): starting v2 payment-request call
+doPaymentRequst(): URL = https://cpc.getswish.net/api/v2/paymentrequests//DD2514D2A1484BB785A2F6CD44E75615
+1a
+1b
+1c
+1d
+2a
+2b
+2c
+2d
+doPaymentRequst(): JSON = {"amount":"0","payeePaymentReference":"300699","payerAlias":"46730868300","callbackUrl":"https://www2.cyberphoto.se/kundvagn/swish_return.php","currency":"SEK","payeeAlias":"1236562151","message":"Avser betalning till CyberPhoto AB"}
+Error: javax.net.ssl.SSLException: Connection reset
+	at sun.security.ssl.Alert.createSSLException(Alert.java:127)
+	at sun.security.ssl.TransportContext.fatal(TransportContext.java:331)
+	at sun.security.ssl.TransportContext.fatal(TransportContext.java:274)
+	at sun.security.ssl.TransportContext.fatal(TransportContext.java:269)
+	at sun.security.ssl.SSLSocketImpl.handleException(SSLSocketImpl.java:1572)
+	at sun.security.ssl.SSLSocketImpl.access$400(SSLSocketImpl.java:73)
+	at sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:982)
+	at java.io.BufferedInputStream.fill(BufferedInputStream.java:246)
+	at java.io.BufferedInputStream.read1(BufferedInputStream.java:286)
+	at java.io.BufferedInputStream.read(BufferedInputStream.java:345)
+	at sun.net.www.http.HttpClient.parseHTTPHeader(HttpClient.java:743)
+	at sun.net.www.http.HttpClient.parseHTTP(HttpClient.java:678)
+	at sun.net.www.http.HttpClient.parseHTTP(HttpClient.java:702)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1595)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1500)
+	at java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:480)
+	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getResponseCode(HttpsURLConnectionImpl.java:352)
+	at swish.Swish.doPaymentRequst(Swish.java:224)
+	at swish.Swish.main(Swish.java:85)
+	Suppressed: java.net.SocketException: Brutet rör (Write failed)
+		at java.net.SocketOutputStream.socketWrite0(Native Method)
+		at java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:111)
+		at java.net.SocketOutputStream.write(SocketOutputStream.java:155)
+		at sun.security.ssl.SSLSocketOutputRecord.encodeAlert(SSLSocketOutputRecord.java:81)
+		at sun.security.ssl.TransportContext.fatal(TransportContext.java:362)
+		... 17 more
+Caused by: java.net.SocketException: Connection reset
+	at java.net.SocketInputStream.read(SocketInputStream.java:210)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at sun.security.ssl.SSLSocketInputRecord.read(SSLSocketInputRecord.java:464)
+	at sun.security.ssl.SSLSocketInputRecord.bytesInCompletePacket(SSLSocketInputRecord.java:68)
+	at sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1350)
+	at sun.security.ssl.SSLSocketImpl.access$300(SSLSocketImpl.java:73)
+	at sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:966)
+	... 12 more
+
+doPaymentRequst(): EXCEPTION -> -1;javax.net.ssl.SSLException: Connection reset
+-1;javax.net.ssl.SSLException: Connection reset

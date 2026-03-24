@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "Z:/order/ws"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "Z:/"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.php": "php"
+		}
+	}
+}

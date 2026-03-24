@@ -1,0 +1,52 @@
+--- Stomp.php.orig      2008-09-16 06:34:43.000000000 -0700
++++ Stomp.php   2009-02-26 12:32:02.396257000 -0800
+@@ -28,7 +28,7 @@
+  * @author Hiram Chirino <hiram@hiramchirino.com>
+  * @author Dejan Bosanac <dejan@nighttale.net> 
+  * @author Michael Caplan <mcaplan@labnet.net>
+- * @version $Revision$
++ * @version $Revision: 43 $
+  */
+ class Stomp
+ {
+@@ -454,7 +454,7 @@
+      */
+     public function disconnect ()
+     {
+-               $header = array();
++               $headers = array();
+ 
+                if ($this->clientId != null) {
+                        $headers["client-id"] = $this->clientId;
+@@ -517,14 +517,15 @@
+         $rb = 1024;
+         $data = '';
+         do {
+-            $read = fgets($this->_socket, $rb);
++            $read = fread($this->_socket, $rb);
+             if ($read === false) {
+                 $this->_reconnect();
+                 return $this->readFrame();
+             }
+             $data .= $read;
+             $len = strlen($data);
+-        } while (($len < 2 || ! ($data[$len - 2] == "\x00" && $data[$len - 1] == "\n")));
++        } while ( !($data[$len - 1] == "\x00" ) && \
++            !($data[$len - 2] == "\x00" && $data[$len - 1] == "\n") );
+         
+         list ($header, $body) = explode("\n\n", $data, 2);
+         $header = explode("\n", $header);
+@@ -559,9 +560,11 @@
+         $except = null;
+         
+         $has_frame_to_read = stream_select($read, $write, $except, $this->_read_timeout_seconds, $this->_read_timeout_milliseconds);
++        if ($has_frame_to_read !== false)
++          $has_frame_to_read = count($read);
+ 
+         if ($has_frame_to_read === false) {
+-            throw new Stomp_Exception('Check failed to determin if the socket is readable');
++            throw new Stomp_Exception('Check failed to determine if the socket is readable');
+         } else if ($has_frame_to_read > 0) {
+             return true;
+         } else {
+

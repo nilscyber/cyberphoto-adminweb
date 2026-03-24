@@ -1,0 +1,144 @@
+/* ============================================================
+   ADMIN SEARCH PRODUCT – styling för produktsöksidan
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. TABELLKOLUMNER
+   ------------------------------------------------------------ */
+.col-art {
+    width: 12ch;
+    white-space: nowrap;
+}
+
+.col-link {
+    width: 24px;
+    text-align: center;
+}
+
+.col-prod {
+    width: auto;
+}
+
+.col-price {
+    width: 12ch;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.col-tg {
+    width: 8ch;
+    text-align: center;
+}
+
+.col-num {
+    width: 8ch;
+    text-align: center;
+}
+
+.col-act {
+    width: 32px;
+    text-align: center;
+}
+
+/* ------------------------------------------------------------
+   2. RADER – PRODUKTLISTA
+   ------------------------------------------------------------ */
+.table-list a.drawer-link {
+    color: #2563eb;
+    text-decoration: underline;
+}
+.table-list a.drawer-link:hover {
+    color: #1d4ed8;
+}
+
+.prod-art-flex {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+/* Prisfält (Netto/Brutto/TG) */
+.table-list td.col-price,
+.table-list td.col-tg {
+    text-align: right;
+}
+
+/* TG-färger */
+.tg-pos { color: #065f46; font-weight: 600; }
+.tg-neg { color: #b91c1c; font-weight: 600; }
+.tg-zero { color: #444; }
+
+/* ------------------------------------------------------------
+   3. FILTER-BAR
+   ------------------------------------------------------------ */
+.search-filters {
+    margin: 10px 0 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-pill {
+    padding: 3px 10px;
+    background: #f3f4f6;
+    border-radius: 999px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 12px;
+}
+
+.filter-pill.active {
+    background: #2563eb;
+    color: #fff;
+}
+
+.filter-pill:hover {
+    background: #e5e7eb;
+}
+
+/* Aktiva inställningar */
+#activePrefs {
+    display: none;
+    margin: 10px 0;
+    padding: 6px 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #f9fafb;
+}
+
+#activePrefs.on {
+    background: #eef2ff;
+}
+
+#activePrefs .apill {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e3a8a;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    margin-right: 4px;
+    cursor: pointer;
+}
+
+#activePrefs .apill b {
+    margin-left: 4px;
+}
+
+/* ------------------------------------------------------------
+   4. SUMMARY-RAD
+   ------------------------------------------------------------ */
+.product-summary-row td {
+    background: #f3f4f6 !important;
+    font-weight: 700;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* ------------------------------------------------------------
+   5. RESULT-INFO
+   ------------------------------------------------------------ */
+.result-info {
+    font-size: 13px;
+    margin-bottom: 12px;
+}

@@ -1,0 +1,39 @@
+body {
+	background-image: url(/order/logo.jpg); 
+	background-repeat: no-repeat; 
+	background-attachment:fixed; 
+	background-position:top right; 
+	background-color: #FFFFFF; 
+	font-family: Verdana; font-size: 11px; 
+	margin-top: 15; 
+	margin-right: 15; 
+	margin-bottom: 15; 
+	margin-left: 15; 
+
+}
+h1 {
+	font-family: Arial; 
+	font-size: 16px; 
+	color: #0000FF ;
+}
+table           
+{
+ background-color: #FFFFFF; 
+ border: 1px solid green;
+}
+td           
+{
+ padding: 2px;
+ font-family: Verdana, Arial, Helvetica;
+ font-size: 11px
+}
+.chat {
+	background-image: url(/order/chat.png); 
+	background-repeat: no-repeat; 
+	background-position:top left; 
+	padding-left: 20px;
+	font-weight:bold;
+	margin-top: 20px;
+}
+.tbtgcolorgreen { color:#009933; font: 12px Verdana; font-weight:bold }
+.tbtgcolorred { color:#CC0000; font: 12px Verdana; font-weight:bold }

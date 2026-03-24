@@ -1,0 +1,1 @@
+<b>Våra öppettider</b><br><br>Ordertelefon är öppen:<br>Vardagar 9.30 - 12.00  13.00 - 17.00<br><br>Orderutlämningen är öppen:<br>Vardagar 10.00 - 17.00<br><br>Webshoppen är öppen dygnet runt alla dagar!

@@ -1,0 +1,30 @@
+/SHIPSTART
+/IFTMINHD, INSERT
+SenderID = 1
+SuppliersOrderNo = 34386
+ReceiverCode = 34386
+ReceiverName = Nils Kohlström
+ReceiverAddress1 = 
+ReceiverAddress2 = Testgatan 35
+ReceiverZipcode = 910 20
+ReceiverCity = HÖRNEFORS
+ReceiverCountry = SE
+ReceiverPhone = 090-711098
+ReceiverFax =
+ReceiverContact =
+ReceiverReference =
+ReceiverPalletRegNo =
+NoOfEURPallets =
+ModeOfTransport = P15STE
+FreeText1 =
+FreeText2 =
+FreeText3 =
+FreeText4 =
+TranspPayer = P
+TransportPayerCustNo = 
+TranspServices = ZCD
+CODAmount = 283.00
+/END
+/IFTMINLN, INSERT
+/END
+/SHIPSTOP

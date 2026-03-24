@@ -1,0 +1,276 @@
+/* ============================================================
+   ADMIN DRAWER – layout & komponenter för produkt/kund-drawers
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. DRAWER-CONTAINER
+   ------------------------------------------------------------ */
+#drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 540px;
+    max-width: 90vw;
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.11);
+    z-index: 2000;
+    transform: translateX(100%);
+    transition: transform 0.22s ease-out;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#drawer.drawer--open {
+    transform: translateX(0);
+}
+
+#drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.32);
+    z-index: 1990;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+#drawer-backdrop.drawer-backdrop--open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Content inside */
+#drawer-content {
+    padding: 14px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Close button */
+#drawer-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 6px;
+}
+#drawer-close:hover {
+    background: #f3f4f6;
+}
+
+/* ------------------------------------------------------------
+   2. DRAWER HEADER
+   ------------------------------------------------------------ */
+.drawer-panel h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.drawer-panel {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #111;
+}
+
+/* Small chips under product/customer name */
+.chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+}
+
+.copy-chip {
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    background:#fff;
+}
+
+/* ------------------------------------------------------------
+   3. DRAWER GRID / LAYOUT-BLOCK
+   ------------------------------------------------------------ */
+.dw-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+}
+
+.dw-h2 {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+/* ------------------------------------------------------------
+   4. ROWER (VÄNSTER/HÖGER-KOLUMNER)
+   ------------------------------------------------------------ */
+.dw-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 2px 0;
+}
+
+.dw-label {
+    font-weight: 700;
+    color: #374151;
+}
+
+.dw-val {
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Tom rad för spacing vid behov */
+.dw-row-spacer {
+    visibility: hidden;
+}
+
+/* Fjärrlager (specialrad) */
+.dw-row-fjarrlager .dw-label {
+    font-weight: 700;
+}
+.dw-row-fjarrlager .dw-val {
+    text-align: right;
+}
+
+/* ------------------------------------------------------------
+   5. CARD BLOCKS
+   ------------------------------------------------------------ */
+.dw-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 14px;
+}
+
+.dw-card-h2 {
+    font-weight: 700;
+    font-size: 14px;
+    margin: 0 0 8px 0;
+}
+
+.dw-card-sub {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* ------------------------------------------------------------
+   6. CONTACT TABLES (kund-drawer & produkt-drawer)
+   ------------------------------------------------------------ */
+table.drawer-contacts,
+table.drawer-orders,
+table.drawer-stock {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+table.drawer-contacts th,
+table.drawer-orders th,
+table.drawer-stock th,
+table.drawer-contacts td,
+table.drawer-orders td,
+table.drawer-stock td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Contact column: always wrap nicely */
+.drawer-contacts td.contact-col {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    text-align: left !important;
+    line-height: 1.35;
+}
+
+/* ------------------------------------------------------------
+   7. CONDITION / DESCRIPTION BLOCK
+   ------------------------------------------------------------ */
+.dw-cond {
+    margin-top: 10px;
+    font-size: 13px;
+}
+.dw-cond-label {
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+/* ------------------------------------------------------------
+   8. BADGE POSITIONERING I DRAWER (samspel med admin_core.css)
+   ------------------------------------------------------------ */
+.badges-wrap {
+    margin: 6px 0 10px 0;
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* ------------------------------------------------------------
+   9. METADATA BLOCK
+   ------------------------------------------------------------ */
+.dw-meta-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.dw-meta-label {
+    font-weight: 700;
+}
+
+.dw-meta-val {
+    text-align: right;
+    color: #374151;
+}
+
+/* Dagar-badge (ålder): använder global .badge-age från admin_core */
+.dw-meta-days {
+    margin-left: 6px;
+}
+
+/* ------------------------------------------------------------
+   10. ORDER-LÄNKAR I DRAWER
+   ------------------------------------------------------------ */
+.order-link {
+    color: #2563eb;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.order-link:hover {
+    color: #1d4ed8;
+}
+
+/* ------------------------------------------------------------
+   11. BUYER INFO (Leverantörsportal)
+   ------------------------------------------------------------ */
+.dw-supplier-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.dw-supplier-kv {
+    margin: 4px 0;
+}
+
+.dw-supplier-kv .kv-key {
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.dw-supplier-kv .kv-val {
+    word-break: break-word;
+}
+
