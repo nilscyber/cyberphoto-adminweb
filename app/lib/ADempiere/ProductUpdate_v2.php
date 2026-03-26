@@ -71,7 +71,7 @@ class ProductUpdate {
 	/**
 	 * Link to web service
 	 */
-	public static $wsdlLink = "http://cyber-erp.cyberphoto.se:8080/adempiere-adempiereWs/ProductUpdateWs?wsdl";
+	public static $wsdlLink = "http://erp-services.cyberphoto.se:8080/adempiere-adempiereWs/ProductUpdateWs?wsdl";
 	function __construct() {
 		$this->client = new SoapClient ( self::$wsdlLink, array (
 				'cache_wsdl' => WSDL_CACHE_NONE 
