@@ -654,47 +654,21 @@
 	}
 	
 	if (preg_match("/banners\.php/i", $_SERVER['PHP_SELF'])) {
-		
-		if ($choose_site != $_SESSION['bannersite'] && $add != "yes" && $change == "" && $delete == "" && $subm == "" && $submC == "" && $copypost == "") {
-			unset($_SESSION['bannersite']);
-			unset($_SESSION['bannerdepartment']);
-			unset($_SESSION['bannersection']);
-		}
-		if ($choose_site != "") {
 
-			if ($choose_site > 0) {
-				$_SESSION['bannersite'] = $choose_site;
-			} else {
-				unset($_SESSION['bannersite']);
-				unset($_SESSION['bannerdepartment']);
-				unset($_SESSION['bannersection']);
-			}
-			// header("Location: https://www.cyberphoto.se/order/admin/banners.php");
-			// exit;
+		// Site och department är alltid Sverige (1) och Foto-video (1)
+		$_SESSION['bannersite']       = 1;
+		$_SESSION['bannerdepartment'] = 1;
 
-		}
-		if ($choose_department != "") {
-
-			if ($choose_department > 0) {
-				$_SESSION['bannerdepartment'] = $choose_department;
-			} else {
-				unset($_SESSION['bannerdepartment']);
-				unset($_SESSION['bannersection']);
-			}
-			// header("Location: https://www.cyberphoto.se/order/admin/banners.php");
-			// exit;
-
-		}
+		// Sektion: uppdatera från GET om valt, annars defaulta till 201
 		if ($choose_section != "") {
-
 			if ($choose_section > 0) {
 				$_SESSION['bannersection'] = $choose_section;
 			} else {
-				unset($_SESSION['bannersection']);
+				$_SESSION['bannersection'] = 201;
 			}
-			// header("Location: https://www.cyberphoto.se/order/admin/banners.php");
-			// exit;
-
+		}
+		if (empty($_SESSION['bannersection'])) {
+			$_SESSION['bannersection'] = 201;
 		}
 
 		if ($change != "") {
@@ -770,163 +744,82 @@
 			$banners->FrontAdminEnd($endnow);
 		}
 		if ($subm) {
-			
-			$olright = true;
 
+			$olright      = true;
 			$addcreatedby = $_COOKIE['login_mail'];
+			$section      = $addsection;
+			$addsite      = $_SESSION['bannerdepartment'];
+			$addstore     = -1; // alltid tillåt slut i lager
+			$addprio      = 0;
 
-			$section = $addsection;
-			
-			if ($addsitecopy > 0) {
-				$addsite = $addsitecopy;
-			} else {
-				$addsite = $_SESSION['bannerdepartment'];
-			}
-			
-			if ($addstore == "yes") {
-				$addstore = -1;
-			} else {
-				$addstore = 0;
-			}
-
-			if ($addprio == "yes") {
-				$addprio = -1;
-			} else {
-				$addprio = 0;
-			}
-			
 			if ($addfrom == "") {
 				$olright = false;
 				$wrongmess .= "<p class=\"boldit_red\">- Datum för när den skall publiseras får inte vara tomt!</p>";
 			}
-			if ($addfrom != "") {
-				if (!($banners->isValidDateTime($addfrom))) {
-					$olright = false;
-					$wrongmess .= "<p class=\"boldit_red\">- Ogiltigt från datum. Skall formateras så här, 2009-01-01 15:00:00</p>";
-				}
+			if ($addfrom != "" && !$banners->isValidDateTime($addfrom)) {
+				$olright = false;
+				$wrongmess .= "<p class=\"boldit_red\">- Ogiltigt från datum. Skall formateras så här, 2009-01-01 15:00:00</p>";
 			}
 			if ($addto == "") {
 				$olright = false;
 				$wrongmess .= "<p class=\"boldit_red\">- Datum för hur länge den skall ligga får inte vara tomt!</p>";
 			}
-			if ($addto != "") {
-				if (!($banners->isValidDateTime($addto))) {
-					$olright = false;
-					$wrongmess .= "<p class=\"boldit_red\">- Ogiltigt till datum. Skall formateras så här, 2009-01-01 15:00:00</p>";
-				}
+			if ($addto != "" && !$banners->isValidDateTime($addto)) {
+				$olright = false;
+				$wrongmess .= "<p class=\"boldit_red\">- Ogiltigt till datum. Skall formateras så här, 2009-01-01 15:00:00</p>";
 			}
 			if ($addpicture == "") {
 				$olright = false;
-				$wrongmess .= "<p class=\"boldit_red\">- Bild måste anges. Skall ligga i start3 mappen!</p>";
-			}
-			if ($addartnr == "" && $addlinc == "" && (!eregi(".php$", $addpicture))) {
-				$olright = false;
-				$wrongmess .= "<p class=\"boldit_red\">- Antingen skall artikel nummer eller länk vara ifyllt!</p>";
-			}
-			/*
-			if ($addlinc != "") {
-				if (!eregi(".php", $addlinc) && !eregi(".html", $addlinc)) {
-				$olright = false;
-				$wrongmess .= "<p class=\"boldit_red\">- Länken måste vara en php sida eller html sida!</p>";
-				}
-			}
-			*/
-			if ($addartnr != "") {
-				if (!($banners->check_artikel_status($addartnr) == $addartnr)) {
-				// if (!($banners->check_artikel_status($addartnr))) {
-					$olright = false;
-					$wrongmess .= "<p class=\"boldit_red\">- Detta artikel nummer finns inte. Vänligen kolla upp detta! (måste skrivas exakt)</p>";
-				}
-			}
-			if ($addstore == "0" && $addartnr == "") {
-				$olright = false;
-				$wrongmess .= "<p class=\"boldit_red\">- Om du inte tillåter slut i lager kan inte artikel nummer vara tomt!</p>";
+				$wrongmess .= "<p class=\"boldit_red\">- Bild måste laddas upp!</p>";
 			}
 			if ($addcreatedby == "") {
 				$olright = false;
-				// $wrongmess .= "<p class=\"boldit_red\">- Du måste ange vem du är!</p>";
 				$wrongmess .= "<p class=\"boldit_red\">- Du måste vara inloggad för att utföra detta!</p>";
 			}
 
 			if ($olright) {
-				$banners->FrontAdminAdd($addsection,$addfrom,$addto,$addpicture,$addartnr,$addlinc,$addstore,$addcomment,$addleverantor,$addcreatedby,$addsite,$addprio,$addsort,$addcategory);
+				$banners->FrontAdminAdd($addsection,$addfrom,$addto,$addpicture,'','', $addstore,null,0,$addcreatedby,$addsite,$addprio,0,0);
+				header('Location: ' . $_SERVER['PHP_SELF']);
+				exit;
 			}
 
 		}
 		if ($submC) {
-			
-			$olright = true;
 
+			$olright      = true;
 			$addcreatedby = $_COOKIE['login_mail'];
-
-			$section = $addsection;
-			
-			if ($addstore == "yes") {
-				$addstore = -1;
-			} else {
-				$addstore = 0;
-			}
-			
-			if ($addprio == "yes") {
-				$addprio = -1;
-			} else {
-				$addprio = 0;
-			}
+			$section      = $addsection;
+			$addstore     = -1;
+			$addprio      = 0;
 
 			if ($addfrom == "") {
 				$olright = false;
 				$wrongmess .= "<p class=\"boldit_red\">- Datum för när den skall publiseras får inte vara tomt!</p>";
 			}
-			if ($addfrom != "") {
-				if (!($banners->isValidDateTime($addfrom))) {
-					$olright = false;
-					$wrongmess .= "<p class=\"boldit_red\">- Ogiltigt från datum. Skall formateras så här, 2009-01-01 15:00:00</p>";
-				}
+			if ($addfrom != "" && !$banners->isValidDateTime($addfrom)) {
+				$olright = false;
+				$wrongmess .= "<p class=\"boldit_red\">- Ogiltigt från datum. Skall formateras så här, 2009-01-01 15:00:00</p>";
 			}
 			if ($addto == "") {
 				$olright = false;
 				$wrongmess .= "<p class=\"boldit_red\">- Datum för hur länge den skall ligga får inte vara tomt!</p>";
 			}
-			if ($addto != "") {
-				if (!($banners->isValidDateTime($addto))) {
-					$olright = false;
-					$wrongmess .= "<p class=\"boldit_red\">- Ogiltigt till datum. Skall formateras så här, 2009-01-01 15:00:00</p>";
-				}
+			if ($addto != "" && !$banners->isValidDateTime($addto)) {
+				$olright = false;
+				$wrongmess .= "<p class=\"boldit_red\">- Ogiltigt till datum. Skall formateras så här, 2009-01-01 15:00:00</p>";
 			}
 			if ($addpicture == "") {
 				$olright = false;
-				$wrongmess .= "<p class=\"boldit_red\">- Bild måste anges!</p>";
-			}
-			if ($addartnr == "" && $addlinc == "" && (!eregi(".php$", $addpicture))) {
-				$olright = false;
-				$wrongmess .= "<p class=\"boldit_red\">- Antingen skall artikel nummer eller länk vara ifyllt!</p>";
-			}
-			/*
-			if ($addlinc != "") {
-				if (!eregi(".php", $addlinc) && !eregi(".html", $addlinc)) {
-				$olright = false;
-				$wrongmess .= "<p class=\"boldit_red\">- Länken måste vara en php sida eller html sida!</p>";
-				}
-			}
-			*/
-			if ($addartnr != "") {
-				if (!($banners->check_artikel_status($addartnr) == $addartnr)) {
-				// if (!($banners->check_artikel_status($addartnr))) {
-					$olright = false;
-					$wrongmess .= "<p class=\"boldit_red\">- Detta artikel nummer finns inte. Vänligen kolla upp detta! (måste skrivas exakt)</p>";
-				}
-			}
-			if ($addstore == "0" && $addartnr == "") {
-				$olright = false;
-				$wrongmess .= "<p class=\"boldit_red\">- Om du inte tillåter slut i lager kan inte artikel nummer vara tomt!</p>";
+				$wrongmess .= "<p class=\"boldit_red\">- Bild måste laddas upp!</p>";
 			}
 			if ($addcreatedby == "") {
 				$olright = false;
-				// $wrongmess .= "<p class=\"boldit_red\">- Du måste ange vem du är!</p>";
 				$wrongmess .= "<p class=\"boldit_red\">- Du måste vara inloggad för att utföra detta!</p>";
 			}
 			if ($olright) {
-				$banners->FrontAdminChange($addid,$addsection,$addfrom,$addto,$addpicture,$addartnr,$addlinc,$addstore,$addcomment,$addleverantor,$addcreatedby,$addprio,$addsort,$addcategory);
+				$banners->FrontAdminChange($addid,$addsection,$addfrom,$addto,$addpicture,'','', $addstore,null,0,$addcreatedby,$addprio,0,0);
+				header('Location: ' . $_SERVER['PHP_SELF']);
+				exit;
 			}
 		}
 		
@@ -2321,11 +2214,7 @@
 			}
 			if ($olright) {
 				$filter->doFilterAdd($addWord,$addcreatedby,$addComment);
-				if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-					header("Location: https://admin.cyberphoto.se/check_incoming.php");
-				} else {
-					header("Location: https://www.cyberphoto.se/order/admin/check_incoming.php");
-				}
+				header("Location: https://" . $_SERVER['HTTP_HOST'] . "/check_incoming.php");
 				exit;
 			}
 
@@ -2351,11 +2240,7 @@
 			}
 			if ($olright) {
 				$filter->doFilterChange($addID,$addWord,$addcreatedby,$addActive,$addComment);
-				if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-					header("Location: https://admin.cyberphoto.se/check_incoming.php");
-				} else {
-					header("Location: https://www.cyberphoto.se/order/admin/check_incoming.php");
-				}
+				header("Location: https://" . $_SERVER['HTTP_HOST'] . "/check_incoming.php");
 				exit;
 			}
 		}

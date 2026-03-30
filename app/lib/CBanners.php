@@ -6,6 +6,18 @@ Class CBanners {
 
 	}
 
+	/**
+	 * Returnerar korrekt src-sökväg för en banner-bild.
+	 * - Nyuppladdade bilder lagras som "/banner_images/filnamn.jpg" (börjar med /) → används direkt.
+	 * - Gamla bilder lagras som bara "filnamn.jpg" → serveras från /banners/ på admin-servern.
+	 */
+	private function buildImgSrc($frontPicture) {
+		if (strncmp($frontPicture, '/', 1) === 0 || strncmp($frontPicture, 'http', 4) === 0) {
+			return htmlspecialchars($frontPicture, ENT_QUOTES, 'UTF-8');
+		}
+		return '/banners/' . htmlspecialchars($frontPicture, ENT_QUOTES, 'UTF-8');
+	}
+
 
 	function isValidDateTime($dateTime)
 	{
@@ -83,11 +95,11 @@ Class CBanners {
 								
 									$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
 								
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							
 								} else {
 								
-									echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							
 								}
 							
@@ -143,11 +155,11 @@ Class CBanners {
 								
 								$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
 								
-								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							
 							} else {
 								
-								echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							
 							}
 						
@@ -261,11 +273,11 @@ Class CBanners {
 								
 									$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
 								
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							
 								} else {
 								
-									echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							
 								}
 							
@@ -333,11 +345,11 @@ Class CBanners {
 								
 								$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
 								
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							
 							} else {
 								
-								echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 
 							}
 						
@@ -460,11 +472,11 @@ Class CBanners {
 							
 								$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
 							
-								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 						
 							} else {
 							
-								echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 						
 							}
 						
@@ -545,11 +557,11 @@ Class CBanners {
 							
 							$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
 							
-								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 						
 						} else {
 							
-							echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+							echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 
 						}
 					
@@ -678,11 +690,11 @@ Class CBanners {
 							
 								$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
 							
-								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 						
 							} else {
 							
-								echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 						
 							}
 						
@@ -766,11 +778,11 @@ Class CBanners {
 							
 							$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
 							
-								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 						
 						} else {
 							
-							echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+							echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 
 						}
 					
@@ -886,7 +898,7 @@ Class CBanners {
 								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
 									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/banners/$frontPicture\"></a>";
 								} else {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 								}
 						
 							} else {
@@ -894,7 +906,7 @@ Class CBanners {
 								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
 									echo "<img border=\"0\" src=\"/banners/$frontPicture\"></a>";
 								} else {
-									echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 								}
 						
 							}
@@ -981,7 +993,7 @@ Class CBanners {
 								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
 									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/banners/$frontPicture\"></a>";
 								} else {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 								}
 						
 						} else {
@@ -989,7 +1001,7 @@ Class CBanners {
 							if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
 								echo "<img border=\"0\" src=\"/banners/$frontPicture\"></a>";
 							} else {
-								echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							}
 
 						}
@@ -1140,7 +1152,7 @@ Class CBanners {
 								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
 									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/banners/$frontPicture\"></a>";
 								} else {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 								}
 						
 							} else {
@@ -1148,7 +1160,7 @@ Class CBanners {
 								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
 									echo "<img border=\"0\" src=\"/banners/$frontPicture\"></a>";
 								} else {
-									echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 								}
 						
 							}
@@ -1236,7 +1248,7 @@ Class CBanners {
 								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
 									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/banners/$frontPicture\"></a>";
 								} else {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/start3/$frontPicture\"></a>";
+									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 								}
 						
 						} else {
@@ -1244,7 +1256,7 @@ Class CBanners {
 							if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
 								echo "<img border=\"0\" src=\"/banners/$frontPicture\"></a>";
 							} else {
-								echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 							}
 
 						}
@@ -1418,43 +1430,25 @@ Class CBanners {
 	function getBannerAdminNow($site,$section,$upcomming=false) {
 		global $choose_site, $choose_department, $choose_section;
 
-		$rowcolor = true;
-		
-		echo "<div class=\"top10\"></div>\n";
-		echo "<div class=\"hr_gray\"></div>\n";
-		echo "<div class=\"top10\"></div>\n";
-		echo "<div>\n";
-		if ($upcomming) {
-			echo "<h2>Planerat</h2>\n";
-		} else {
-			echo "<h2>Just nu</h2>\n";
-		}
-		echo "<table border=\"0\" cellpadding=\"2\" cellspacing=\"1\" width=\"100%\">\n";
-		echo "\t<tr>\n";
-		if ($upcomming) {
-			echo "\t\t<td width=\"110\">Visas från</td>\n";
-		} else {
-			echo "\t\t<td width=\"110\">Visas till</td>\n";
-		}
-		echo "\t\t<td width=\"75\" align=\"center\">Återstår</td>\n";
-		if ($section == 23 || $section == 24) {
-			echo "\t\t<td width=\"65\" align=\"center\">Sortering</td>\n";
-		}
-		echo "\t\t<td width=\"150\">Bild</td>\n";
-		echo "\t\t<td width=\"100\">Artikel nr</td>\n";
-		echo "\t\t<td width=\"300\">Eventuell länk</td>\n";
-		echo "\t\t<td width=\"95\">Tillåt slut lager</td>\n";
-		echo "\t\t<td width=\"15\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"15\">&nbsp;</td>\n";
-		// echo "\t\t<td width=\"80\" align=\"center\">Leverantör</td>\n";
-		// echo "\t\t<td width=\"130\">Ev. kommentar</td>\n";
-		echo "\t\t<td width=\"25\" align=\"center\">Av</td>\n";
-		echo "\t\t<td width=\"50\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"50\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"50\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"50\">&nbsp;</td>\n";
-		echo "\t</tr>\n";
-		
+		$selfUrl = htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8');
+		$heading = $upcomming ? 'Planerat' : 'Just nu';
+		$dateCol = $upcomming ? 'Visas från' : 'Visas till';
+		$showSort = ($section == 23 || $section == 24);
+
+		echo "<div style=\"margin-top:20px;\">\n";
+		echo "<h2 style=\"font-size:16px;margin-bottom:8px;\">$heading</h2>\n";
+		echo "<table class=\"table-list\">\n";
+		echo "<thead><tr>\n";
+		echo "  <th>$dateCol</th>\n";
+		echo "  <th>Återstår</th>\n";
+		if ($showSort) echo "  <th>Sortering</th>\n";
+		echo "  <th>Bild</th>\n";
+		echo "  <th>Status</th>\n";
+		echo "  <th>Av</th>\n";
+		echo "  <th colspan=\"4\"></th>\n";
+		echo "</tr></thead>\n";
+		echo "<tbody>\n";
+
 		$select  = "SELECT frontID, frontSection, frontDateFrom, frontDateTo, frontPicture, frontArtNr, frontLinc, frontAllowNull, frontLeverantor, frontComment, frontCreatedBy, frontPrio, frontSort ";
 		$select .= "FROM cyberphoto.frontAdmin ";
 		if ($upcomming) {
@@ -1464,121 +1458,82 @@ Class CBanners {
 		}
 		$select .= "AND frontSection = '" . $section . "' AND frontSiteNew = '" . $site . "' ";
 		$select .= "ORDER BY frontSort DESC, frontDateTo ASC, frontArtNr ASC ";
-		
-		// echo $select;
 
 		$res = mysqli_query(Db::getConnection(), $select);
 
-			if (mysqli_num_rows($res) > 0) {
-			
-				while ($row = mysqli_fetch_array($res)) {
-			
-					extract($row);
-					
-					if ($rowcolor == true) {
-						$backcolor = "firstrow";
-					} else {
-						$backcolor = "secondrow";
-					}
-					
-					if ($frontArtNr != "" && $this->artikel_status_utgangen($frontArtNr)) {
-						$showutgangen = "<a onMouseOver=\"this.T_WIDTH=200;this.T_BGCOLOR='#FF0000';this.T_FONTCOLOR='#FFFFFF';return escape('<b>Detta är en utgången produkt!</b>')\"><font color='85000D'>&nbsp;utg</font></a>";
-					} else {
-						$showutgangen = "&nbsp;";
-					}
-					
-					$frontDateFrom = preg_replace('/:[0-9][0-9][0-9]/','', $frontDateFrom);
-					$frontDateTo = preg_replace('/:[0-9][0-9][0-9]/','', $frontDateTo);
-					$beskrivning = $this->getbeskrivningArtNew($frontArtNr);
-					$leverantor  = $this->getLeverantorName($frontLeverantor);
-					$aterstar = $this->getDaysLeft($frontDateTo);
-					$lagersaldo = $this->artikel_status_store($frontArtNr);
-					$frontLinc2 = wordwrap($frontLinc, 60, "<br />\n", true);
+		if (mysqli_num_rows($res) > 0) {
 
-					echo "\t<tr>\n";
-					if ($upcomming) {
-						echo "\t\t<td class=\"$backcolor\">" . date("j M Y H:i", strtotime($frontDateFrom)) . "</td>\n";
-					} else {
-						echo "\t\t<td class=\"$backcolor\">" . date("j M Y H:i", strtotime($frontDateTo)) . "</td>\n";
-					}
-					if ($aterstar < 4) {
-					echo "\t\t<td class=\"$backcolor\" align=\"right\"><font color=\"red\"><b>" . $aterstar . " dagar&nbsp;&nbsp;</td>\n";
-					} else {
-					echo "\t<td class=\"$backcolor\" align=\"right\">" . $aterstar . " dagar&nbsp;&nbsp;</td>\n";
-					}
-					if ($section == 23 || $section == 24) {
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">$frontSort</td>\n";
-					}
-					if ($section == 201 || $section == 202 || $section == 203 || $section == 204) {
-						echo "\t\t<td class=\"$backcolor\"><a onMouseOver=\"this.T_WIDTH=810;return escape('<img width=\'800\' border=\'0\' src=\'https://admin.cyberphoto.se/banners/$frontPicture\'>')\">" . $frontPicture . "</a></td>\n";
-					} else {
-						echo "\t\t<td class=\"$backcolor\"><a onMouseOver=\"this.T_WIDTH=875;return escape('<img border=\'0\' src=\'http://www.cyberphoto.se/start3/$frontPicture\'>')\">" . $frontPicture . "</a></td>\n";
-					}
-					if ($frontArtNr != "") {
-					echo "\t\t<td class=\"$backcolor\">" . $frontArtNr . "</td>\n";
-					} else {
-					echo "\t\t<td class=\"$backcolor\">&nbsp;</td>\n";
-					}
-					echo "\t\t<td class=\"$backcolor\"><a href=\"$frontLinc\" target=\_blank\">" . $frontLinc2 . "</a></td>\n";
-					if ($frontAllowNull == -1) {
-					echo "\t\t<td class=\"$backcolor\" align=\"center\">Ja" . $showutgangen . "</td>\n";
-					} else {
-						if ($lagersaldo > 0) {
-							echo "\t\t<td class=\"$backcolor\" align=\"center\">Nej (" . $lagersaldo . ")" . $showutgangen . "</td>\n";
-						} else {
-							echo "\t\t<td class=\"$backcolor\" align=\"center\">Nej" . $showutgangen . "</td>\n";
-						}
-					}
-					if ($frontAllowNull == -1 || ($frontAllowNull == 0 && $this->check_store_status($frontArtNr))) {
-						echo "\t\t<td class=\"#FFFFFF\" align=\"center\"><a onMouseOver=\"this.T_WIDTH=150;this.T_BGCOLOR='#FFFF00';return escape('<b>Denna visas just nu!</b>')\"><img border=\"0\" src=\"status_green.jpg\"></a></td>\n";
-					} else {
-						echo "\t\t<td class=\"#FFFFFF\" align=\"center\"><a onMouseOver=\"this.T_WIDTH=150;this.T_BGCOLOR='#FFFF00';return escape('<b>Denna visas EJ nu!</b>')\"><img border=\"0\" src=\"status_red.jpg\"></a></td>\n";
-					}
-					if ($frontPrio == -1) {
-						echo "\t\t<td class=\"#FFFFFF\" align=\"center\"><a onMouseOver=\"this.T_WIDTH=250;this.T_BGCOLOR='#FFFF00';return escape('<b>Detta är en prioriterad frontbanner!</b>')\"><img border=\"0\" src=\"star.gif\"></a></td>\n";
-					} else {
-						echo "\t\t<td class=\"#FFFFFF\">&nbsp;</td>\n";
-					}
-					/*
-					if ($frontLeverantor > 0) {
-					echo "<td class=\"$rowcolor\" align=\"center\"><font face=\"Verdana\" size=\"1\"><a onMouseOver=\"this.T_WIDTH=250;return escape('<b>$leverantor</b>')\">Ja</a></td>";
-					} else {
-					echo "<td class=\"$rowcolor\"><font face=\"Verdana\" size=\"1\">&nbsp;</td>";
-					}
-					echo "<td class=\"$rowcolor\"><font face=\"Verdana\" size=\"1\">" . $frontComment . "</td>";
-					*/
-					echo "\t\t<td class=\"$rowcolor\" align=\"center\">" . $frontCreatedBy . "</td>";
-					echo "\t\t<td class=\"#FFFFFF\" align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] ."?copypost=" . $frontID . "\">Kopiera</a></td>\n";
-					echo "\t\t<td class=\"#FFFFFF\" align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] ."?change=" . $frontID . "\">Ändra</a></td>\n";
-					if ($upcomming) {
-						echo "\t\t<td class=\"#FFFFFF\">&nbsp;</td>\n";
-						echo "\t\t<td class=\"#FFFFFF\">&nbsp;</td>\n";
-					} else {
-						echo "\t\t<td class=\"#FFFFFF\" align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] ."?extend=" . $frontID . "&choose_site=$choose_site&choose_department=$choose_department&choose_section=$choose_section\">Förläng</a></td>\n";
-						echo "\t\t<td class=\"#FFFFFF\" align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] ."?endnow=" . $frontID . "&choose_site=$choose_site&choose_department=$choose_department&choose_section=$choose_section\">Avsluta</a></td>\n";
-					}
-					// echo "\t\t<td class=\"#FFFFFF\" align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] ."?confirmdelete=" . $frontID . "\">Ta bort</a></td>\n";
-					echo "\t</tr>\n";
-				
-					if ($rowcolor == true) {
-						$rowcolor = false;
-					} else {
-						$rowcolor = true;
-					}
-				
+			while ($row = mysqli_fetch_array($res)) {
+				extract($row);
+
+				$aterstar  = $this->getDaysLeft($frontDateTo);
+				$isActive  = ($frontAllowNull == -1 || ($frontAllowNull == 0 && $this->check_store_status($frontArtNr)));
+				$imgSrc    = $this->buildImgSrc($frontPicture);
+				$imgLabel  = htmlspecialchars(basename($frontPicture), ENT_QUOTES, 'UTF-8');
+				$createdBy = htmlspecialchars(strstr($frontCreatedBy, '@', true) ?: $frontCreatedBy, ENT_QUOTES, 'UTF-8');
+				$dateVal   = $upcomming ? date("j M Y", strtotime($frontDateFrom)) : date("j M Y", strtotime($frontDateTo));
+				$rowStyle  = '';
+
+				echo "<tr$rowStyle>\n";
+
+				// Datum
+				echo "  <td style=\"white-space:nowrap;\">$dateVal</td>\n";
+
+				// Återstår
+				if ($aterstar < 4) {
+					echo "  <td style=\"color:#dc2626;font-weight:700;text-align:right;white-space:nowrap;\">$aterstar d</td>\n";
+				} else {
+					echo "  <td style=\"text-align:right;white-space:nowrap;\">$aterstar d</td>\n";
 				}
-				
-			} else {
-			
-			echo "\t<tr>\n";
-			echo "\t\t<td colspan=\"12\"><span class=\"noresult\">Inga poster finns upplagd</span></td>\n";
-			echo "\t</tr>\n";
-			
+
+				// Sortering (valfri kolumn)
+				if ($showSort) {
+					echo "  <td style=\"text-align:center;\">$frontSort</td>\n";
+				}
+
+				// Bild — thumbnail med tooltip vid hover
+				echo "  <td>\n";
+				echo "    <div style=\"display:flex;align-items:center;gap:8px;\">\n";
+				echo "      <img src=\"$imgSrc\" alt=\"\" style=\"height:40px;width:auto;border-radius:3px;border:1px solid #e5e7eb;object-fit:cover;cursor:pointer;\"\n";
+				echo "           onclick=\"this.style.height=this.style.height==='40px'?'120px':'40px'\">\n";
+				echo "      <span style=\"font-size:11px;color:#6b7280;word-break:break-all;\">$imgLabel</span>\n";
+				echo "    </div>\n";
+				echo "  </td>\n";
+
+				// Status-indikator
+				if ($isActive) {
+					$statusDot = '<span title="Visas just nu" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981;"></span>';
+				} else {
+					$statusDot = '<span title="Visas EJ" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;"></span>';
+				}
+				echo "  <td style=\"text-align:center;\">$statusDot</td>\n";
+
+				// Skapad av (bara förnamn/användarnamn)
+				echo "  <td style=\"font-size:12px;color:#6b7280;\">$createdBy</td>\n";
+
+				// Action-knappar
+				$btnStyle = 'style="display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;text-decoration:none;border:1px solid #d1d5db;background:#f9fafb;color:#374151;"';
+				echo "  <td><a href=\"{$selfUrl}?copypost={$frontID}\" $btnStyle>Kopiera</a></td>\n";
+				echo "  <td><a href=\"{$selfUrl}?change={$frontID}\" $btnStyle>Ändra</a></td>\n";
+				if ($upcomming) {
+					echo "  <td></td><td></td>\n";
+				} else {
+					$extUrl = "{$selfUrl}?extend={$frontID}&choose_site={$choose_site}&choose_department={$choose_department}&choose_section={$choose_section}";
+					$endUrl = "{$selfUrl}?endnow={$frontID}&choose_site={$choose_site}&choose_department={$choose_department}&choose_section={$choose_section}";
+					echo "  <td><a href=\"$extUrl\" $btnStyle>Förläng</a></td>\n";
+					echo "  <td><a href=\"$endUrl\" style=\"display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;text-decoration:none;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;\">Avsluta</a></td>\n";
+				}
+
+				echo "</tr>\n";
 			}
 
-		echo "</table>\n";
-		echo "</div>\n";
+		} else {
+			$cols = $showSort ? 10 : 9;
+			echo "<tr><td colspan=\"$cols\"><span class=\"noresult\">Inga poster finns upplagda</span></td></tr>\n";
+		}
 
+		echo "</tbody></table>\n";
+		echo "</div>\n";
 	}
 
 	function artikel_status_store($frontArtNr) {
@@ -2159,7 +2114,7 @@ Class CBanners {
 					
 						}
 					
-						echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+						echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 					
 					}
 				
@@ -2220,7 +2175,7 @@ Class CBanners {
 					
 					}
 					
-					echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+					echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 				
 				}
 		
@@ -2318,7 +2273,7 @@ Class CBanners {
 					
 						}
 					
-						echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+						echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 					
 					}
 				
@@ -2379,7 +2334,7 @@ Class CBanners {
 					
 					}
 					
-					echo "<img border=\"0\" src=\"/start3/$frontPicture\"></a>";
+					echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 				
 				}
 		
@@ -2456,7 +2411,7 @@ Class CBanners {
 			echo "<td><font face=\"Verdana\" size=\"1\"><b>" . date("j M Y", strtotime($frontDateFrom)) . "</font></td>";
 			echo "<td><font face=\"Verdana\" size=\"1\"><b>" . date("j M Y", strtotime($frontDateTo)) . "</font></td>";
 			echo "<td align=\"center\"><font face=\"Verdana\" size=\"1\"><b>" . $this->getDaysBetween($frontDateFrom,$frontDateTo,$datumfrom,$datumto) . "</font></td>";
-			echo "<td><font face=\"Verdana\" size=\"1\"><img src=\"/start3/$frontPicture\"></font></td>";
+			echo "<td><font face=\"Verdana\" size=\"1\"><img src=\"{$this->buildImgSrc($frontPicture)}\"></font></td>";
 			echo "<td align=\"center\"><font face=\"Verdana\" size=\"1\"><b>$frontSection</font></td>";
 			echo "<td align=\"center\"><font face=\"Verdana\" size=\"1\"><b>$frontCreatedBy</font></td>";
 			echo "</tr>";

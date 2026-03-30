@@ -2,5 +2,6 @@ dbdata/
 .env
 Thumbs.db
 app/public/banners/
+app/public/banner_images/
 docker/cert/
 .claude/

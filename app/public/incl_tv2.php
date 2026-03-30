@@ -5,6 +5,6 @@
 		include $class . '.php';
 	});
 	$banners = new CBanners();
-	$banners->getBannerNoFramePrio(202,1,true,"no",1);
+	$banners->getBannerNoFrame(202,1,true,"no",1);
 	
 ?>

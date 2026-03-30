@@ -120,7 +120,7 @@ $globalHtml = CAdminUser::renderGlobalQuotationsGrouped($adUserId, 50, 5000);
 
 if ($globalHtml !== '') {
     echo '<div class="profile-widget">' . "\n";
-    echo '  <h3>Alla säljare  pågående offerter</h3>' . "\n";
+    echo '  <h3>Alla säljare - pågående offerter</h3>' . "\n";
     echo $globalHtml . "\n";
     echo '</div>' . "\n\n";
 }

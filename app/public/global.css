@@ -186,13 +186,37 @@ select {
 	text-decoration: none;
 	width: 300px;
 }
-.select_frontsection { 
-	font-family: Verdana; 
-	font-size: 14px; 
-	font-weight: bold; 
-	color: #FF9933; 
+.select_frontsection {
+	font-family: Verdana;
+	font-size: 14px;
+	font-weight: bold;
+	color: #FF9933;
 	text-decoration: none;
 	width: 300px;
+}
+
+.select-modern {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e40af;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 6px 10px;
+    min-width: 200px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.select-modern:hover,
+.select-modern:focus {
+    border-color: #6ee7b7;
+    box-shadow: 0 0 0 2px rgba(16,185,129,0.15);
+}
+
+.select-modern--section {
+    color: #92400e;
 }
 th { 
 	font-family: Verdana, Arial, Helvetica; 
@@ -765,14 +789,14 @@ tr:nth-child(even) {background: #ffffff}
 .marination-table thead th{background:#f9fafb;border-bottom:2px solid #e5e7eb;padding:8px;text-align:left}
 .marination-table td{border-bottom:1px solid #eee;padding:8px}
 
-/* Grupp-rad – färga själva cellerna för att slå igenom all annan CSS */
+/* Grupp-rad ï¿½ fï¿½rga sjï¿½lva cellerna fï¿½r att slï¿½ igenom all annan CSS */
 .marination-group td{background:#e5e7eb !important; font-weight:700}
 
-/* Zebra & hover endast på datarader */
+/* Zebra & hover endast pï¿½ datarader */
 .marination-table tbody tr.data-row:nth-child(even){background:#f9fafb}
 .marination-table tbody tr.data-row:hover{background:#eef2ff}
 
-/* Placera tajt ovanför menyn */
+/* Placera tajt ovanfï¿½r menyn */
 .quick-search{
   width:150px;
   margin:2px 0 3px 0;
@@ -811,10 +835,10 @@ tr:nth-child(even) {background: #ffffff}
 .btn-more{display:inline-block;padding:4px 8px;border:1px solid #cfd6e0;border-radius:4px;text-decoration:none;background:#f3f6fa}
 .btn-more:hover{background:#e8eef7}
 
-/* Slimma headern (lägg detta EFTER dina nuvarande drawer-regler) */
+/* Slimma headern (lï¿½gg detta EFTER dina nuvarande drawer-regler) */
 .drawer-header{
   padding: 3px 10px;   /* var 10px 14px */
-  min-height: 32px;    /* säkerhetsnät: precis över krysset */
+  min-height: 32px;    /* sï¿½kerhetsnï¿½t: precis ï¿½ver krysset */
 }
 
 .drawer-header h1{
@@ -830,10 +854,10 @@ tr:nth-child(even) {background: #ffffff}
   line-height: 24px;
 }
 
-/* (valfritt) lite mindre innerpadding i innehållet */
+/* (valfritt) lite mindre innerpadding i innehï¿½llet */
 .drawer-content{ padding: 12px; }
 
-/* ===== Standard tabelltema (grått) ===== */
+/* ===== Standard tabelltema (grï¿½tt) ===== */
 :root{
   --tbl-header-bg: #97e9e5;   /* rubrikrad bakgrund */
   --tbl-header-fg: #111827;
@@ -843,7 +867,7 @@ tr:nth-child(even) {background: #ffffff}
   --tbl-border:     #d1d5db;
 }
 
-.with-drawer-gutter{ padding-right:150px; } /* lämna luft för slidern */
+.with-drawer-gutter{ padding-right:150px; } /* lï¿½mna luft fï¿½r slidern */
 
 .table-list{
   width:100%; border-collapse:separate; border-spacing:0;
@@ -862,7 +886,7 @@ tr:nth-child(even) {background: #ffffff}
 .text-right{ text-align:right; }
 .text-center{ text-align:center; }
 
-/* Produktlänk = ren text-länk (öppnar drawer) */
+/* Produktlï¿½nk = ren text-lï¿½nk (ï¿½ppnar drawer) */
 .drawer-link.btn-more{
   background:transparent; border:0; padding:0; display:inline;
   color:#0b57d0; text-decoration:none; cursor:pointer;
@@ -885,8 +909,8 @@ tr:nth-child(even) {background: #ffffff}
 .badge-used{background:#111827;border-color:#111827;color:#fff}         /* Begagnad */
 .badge-deal{background:#ede9fe;border-color:#ddd6fe;color:#4c1d95}       /* Fyndvara (lila) */
 .badge-drop{
-  background:#2563eb;     /* blå-600 */
-  border-color:#1e40af;   /* blå-800 kant */
+  background:#2563eb;     /* blï¿½-600 */
+  border-color:#1e40af;   /* blï¿½-800 kant */
   color:#fff;
 }
 
@@ -903,7 +927,7 @@ tr:nth-child(even) {background: #ffffff}
   border-radius:999px;
   font-weight:700;
   font-size:12px;
-  background:#dc2626;   /* röd */
+  background:#dc2626;   /* rï¿½d */
   color:#fff;           /* vit text */
   border:1px solid #b91c1c;
 }
@@ -914,12 +938,12 @@ tr:nth-child(even) {background: #ffffff}
 }
 .pref-modal.show{ display:flex; }
 
-/* Inre lådan */
+/* Inre lï¿½dan */
 .pref-modal .pref-dialog{
   background:#fff; border:1px solid #e5e7eb; border-radius:12px;
   min-width:320px; max-width:420px; padding:12px;
   box-shadow:0 10px 30px rgba(0,0,0,.25);
-  /* isolera från globala resets */
+  /* isolera frï¿½n globala resets */
   font: inherit;
 }
 .pref-modal *{ box-sizing:border-box; font: inherit; }
@@ -935,11 +959,11 @@ tr:nth-child(even) {background: #ffffff}
 }
 .pref-modal .pref-close:hover{ background:#f2f6ff; border-color:#b7c4da; }
 
-/* Body: en inställning per rad */
+/* Body: en instï¿½llning per rad */
 .pref-modal .pref-body{ padding:6px 2px; }
 .pref-modal .pref-row{
   display:flex; align-items:center; gap:8px;
-  margin:6px 0;  /* ? gör att checkrutorna hamnar på varsin rad */
+  margin:6px 0;  /* ? gï¿½r att checkrutorna hamnar pï¿½ varsin rad */
 }
 
 /* Footer */
@@ -949,7 +973,7 @@ tr:nth-child(even) {background: #ffffff}
 }
 .pref-modal .pref-btn:hover{ background:#f2f6ff; border-color:#b7c4da; }
 
-/* === Kundsök: gör namnlänken identisk med produktsök === */
+/* === Kundsï¿½k: gï¿½r namnlï¿½nken identisk med produktsï¿½k === */
 .table-list .col-name a.drawer-link{
   color:#0b66d6 !important;
   text-decoration:none;
@@ -966,7 +990,7 @@ tr:nth-child(even) {background: #ffffff}
 .table-list .col-name .copy-num{ color:inherit; margin-left:6px; }
 .table-list tbody tr:hover td{ background:#f8fbff; }
 
-/* Layout för försäljningsdashboard */
+/* Layout fï¿½r fï¿½rsï¿½ljningsdashboard */
 .sales-dashboard{
     margin-top: 8px;
     margin-bottom: 24px;
@@ -1104,32 +1128,32 @@ tr:nth-child(even) {background: #ffffff}
     font-weight: 600;
 }
 
-/* Grundboll – används överallt */
+/* Grundboll ï¿½ anvï¿½nds ï¿½verallt */
 .summary-dot{
     display:inline-block;
     width:8px;
     height:8px;
     border-radius:9999px;
-    background:#9ca3af;      /* default grå */
+    background:#9ca3af;      /* default grï¿½ */
     margin-right:6px;
     vertical-align:middle;
 }
 
-/* Färgkoder – samma som tidigare kort */
+/* Fï¿½rgkoder ï¿½ samma som tidigare kort */
 .summary-dot-total{
-    background:#111827;      /* mörk för "Totalt" */
+    background:#111827;      /* mï¿½rk fï¿½r "Totalt" */
 }
 
 .summary-dot-ship{
-    background:#2563eb;      /* blå – speditör */
+    background:#2563eb;      /* blï¿½ ï¿½ speditï¿½r */
 }
 
 .summary-dot-store{
-    background:#ea580c;      /* orange – lagershop */
+    background:#ea580c;      /* orange ï¿½ lagershop */
 }
 
 .summary-dot-avg{
-    background:#6b7280;      /* neutral grå – snittorder */
+    background:#6b7280;      /* neutral grï¿½ ï¿½ snittorder */
 }
 
 .sales-detail-table td .summary-dot{
@@ -1235,33 +1259,33 @@ tr:nth-child(even) {background: #ffffff}
 }
 
 .diff-positive{
-    color:#16a34a; /* grön */
+    color:#16a34a; /* grï¿½n */
 }
 
 .diff-negative{
-    color:#dc2626; /* röd */
+    color:#dc2626; /* rï¿½d */
 }
 
 .diff-neutral{
-    color:#6b7280; /* grå */
+    color:#6b7280; /* grï¿½ */
 }
 
-/* Bollar i tabellen (återanvänds från summary-kortet) */
+/* Bollar i tabellen (ï¿½teranvï¿½nds frï¿½n summary-kortet) */
 .comparison-table td .summary-dot{
     margin-right:6px;
     vertical-align:middle;
 }
 
-/* Om du vill ha en separat färg för 'Totalt' */
+/* Om du vill ha en separat fï¿½rg fï¿½r 'Totalt' */
 .summary-dot-total{
-    /* kan vara samma som summary-dot, eller egen färg */
+    /* kan vara samma som summary-dot, eller egen fï¿½rg */
 }
 
-.comparison-table .diff-positive { color: #16a34a; } /* grön */
-.comparison-table .diff-negative { color: #dc2626; } /* röd */
+.comparison-table .diff-positive { color: #16a34a; } /* grï¿½n */
+.comparison-table .diff-negative { color: #dc2626; } /* rï¿½d */
 
 
-/* KPI-kort + donut-gauge – som du redan har, men för tydlighet */
+/* KPI-kort + donut-gauge ï¿½ som du redan har, men fï¿½r tydlighet */
 .kpi-card{
     background: #ffffff;
     border-radius: 12px;

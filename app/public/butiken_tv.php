@@ -1,7 +1,7 @@
 <?php
-function __autoload($class_name) {
+spl_autoload_register(function ($class_name) {
 	include $class_name . '.php';
-}
+});
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="sv" xmlns="http://www.w3.org/1999/xhtml">
@@ -21,7 +21,10 @@ function __autoload($class_name) {
 		  $("#picture").load("incl_tv1.php");
 		 <?php } ?>
 	  }
-	 setInterval('autoRefresh_div()', 25000);
+	 $(document).ready(function() {
+	   autoRefresh_div();
+	   setInterval(autoRefresh_div, 25000);
+	 });
 	</script>
 	<style>
 		body {

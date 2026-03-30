@@ -102,7 +102,6 @@
     <li><a href="incomingOrders.php" <?php if (preg_match("/incomingOrders\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Marginalstruktur</a></li>
     <li><a href="best_tg.php" <?php if (preg_match("/best_tg\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Bäst täckningsgrad</a></li>
     <li><a href="pay_methods.php" <?php if (preg_match("/pay_methods\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Fördelning betalsätt</a></li>
-    <li><a href="specialdeals.php" <?php if (preg_match("/specialdeals\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Specialdeals</a></li>
 	<li><a href="product_feedback.php" <?php if (preg_match("/product_feedback\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Missad försäljning</a></li>
 	<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
 	<li><a href="focus_products.php" <?php if (preg_match("/focus_products\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Våra fokusprodukter</a></li>
@@ -190,7 +189,7 @@
 	</ul>
 </li>
 
-<?php if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") { ?>
+<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
 <li>Development
 	<ul>
     <li><a href="random_employees.php" <?php if (preg_match("/random_employees\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Slumpgeneratorn</a></li>
@@ -204,6 +203,7 @@
     <li><a href="klarna_on_site.php" <?php if (preg_match("/klarna_on_site\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Klarna On Site</a></li>
 	<li><a href="cms.php" <?php if (preg_match("/cms\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>CMS</a></li>
 	<li><a href="menu_web.php" <?php if (preg_match("/menu_web\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Meny webbshop</a></li>
+    <li><a href="specialdeals.php" <?php if (preg_match("/specialdeals\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Specialdeals</a></li>
 	</ul>
 </li>
 <?php } ?>

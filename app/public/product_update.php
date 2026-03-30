@@ -4,6 +4,9 @@ spl_autoload_register(function ($class) {
 });
 
 session_start();
+extract($_GET, EXTR_SKIP);
+extract($_POST, EXTR_SKIP);
+extract($_COOKIE, EXTR_SKIP);
 
 $pac_exist    = false;
 $is_hcampaign = (isset($_GET['hcampaign']) && $_GET['hcampaign'] === "yes");
@@ -127,48 +130,52 @@ if (!empty($artnr)) {
 if ($edit == "yes") {
     $rows = $product->getProductUpdateInfo($ID);
 
-    $addfrom             = $rows->updatetime;
+    if (!$submC) {
+        $addfrom = $rows->updatetime;
+    }
     $m_product_update_id = $rows->m_product_update_id;
     $add_country_id      = $rows->m_pricelist_id;
 
-    // Historik: olika prislistor, nya uppdrag är alltid SE (1)
-    if ($add_country_id == 1000280) {
-        $add_country = 3;
-    } elseif ($add_country_id == 1000018) {
-        $add_country = 2;
-    } else {
-        $add_country = 1;
-    }
+    if (!$submC) {
+        // Historik: olika prislistor, nya uppdrag är alltid SE (1)
+        if ($add_country_id == 1000280) {
+            $add_country = 3;
+        } elseif ($add_country_id == 1000018) {
+            $add_country = 2;
+        } else {
+            $add_country = 1;
+        }
 
-    if ($rows->isupdtpricelist == "Y") {
-        $check_addprice = "yes";
-        $addprice       = $rows->pricelist;
-        // Sverige: 25 % moms
-        $addprice = round($addprice * 1.25, 2);
-    }
+        if ($rows->isupdtpricelist == "Y") {
+            $check_addprice = "yes";
+            $addprice       = $rows->pricelist;
+            // Sverige: 25 % moms
+            $addprice = round($addprice * 1.25, 2);
+        }
 
-    if ($rows->isupdtname == "Y") {
-        $check_name = "yes";
-        $addname    = $rows->name;
-    }
-    if ($rows->isupdtdescription == "Y") {
-        $check_comment = "yes";
-        $addcomment    = $rows->description;
-    }
-    if ($rows->isupdtselfservice == "Y") {
-        $check_showweb = "yes";
-        $showweb       = ($rows->isselfservice == "Y") ? "yes" : "";
-    }
-    if ($rows->isupdtexclautopricing == "Y") {
-        $check_priceshape = "yes";
-        $priceshape       = ($rows->isexclautopricing == "Y") ? "yes" : "";
-    }
-    if ($rows->isupdtdiscontinued == "Y") {
-        $check_utgangen = "yes";
-        $utgangen       = ($rows->discontinued == "Y") ? "yes" : "";
-    }
-    if ($rows->isTradeIn == -1) {
-        $check_addprice = "";
+        if ($rows->isupdtname == "Y") {
+            $check_name = "yes";
+            $addname    = $rows->name;
+        }
+        if ($rows->isupdtdescription == "Y") {
+            $check_comment = "yes";
+            $addcomment    = $rows->description;
+        }
+        if ($rows->isupdtselfservice == "Y") {
+            $check_showweb = "yes";
+            $showweb       = ($rows->isselfservice == "Y") ? "yes" : "";
+        }
+        if ($rows->isupdtexclautopricing == "Y") {
+            $check_priceshape = "yes";
+            $priceshape       = ($rows->isexclautopricing == "Y") ? "yes" : "";
+        }
+        if ($rows->isupdtdiscontinued == "Y") {
+            $check_utgangen = "yes";
+            $utgangen       = ($rows->discontinued == "Y") ? "yes" : "";
+        }
+        if ($rows->isTradeIn == -1) {
+            $check_addprice = "";
+        }
     }
 }
 
@@ -200,7 +207,7 @@ if (!$subm && !$submC) {
     $utpris_se        = $rows->utpris;
     $utpris_moms_se   = $rows->utpris + $rows->utpris * $rows->momssats;
 
-    $marginal_se      = (($rows->utpris - $rows->art_id) / $rows->utpris) * 100;
+    $marginal_se      = $rows->utpris != 0 ? (($rows->utpris - $rows->art_id) / $rows->utpris) * 100 : 0;
     $marginal_tb_se   = $utpris_se - $netto_se;
     $marginal_tb_moms_se = $marginal_tb_se + ($marginal_tb_se * $rows->momssats);
 
@@ -368,7 +375,7 @@ if ($subm) {
         }
 
         // Standarduppdatering
-        $product->makeProductUpdate(
+        if (!$product->makeProductUpdate(
             $m_product_id,
             $addfrom,
             $add_country,
@@ -384,7 +391,10 @@ if ($subm) {
             $addcomment,
             $check_priceshape,
             $priceshape
-        );
+        )) {
+            $olright = false;
+            $wrongmess .= "<p class=\"wrongmess\">- Denna handling gick ej att utföra... Sorry ;)</p>";
+        }
 
         // Värdepaket (PAC)
         if ($check_addprice_pac == "yes" && $check_addprice == "yes") {
@@ -776,7 +786,7 @@ if ($calc) {
     ?>
 
     <?php if (!$uppdate_ok) { ?>
-    <form name="update_form">
+    <form name="update_form" method="post">
     <?php if (!empty($m_product_update_id)) { ?>
         <input type="hidden" value="true" name="submC">
         <input type="hidden" value="<?php echo $m_product_update_id; ?>" name="m_product_update_id">

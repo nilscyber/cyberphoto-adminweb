@@ -76,17 +76,8 @@
 
 				// Vänta 3 sekunder så vi hinner se datan
 				// sleep(3);
-				if (isset($_SESSION['return_to'])) {
-					if ($_SESSION['return_to'] == "https://admin.cyberphoto.se/index.php") {
-						header('Location: profile.php');
-					} else {
-						// header('Location: profile.php');
-						header('Location: ' . $_SESSION['return_to']);
-					}
-					unset($_SESSION['return_to']);
-				} else {
-					header('Location: profile.php');
-				}
+				unset($_SESSION['return_to']);
+				header('Location: profile.php');
 				exit;
 			}
 		}

@@ -65,7 +65,11 @@ Class CProduct {
 			exit;
 		}
 		include_once 'ADempiere/ProductUpdate_v2.php';
-		$pr = new ProductUpdate();
+		try {
+			$pr = new ProductUpdate();
+		} catch (Exception $e) {
+			return false;
+		}
 		
 		if ($_COOKIE['login_ok'] != "true" && false) {
 			echo "Du är inte längre inloggad och därför ej behörig att utföra denna åtgärd...";
@@ -133,11 +137,12 @@ Class CProduct {
 			}
 		}
 		
-		$res = $pr->add();
-		if ($res !== true) {
-			echo "error: " . $res;
+		try {
+			$res = $pr->add();
+		} catch (Exception $e) {
+			return false;
 		}
-				
+		return ($res === true);
 	}
 
 	function changeProductUpdate($m_product_update_id,$m_product_id,$addfrom,$add_country,$check_addprice,$addprice_VAT,$check_showweb,$showweb,$check_utgangen,$utgangen,$check_name,$addname,$check_comment,$addcomment,$check_priceshape,$priceshape) {
@@ -212,8 +217,8 @@ Class CProduct {
 				$updt .= "isexclautopricing = 'N', ";
 			}
 		} else {
-			$updt .= "isupdtselfservice = 'N', ";
-			$updt .= "isselfservice = 'N', ";
+			$updt .= "isupdtexclautopricing = 'N', ";
+			$updt .= "isexclautopricing = 'N', ";
 		}
 		$updt .= "updatetime = '" . $addfrom . "' ";
 		$updt .= "WHERE isactive = 'Y' AND isupdated = 'N' AND m_product_update_id = '" . $m_product_update_id . "' ";

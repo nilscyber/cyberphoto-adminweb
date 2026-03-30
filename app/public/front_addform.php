@@ -1,144 +1,125 @@
 <?php
-if ($_COOKIE['login_ok'] != "true") {
-	echo "<div class=\"container_loggin\">\n";
-	echo "<span class=\"not_loggin\">Du är Ej inloggad och kommer därför inte kunna utföra åtgärden!</span>\n";
-	echo "</div>\n";
-	echo "<div class=\"clear\"></div>\n";
+if (($_COOKIE['login_ok'] ?? '') !== 'true') {
+    echo '<p style="color:#dc2626;font-weight:600;">Du är ej inloggad och kan därför inte utföra åtgärden.</p>';
 }
+
+if ($addsort == "")     $addsort = 0;
+if ($addcategory == "") $addcategory = 0;
+if ($section == "")     $section = $_SESSION['bannersection'];
+
+$formTitle = $addid ? 'Redigera post' : ($addidc ? 'Kopiera post' : 'Lägg till post');
+$submitLabel = $addid ? 'Uppdatera' : ($addidc ? 'Kopiera post' : 'Lägg till');
 ?>
-<div class="top10"></div>
-<div class="hr_gray"></div>
-<div class="top10"></div>
-<?php
-if ($addid != "") {
-	echo "<h2>Redigera post</h2>\n";
-} elseif ($addidc != "") {
-	echo "<h2>Kopiera post</h2>\n";
-} else {
-	if ($section == "") {
-		$section = $_SESSION['bannersection'];
-	}
-	echo "<h2>Lägg till post</h2>\n";
-}
-if ($addsort == "") {
-	$addsort = 0;
-}
-if ($addcategory == "") {
-	$addcategory = 0;
-}
-?>
-<div class="container_grey floatleft">
-<form name="addbannerform">
-  <?php if ($addid !="") { ?>
-  <input type="hidden" value="<?php echo $addid; ?>" name="addid">
-  <input type="hidden" value=true name="submC">
-  <?php } else { ?>
-  <input type="hidden" value=true name="subm">
-  <input type="hidden" value="yes" name="add">
-  <input type="hidden" value="<?php echo $addidc; ?>" name="addidc">
-  <?php } ?>
-  <table border="0" cellpadding="5" cellspacing="3">
-    <?php if ($addidc != "") { ?>
-    <tr>
-      <td>Kopiera till</td>
-      <td>
-	  <select size="1" name="addsitecopy">
-	  <option></option>
-	  <option>*** Sverige ***</option>
-	  <option value="1">Foto-Video</option>
-	  <option value="2">Mobiltelefoni</option>
-	  <option value="3">Batterier</option>
-	  <option value="4">Outdoor</option>
-	  <option></option>
-	  <option>*** Norge ***</option>
-	  <!--
-	  <option value="101">Foto-Video</option>
-	  -->
-	  <option value="102">Mobiltelefoni</option>
-	  <!--
-	  <option value="103">Batterier</option>
-	  <option value="104">Outdoor</option>
-	  -->
-	  <option></option>
-	  <option>*** Finland ***</option>
-	  <!--
-	  <option value="201">Foto-Video</option>
-	  -->
-	  <option value="202">Mobiltelefoni</option>
-	  <!--
-	  <option value="203">Batterier</option>
-	  <option value="204">Outdoor</option>
-	  -->
-	  <option></option>
-	  <option>*** Finland (svenska) ***</option>
-	  <!--
-	  <option value="301">Foto-Video</option>
-	  -->
-	  <option value="302">Mobiltelefoni</option>
-	  <!--
-	  <option value="303">Batterier</option>
-	  <option value="304">Outdoor</option>
-	  -->
-	  </select>
-	  </td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td><a onMouseOver="this.T_WIDTH=350;return escape('<b>Kopiera post till annan frontsida!</b><br><br>Om du kopiera post till annan frontsida och den är aktiv så visas den omgående.<br><br>Var därför mycket noggrann med att Allt är korrekt. Framförallt bilder och bildlänkar är känsliga.')"><b>OBS! Läs detta!</b></a></td>
-    </tr>
-    <?php } ?>
-    <tr>
-      <td>Gäller från <font color="#FF0000">*</font></td>
-      <td><input type="text" name="addfrom" size="20" value="<?php if ($addfrom == "") { echo date("Y-m-d H:i:s", time()); } else { echo $addfrom; }  ?>" style="font-family: Verdana; font-size: 8pt"></td>
-      <td>&nbsp;</td>
-      <td>Gäller till <b><font color="#FF0000">*</font></b></td>
-      <td><input type="text" name="addto" size="20" value="<?php if ($addto == "") { echo date("Y-m-d 23:59:59",mktime(0,0,0,date("n")+1,1-1,date("Y"))); } else { echo $addto; }  ?>" style="font-family: Verdana; font-size: 8pt"></td>
-    </tr>
-    <tr>
-      <td>Sektion <b><font color="#FF0000">*</font></b></td>
-      <td><input type="text" name="addsection" value="<?php echo $section; ?>" size="5" style="font-family: Verdana; font-size: 8pt<?php if ($change != "") { ?>; background-color: #CCCCCC<?php } ?>"<?php if ($change != "") { ?> onFocus="this.blur()"<?php } ?>></td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <?php if ($change != "") { ?>
-      <td><a href="<?php echo $_SERVER['PHP_SELF']; ?>?change=<?php echo $addid; ?>&now=yes">Avsluta tiden som är nu</a></td>
-      <?php } else { ?>
-      <td>&nbsp;</td>
-      <?php } ?>
-    </tr>
-    <tr>
-      <td>Bild <b><font color="#FF0000">*</font></b></td>
-      <td><input type="text" name="addpicture" size="20" value="<?php echo $addpicture; ?>" style="font-family: Verdana; font-size: 8pt"></td>
-      <td>&nbsp;</td>
-      <td>Art nr</td>
-      <td><input type="text" name="addartnr" size="20" value="<?php echo $addartnr; ?>" style="font-family: Verdana; font-size: 8pt"></td>
-    </tr>
-    <tr>
-      <td>Länk</td>
-      <td colspan="4"><input type="text" name="addlinc" size="62" value="<?php echo $addlinc; ?>" style="font-family: Verdana; font-size: 8pt"></td>
-    </tr>
-    <tr>
-      <td>Tillåt slut i lager</td>
-      <td><input type="checkbox" name="addstore" value="yes" <?php if ($addstore == -1) { ?> checked <?php } ?>></td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <td>Prioriterad</td>
-      <td><input type="checkbox" name="addprio" onclick="javascript:alertPrio()" value="yes" <?php if ($addprio == -1) { ?> checked <?php } ?><?php if ($change != "") echo " disabled";?>></td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
-	<tr>
-      <td>Sortera</td>
-      <td colspan="4"><input type="text" name="addsort" size="2" value="<?php echo $addsort; ?>" style="font-family: Verdana; font-size: 8pt">&nbsp;gäller endast sektion vänster/höger, 0 är default</td>
-    </tr>
-	<tr>
-      <td>Kategori</td>
-      <td colspan="4"><input type="text" name="addcategory" size="2" value="<?php echo $addcategory; ?>" style="font-family: Verdana; font-size: 8pt">&nbsp;gäller endast banners i prislista, 0 är default</td>
-    </tr>
-  </table>
-  <p><input type="submit" value="<?php if ($addid !="") { ?>Uppdatera<?php } elseif ($addidc !="") {?>Kopiera post<?php } else { ?>Lägg till<?php } ?>" name="skicka" style="font-family: Verdana; font-size: 8pt; color: #000000; font-weight: bold; background-color: #C0C0C0"></p>
+
+<div style="margin-top:12px;">
+<h2><?= $formTitle ?></h2>
+
+<form name="addbannerform" style="max-width:500px;">
+    <?php if ($addid): ?>
+        <input type="hidden" name="addid"  value="<?= (int)$addid ?>">
+        <input type="hidden" name="submC" value="true">
+    <?php else: ?>
+        <input type="hidden" name="subm"   value="true">
+        <input type="hidden" name="add"    value="yes">
+        <input type="hidden" name="addidc" value="<?= htmlspecialchars($addidc, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endif; ?>
+    <input type="hidden" name="addsection" value="<?= (int)$section ?>">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div>
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">
+                Gäller från <span style="color:#dc2626;">*</span>
+            </label>
+            <input type="text" name="addfrom" class="select-modern"
+                   value="<?= $addfrom ? htmlspecialchars($addfrom, ENT_QUOTES, 'UTF-8') : date('Y-m-d H:i:s') ?>"
+                   style="width:100%;box-sizing:border-box;">
+        </div>
+        <div>
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;">
+                Gäller till <span style="color:#dc2626;">*</span>
+            </label>
+            <input type="text" name="addto" class="select-modern"
+                   value="<?= $addto ? htmlspecialchars($addto, ENT_QUOTES, 'UTF-8') : date('Y-m-d 23:59:59', mktime(0,0,0,date('n')+1,0,date('Y'))) ?>"
+                   style="width:100%;box-sizing:border-box;">
+        </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">
+            Bild <span style="color:#dc2626;">*</span>
+        </label>
+
+        <input type="hidden" name="addpicture" id="addpicture"
+               value="<?= htmlspecialchars($addpicture, ENT_QUOTES, 'UTF-8') ?>">
+
+        <?php
+        $prevSrc = '';
+        if (!empty($addpicture)) {
+            $p = $addpicture;
+            $prevSrc = (strncmp($p,'/',1)===0 || strncmp($p,'http',4)===0)
+                ? htmlspecialchars($p, ENT_QUOTES, 'UTF-8')
+                : '/start3/' . htmlspecialchars($p, ENT_QUOTES, 'UTF-8');
+        }
+        ?>
+        <div id="banner-preview-wrap" style="<?= $prevSrc ? '' : 'display:none;' ?>margin-bottom:8px;">
+            <img id="banner-preview" src="<?= $prevSrc ?>" alt="Förhandsgranskning"
+                 style="max-height:120px;max-width:100%;border:1px solid #d1d5db;border-radius:6px;">
+        </div>
+
+        <label class="btn-ghost btn" for="banner-file-input"
+               style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:600;border:1px solid #d1d5db;background:#f9fafb;color:#374151;text-decoration:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+            </svg>
+            Välj bild
+        </label>
+        <input type="file" id="banner-file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;">
+        <span id="banner-upload-status" style="margin-left:8px;font-size:12px;color:#6b7280;"></span>
+    </div>
+
+    <button type="submit" style="padding:8px 20px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;">
+        <?= $submitLabel ?>
+    </button>
 </form>
 </div>
-<div class="clear"></div>
+
+<script>
+(function () {
+    var fileInput   = document.getElementById('banner-file-input');
+    var hiddenPath  = document.getElementById('addpicture');
+    var preview     = document.getElementById('banner-preview');
+    var previewWrap = document.getElementById('banner-preview-wrap');
+    var status      = document.getElementById('banner-upload-status');
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', function () {
+        var file = this.files[0];
+        if (!file) return;
+        status.style.color = '#6b7280';
+        status.textContent = 'Laddar upp…';
+
+        var formData = new FormData();
+        formData.append('banner_image', file);
+
+        fetch('banner_upload.php', { method: 'POST', body: formData })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.error) {
+                    status.style.color = '#dc2626';
+                    status.textContent = data.error;
+                    return;
+                }
+                hiddenPath.value = data.path;
+                preview.src = data.path;
+                previewWrap.style.display = 'block';
+                status.style.color = '#059669';
+                status.textContent = '✓ ' + file.name;
+            })
+            .catch(function () {
+                status.style.color = '#dc2626';
+                status.textContent = 'Uppladdningen misslyckades.';
+            });
+    });
+}());
+</script>

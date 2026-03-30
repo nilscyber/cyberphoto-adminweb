@@ -19,7 +19,7 @@
 		echo "<h2>Aktuella bevakningar</h2>\n";
 		$monitor->getActualMonitors();
 		// if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") {
-		if ($_COOKIE['login_mail'] == 'sjabo@cyberphoto.nu') {
+		if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') {
 			echo "<h2>Redan aviserade bevakningar</h2>\n";
 			$monitor->getNotActualMonitors();
 		}
