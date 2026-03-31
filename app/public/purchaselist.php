@@ -1,6 +1,7 @@
 <?php
 require_once("CWebADInternSuplier.php");
 $adintern = new CWebADInternSuplier();
+$artnr = isset($_GET['artnr']) ? $_GET['artnr'] : '';
 ?>
 <html>
 

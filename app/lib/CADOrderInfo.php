@@ -277,7 +277,7 @@ Class CADOrderInfo {
 				
 					while ($res && $row = pg_fetch_row($res)) {
 					
-						$beskrivning = eregi_replace("\n", "<br>", $row[2]);
+						$beskrivning = preg_replace("/\n/i", "<br>", $row[2]);
 						
 						if ($countrow == 1) {
 							echo "<div class=\"chat\">Interna kommentarer om denna order</div>\n";
@@ -326,7 +326,7 @@ Class CADOrderInfo {
 				
 					while ($res && $row = pg_fetch_row($res)) {
 					
-						$beskrivning = eregi_replace("\n", "<br>", $row[2]);
+						$beskrivning = preg_replace("/\n/i", "<br>", $row[2]);
 						
 						echo "<div class=\"bottom5\">\n";
 						echo "<div style=\"float: left; margin-right: 5px;\">" . date("Y-m-d", strtotime($row[0])) . "</div>\n";
