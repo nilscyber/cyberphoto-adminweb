@@ -76,6 +76,7 @@ $submitLabel = $addid ? 'Uppdatera' : ($addidc ? 'Kopiera post' : 'Lägg till');
         </label>
         <input type="file" id="banner-file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;">
         <span id="banner-upload-status" style="margin-left:8px;font-size:12px;color:#6b7280;"></span>
+        <div style="margin-top:14px;font-size:11px;color:#6b7280;">För att passa våra TV-skärmar i butiken ska storleken vara: <b>1920 x 1044 px</b></div>
     </div>
 
     <button type="submit" style="padding:8px 20px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;">

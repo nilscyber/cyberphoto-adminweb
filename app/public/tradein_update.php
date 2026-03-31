@@ -3,6 +3,11 @@ spl_autoload_register(function ($class) {
 	include $class . '.php';
 });
 
+session_start();
+extract($_GET, EXTR_SKIP);
+extract($_POST, EXTR_SKIP);
+extract($_COOKIE, EXTR_SKIP);
+
 $tradein = new CTradeIn();
 
 if ($edit == "yes") {
@@ -69,7 +74,7 @@ if ($wrongmess) {
 ?>
 <div>
 <?php if (!$uppdate_ok) { ?>
-<form name="update_form">
+<form name="update_form" method="post">
 <input type="hidden" value=true name="subm">
 <table id="update_box" border="0" cellpadding="2" cellspacing="0">
   <tr>
