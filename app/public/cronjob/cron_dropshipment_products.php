@@ -12,6 +12,7 @@
 
 include_once("Db.php");
 include_once("CDropship.php");
+include_once(__DIR__ . "/../../lib/SmtpMail.php");
 
 $u8 = function ($s) {
     return (string)$s;
@@ -102,9 +103,5 @@ $toMail = "stefan@cyberphoto.se, emil.lindberg@cyberphoto.se";
 $rawSubject = $title . " | Levererat: " . substr($from, 0, 10) . "" . substr($toInclusive, 0, 10);
 $subject = '=?UTF-8?B?' . base64_encode($rawSubject) . '?=';
 
-$headers  = "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-$headers .= "From: no-reply@cyberphoto.se\r\n";
-
-mail($toMail, $subject, $body, $headers);
+SmtpMail::send($toMail, $subject, $body);
 ?>

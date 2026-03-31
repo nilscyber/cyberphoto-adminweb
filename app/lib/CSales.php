@@ -246,8 +246,8 @@ function displaySalesPerUser() {
 		$diff_pct_color = ($diff_pct >= 0) ? 'style="color: green;"' : 'style="color: red;"';
 
 		echo "<tr class=\"$backcolor\">
-			<td align=\"left\">" . isset($sales_now[$seller]['namn']) ? $sales_now[$seller]['namn'] :
-					(isset($sales_last[$seller]['namn']) ? $sales_last[$seller]['namn'] : $seller) . "</td>
+			<td align=\"left\">" . (isset($sales_now[$seller]['namn']) ? $sales_now[$seller]['namn'] :
+					(isset($sales_last[$seller]['namn']) ? $sales_last[$seller]['namn'] : $seller)) . "</td>
 			<td align=\"center\">$antal</td>
 			<td align=\"right\">" . number_format($summa, 0, ',', ' ') . " SEK</td>
 			<td align=\"right\">" . number_format($last_summa, 0, ',', ' ') . " SEK</td>

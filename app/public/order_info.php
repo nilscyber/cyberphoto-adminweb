@@ -1,6 +1,7 @@
 <?php
 require_once("CADOrderInfo.php");
 $orderi = new CADOrderInfo();
+$order = isset($_GET['order']) ? $_GET['order'] : '';
 ?>
 <html>
 

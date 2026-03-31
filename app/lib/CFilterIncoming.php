@@ -78,11 +78,11 @@ Class CFilterIncoming {
 
 		$orderdatum = date("Y-m-d H:i:s", time());
 		
-		$addcreatedby = "noreply";
+		$addcreatedby = "noreply@cyberphoto.se";
 
 		// $recipient .= " stefan";
-		$recipient .= " po";
-		$recipient .= " urgent_ticket";
+		$recipient .= " po@cyberphoto.se";
+		$recipient .= " urgent_ticket@cyberphoto.se";
 		
 		$subj = $orderdatum . " Order som MÅSTE kontrolleras är upplagd!";
 
