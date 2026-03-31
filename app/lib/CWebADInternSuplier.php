@@ -2810,7 +2810,7 @@ Class CWebADInternSuplier {
 		global $supID;
 
 		$countrow = 1;
-		$dagensdatum = date("Y-m-d", strtotime(yesterday));
+		$dagensdatum = date("Y-m-d", strtotime('yesterday'));
 		$totalvikt = 0;
 		$antaltotal = 0;
 		
