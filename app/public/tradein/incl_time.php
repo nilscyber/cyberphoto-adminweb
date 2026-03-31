@@ -1,5 +1,6 @@
 <?php
 session_start();
+date_default_timezone_set('Europe/Stockholm');
 require_once("CTemp.php");
 $temp = new CTemp();
 

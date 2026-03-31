@@ -19,7 +19,7 @@ Class CTradeIn {
 
 	function replace_char($string) {
 			$from = array("Mon", "Tue", "Wen", "Thu", "Fri", "Sat", "Sun");
-			$to = array("M�n", "Tis", "Ons", "Tor", "Fre", "L�r", "S�n");
+			$to = array("Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön");
 			// return str_replace($from, $to, $string);
 			return str_replace($from, $to, $string);
 	}
@@ -332,9 +332,9 @@ Class CTradeIn {
 				if ($res && pg_num_rows($res) > 0) {
 				
 					if ($lastweek) {
-						echo "<div class=\"count_data bold italic\">S�lda begagnade produkter senaste veckan</div>\n";
+						echo "<div class=\"count_data bold italic\">Sålda begagnade produkter senaste veckan</div>\n";
 					} else {
-						echo "<div class=\"count_data bold italic\">Senast s�lda begagnade produkter</div>\n";
+						echo "<div class=\"count_data bold italic\">Senast sålda begagnade produkter</div>\n";
 					}
 					echo "<table id=\"begg_senaste\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
 				
@@ -1654,9 +1654,9 @@ Class CTradeIn {
 		if ($res && pg_num_rows($res) > 0) {
 		
 			if ($all) {
-				echo "<div class=\"count_data bold italic\">Samtliga produkter fler �n 1st</div>\n";
+				echo "<div class=\"count_data bold italic\">Samtliga produkter fler än 1st</div>\n";
 			} else {
-				echo "<div class=\"count_data bold italic\">Produkter fler �n 2st</div>\n";
+				echo "<div class=\"count_data bold italic\">Produkter fler än 2st</div>\n";
 			}
 			echo "<table id=\"begg_miss5555\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
 		
@@ -2062,7 +2062,7 @@ Class CTradeIn {
 		
 		if ($res && pg_num_rows($res) > 0) {
 		
-			echo "<div class=\"count_data bold italic\">Inbytesaff�rer d�r vi saknar personnummer</div>\n";
+			echo "<div class=\"count_data bold italic\">Inbytesaffärer där vi saknar personnummer</div>\n";
 			echo "<table id=\"begg_missprice\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
 		
 			while ($res && $row = pg_fetch_object($res)) {
@@ -2200,10 +2200,12 @@ Class CTradeIn {
 	}
 
 	function addNotify($artnr,$showname,$type) {
-	
+
+		$showname = substr($showname, 0, 50);
+
 		$todaydate = date("Y-m-d H:i:s", time());
 		$todaydate_short = date("Y-m-d", time());
-		
+
 		/*
 		$updt  = "INSERT INTO cyberadmin.tradeinnotify ";
 		$updt .= "(notArtnr, notShow, notType, notTime) ";
@@ -2218,9 +2220,13 @@ Class CTradeIn {
 
 		// echo $updt;
 		// exit;
-		
-		$res = mysqli_query(Db::getConnection(true), $updt);
-	
+
+		try {
+			$res = mysqli_query(Db::getConnection(true), $updt);
+		} catch (\Exception $e) {
+			// Notify insert failed silently — non-critical
+		}
+
 	}
 
 	function getPingIncomming($oldies) {
