@@ -605,7 +605,7 @@ class CMonitorArticles {
     function sendMonitorMess_v1($monUser, $monArtnr, $monStoreValue, $monComment, $monType) {
         $bevdatum = date("Y-m-d H:i:s", time());
 
-        $addcreatedby = "no-reply";
+        $addcreatedby = "no-reply@cyberphoto.se";
         $recipient = " " . $monUser;
         $subj = $bevdatum . " Bevakning av artikel " . $monArtnr;
         $extra = "From: " . $addcreatedby;

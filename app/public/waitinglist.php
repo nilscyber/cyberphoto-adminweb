@@ -1,4 +1,7 @@
 <?php
+extract($_GET, EXTR_SKIP);
+extract($_POST, EXTR_SKIP);
+extract($_COOKIE, EXTR_SKIP);
 require_once("CWebADInternSuplier.php");
 $adintern = new CWebADInternSuplier();
 ?>
