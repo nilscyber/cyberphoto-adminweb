@@ -1560,7 +1560,7 @@ Class CMobile {
 		
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1589,7 +1589,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= $desc;
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1622,7 +1622,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= $desc;
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1657,7 +1657,7 @@ Class CMobile {
 		$text1 .= "K�pare: " . $old_lnamn . "\n\n";
 		$text1 .= $desc;
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1720,7 +1720,7 @@ Class CMobile {
 			$text1 .= "Produkten skall skickas till: " . $old_lpostadr . "\n\n";
 		}
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1803,7 +1803,7 @@ Class CMobile {
 		}
 		$text1 .= "http://www.birthday.se/sok/?a=" . urlencode($old_lco) . "&z=" . urlencode($old_lpostnr) . "&c=" . urlencode($old_lpostadr) . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1829,7 +1829,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1852,7 +1852,7 @@ Class CMobile {
 		$text1 .= "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 	
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 	
 	}
 	
@@ -1887,7 +1887,7 @@ Class CMobile {
 		}
 		$text1 .= "Registrerat fr�n IP-adress: " . $_SERVER['REMOTE_ADDR'] . "\n\n";
 	
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 	
 	}
 	
@@ -1907,7 +1907,7 @@ Class CMobile {
 		// $text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1928,7 +1928,7 @@ Class CMobile {
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		$text1 .= "Netto: " . $goodsvalue . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1951,7 +1951,7 @@ Class CMobile {
 		$text1 .= "Kundvagnen:\n\n";
 		$text1 .= $this->viewBasketShort($kundvagn);
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1983,7 +1983,7 @@ Class CMobile {
 		$text1 .= "Kundvagnen:\n\n";
 		$text1 .= $this->viewBasketShort($kundvagn);
 	
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 	
 	}
 	
@@ -2018,7 +2018,7 @@ Class CMobile {
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		$text1 .= "Netto: " . $goodsvalue . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -2058,7 +2058,7 @@ Class CMobile {
 			$text1 .= "Mobil: " . $old_mobilnr . "\n\n";
 		}
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	
@@ -2105,7 +2105,7 @@ Class CMobile {
 		}
 		$text1 .= "http://www.birthday.se/sok/?a=" . urlencode($old_lco) . "&z=" . urlencode($old_lpostnr) . "&c=" . urlencode($old_lpostadr) . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	
@@ -2127,7 +2127,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -2147,7 +2147,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -2167,7 +2167,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -2187,7 +2187,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	
@@ -2206,7 +2206,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -2225,7 +2225,7 @@ Class CMobile {
 		$text1 = "V�nligen kontrollera detta i aff�rssystemet.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	
@@ -2252,7 +2252,7 @@ Class CMobile {
 		$text1 .= "V�nligen vidta l�mpliga �tg�rder.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	

@@ -1956,7 +1956,7 @@ Class CCheckStart {
 			}
 		}
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 

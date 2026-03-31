@@ -2643,7 +2643,7 @@ Class CCampaignCheck {
 		// $text1 .= "http://www.cyberphoto.se/order/admin/campaign.php?show=" . $cnt . "\n";
 		$text1 .= "http://admin.cyberphoto.se/campaign.php?show=" . $cnt . "\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 

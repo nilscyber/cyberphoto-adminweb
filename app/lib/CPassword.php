@@ -168,7 +168,7 @@ Class CPassword {
 			$text1 .= "Dina inloggningsuppgifter ändrar du vid nästa orderläggning.\n\n";
 		}
 		$extra = array("Content-type =>"text/plain: charset=\"UTF-8","From" => "$addcreatedby"); 
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	

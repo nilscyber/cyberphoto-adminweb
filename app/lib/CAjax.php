@@ -517,7 +517,7 @@ function sendMess($subj, $text, $senderMail, $namn, $recipient, $type, $telefon,
 	}
 	
 	// mail till oss
-	mail($recipient, $subj, $text1, $extra);
+	SmtpMail::send($recipient, $subj, $text1, $extra);
 	
 	// spara meddelandet i en databas
 
@@ -556,7 +556,7 @@ eof;
 	}
 	// $extraKopia .= "Reply-To: detta_meddelande_går_inte_att_svara_på@__.se";
 
-	mail($senderMail, $subjKopia, $textKopia, $extraKopia);
+	SmtpMail::send($senderMail, $subjKopia, $textKopia, $extraKopia);
 
 	$this->saveMessage($subj, $text, $senderMail, $namn, $recipient, $type, $telefon, $ordernr);
 
@@ -604,7 +604,7 @@ function sendMessService($subj, $text, $senderMail, $namn, $recipient, $type, $t
 	$text1 .= "\n-------------------------------------------------";
 	
 	// mail till oss
-	mail($recipient, $subj, $text1, $extra);
+	SmtpMail::send($recipient, $subj, $text1, $extra);
 	
 	// spara meddelandet i en databas
 
@@ -628,7 +628,7 @@ eof;
 	$extraKopia = "From:autosvar@cyberphoto.se\n";
 	// $extraKopia .= "Reply-To: detta_meddelande_går_inte_att_svara_på@__.se";
 
-	mail($senderMail, $subjKopia, $textKopia, $extraKopia);
+	SmtpMail::send($senderMail, $subjKopia, $textKopia, $extraKopia);
 
 	$this->saveMessage($subj, $text, $senderMail, $namn, $recipient, $type, $telefon, $ordernr);
 

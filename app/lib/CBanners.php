@@ -1983,7 +1983,7 @@ Class CBanners {
 			$text1 .= "http://www.cyberphoto.se/start3/" . $addpicture . " ";
 		}
 	
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 

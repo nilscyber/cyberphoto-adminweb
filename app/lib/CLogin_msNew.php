@@ -421,7 +421,7 @@ eof;
 $subject = "Kundinfo från CyberPhoto";
 $extra = "From: order@cyberphoto.se\n";
 
-mail($row->email, $subject, $message, $extra);
+SmtpMail::send($row->email, $subject, $message, $extra);
 endif; 
 }
 

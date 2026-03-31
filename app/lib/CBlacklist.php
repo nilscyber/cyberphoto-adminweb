@@ -58,7 +58,7 @@ Class CBlacklist {
 		$text1 .= "Bavakning upplagd av: " . $by . "\n\n";
 		$text1 .= "Eventuell notering: " . $note . "\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	

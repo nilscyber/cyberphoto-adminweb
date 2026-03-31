@@ -1651,7 +1651,7 @@ Class CTurnOver {
 		
 		$text1 = "Klockan är nu efter 16:00 och det finns " . $summapac . " st ordrar för packning!\n\nVänligen vidta lämplig åtgärd.\n\n// SysAdmin";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	function sendMessOrder($summakolla) {
@@ -1665,7 +1665,7 @@ Class CTurnOver {
 		
 		$text1 = "Klockan är nu efter 15:45 och det finns " . $summakolla . " st ordrar som måste kollas!\n\nVänligen vidta lämplig åtgärd.\n\n// SysAdmin";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1686,7 +1686,7 @@ Class CTurnOver {
 		
 		$text1 = $this->getTotalValueToday($land);
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -1700,7 +1700,7 @@ Class CTurnOver {
 		$text1  = "Just nu finns det " . $numbers . " st ordrar att plocka. Har ni några minuter över så kom gärna ner och plocka ett par ordrar.\n\n";
 		$text1 .= "// Logistikgruppen\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 

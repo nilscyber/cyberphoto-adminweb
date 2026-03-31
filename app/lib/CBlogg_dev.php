@@ -1546,7 +1546,7 @@ Class CBlogg {
 		$text1 .= "Blogginlägg:\t" . $bloggHeader . "\n\n";
 		$text1 .= "Godkänn inlägget genom att klicka nedan.\nhttp://www.cyberphoto.se/blogg/accept.php?ID=" . $getbloggID . "";	
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 

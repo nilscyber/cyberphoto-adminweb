@@ -627,7 +627,7 @@ class CMonitorArticles {
         // $text1 .= "http://www2.cyberphoto.se/info.php?article=" . $monArtnr . "\n";
         $text1 .= "https://admin.cyberphoto.se/search_dispatch.php?mode=product&q=" . $monArtnr . "\n";
 
-        @mail($recipient, $subj, $text1, $extra);
+        SmtpMail::send($recipient, $subj, $text1, $extra);
     }
 
     function isValidDateTime($dateTime) {

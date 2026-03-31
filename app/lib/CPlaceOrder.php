@@ -935,7 +935,7 @@ function sendMailToRecipient($artnr, $ordernr) {
     $text1 .= "Registrerad på order nr: " . $ordernr . "\n\n";
     $text1 .= "Vänligen vidta de åtgärder som du önskar göra i affärssystemet.\n\n";
 
-    mail($recipient, $subj, $text1, $extra);
+    SmtpMail::send($recipient, $subj, $text1, $extra);
 }
 
 function mailaSlutet() {
@@ -1108,7 +1108,7 @@ EOF;
 
         $headers2 = "From: CyberPhoto <order@cyberphoto.se>\n";
 
-        mail("$orderrecipient", "$subject", "$ordermessage", "$headers2");
+        SmtpMail::send("$orderrecipient", "$subject", "$ordermessage", "$headers2");
     }
 # ordna så att mailen inte skickas igen om någon laddar om sidan
     unset($to, $messageHtml, $headers, $subject);

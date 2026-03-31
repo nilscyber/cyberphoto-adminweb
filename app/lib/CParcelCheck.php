@@ -427,7 +427,7 @@ var $conn_my;
 		$text1 = "Vänligen kontrollera detta omgående.\n\n";
 		$text1 .= "http://www.cyberphoto.se/order/admin/bad_parcel.php\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -662,7 +662,7 @@ var $conn_my;
 		$text1 = "Vänligen kontrollera detta omgående.\n\n";
 		$text1 .= "http://www.cyberphoto.se/order/admin/bad_parcel.php\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -838,7 +838,7 @@ var $conn_my;
 		$text1 = "Vänligen kontrollera detta i vårt affärssystem.\n\n";
 		$text1 .= "http://www.cyberphoto.se/order/admin/not_priced.php\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 
@@ -988,7 +988,7 @@ var $conn_my;
 		$text1 = "Vänligen kontrollera detta i vårt affärssystem.\n\n";
 		$text1 .= "http://www.cyberphoto.se/order/admin/not_priced.php\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	

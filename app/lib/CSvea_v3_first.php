@@ -633,7 +633,7 @@ Class CSvea {
                     ". Kundnummer: $kundnrsave. Ordersumma: $goodsvalueMoms. pclass: $this->pclass', '$kundvagn_local', '1', '$SveaErrorResult', '$logIP', '$cntry', '$lang')";
 
             // $extra = "From: " . "nils@cyberphoto.se";
-            // mail("nils@cyberphoto.se", "Nekad klarna ", "insert: " . $insert, $extra);            
+            // SmtpMail::send("nils@cyberphoto.se", "Nekad klarna ", "insert: " . $insert, $extra);            
             if ($_SERVER['REMOTE_ADDR'] != "192.168.1.89") {
                 // $this->sendMessToOTRS($kundnrsave,$this->cust_pno,$goodsvalueMoms,$result,$this->pclass,$kundvagn_local);
             }
@@ -679,7 +679,7 @@ Class CSvea {
         $text1 .= "Betalsätt: " . $pclass . "\n\n";
         $text1 .= "Kundvagn: " . $kundvagn . "\n\n";
 
-        mail($recipient, $subj, $text1, $extra);
+        SmtpMail::send($recipient, $subj, $text1, $extra);
     }
 
     function sendMessIfPclass($kundnrsave, $personnr, $goodsvalueMoms, $result, $pclass, $kundvagn) {
@@ -710,7 +710,7 @@ Class CSvea {
 		}
         $text1 .= "Kundvagn: " . $kundvagn . "\n\n";
 
-        mail($recipient, $subj, $text1, $extra);
+        SmtpMail::send($recipient, $subj, $text1, $extra);
     }
 	
     /**

@@ -970,7 +970,7 @@ if (isset($to)) {
 
 	$headers2 = "From: CyberPhoto <order@cyberphoto.se>\n";
 
-	mail("$orderrecipient", "$subject", "$ordermessage", "$headers2");
+	SmtpMail::send("$orderrecipient", "$subject", "$ordermessage", "$headers2");
 
         }
 # ordna så att mailen inte skickas igen om någon laddar om sidan

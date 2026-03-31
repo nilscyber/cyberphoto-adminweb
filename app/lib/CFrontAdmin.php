@@ -1910,7 +1910,7 @@ function sendFrontMess($addcreatedby,$addsection,$addsite,$addpicture) {
 		}
 	}
 	
-	mail($recipient, $subj, $text1, $extra);
+	SmtpMail::send($recipient, $subj, $text1, $extra);
 
 }
 

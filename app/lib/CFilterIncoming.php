@@ -96,7 +96,7 @@ Class CFilterIncoming {
 		$text1 .= "Mer information kan du hitta på sidan för filterhanteringen\n";
 		$text1 .= "http://admin.cyberphoto.se/check_incoming.php\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	

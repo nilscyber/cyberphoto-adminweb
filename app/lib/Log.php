@@ -185,7 +185,7 @@ Class Log {
         ;
 
 
-        if (!mail($recipient, $subject, $message, $extra))
+        if (!SmtpMail::send($recipient, $subject, $message, $extra))
             error_log("Gick inte att skapa ärende. Meddelande: " . $message, 1, "admin@cyberphoto.se", "Subject: Problem med error log\nFrom: admin@cyberphoto.se\n");
     }
 

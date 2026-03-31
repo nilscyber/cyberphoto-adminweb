@@ -79,7 +79,7 @@ Class CTemp {
 		$text1 .= "Temperatur: " . $temperature . "\n";
 		$text1 .= "Luftfuktighet: " . $humidity . "%\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	

@@ -78,7 +78,7 @@ class CVerkkomaksut {
 		//$_GET["ORDER_NUMBER"];$_GET["TIMESTAMP"];$_GET["PAID"];$_GET["RETURN_AUTHCODE"];
 		//$test = true;
 		//$_SERVER["REQUEST_URI"]
-		//mail("admin@cyberphoto.se", "Log, store_result", "Sidan som hänvisade hit:: \n" . $_SERVER["REQUEST_URI"]);
+		//SmtpMail::send("admin@cyberphoto.se", "Log, store_result", "Sidan som hänvisade hit:: \n" . $_SERVER["REQUEST_URI"]);
 		if ($_GET["PAID"] != "")  {
 			//echo "här: <br>" . $this->get_md5_string_receipt() . "<br>" . $_GET["RETURN_AUTHCODE"];
 			if ($this->get_md5_string_receipt() == $_GET["RETURN_AUTHCODE"] || $this->test) {
@@ -100,7 +100,7 @@ class CVerkkomaksut {
 					$update .= "ordernr = " . $ordernr;
 					///**
 					if (!mysqli_query(Db::getConnection(true), $update)) {
-						mail("admin@cyberphoto.se", "Obs!! Kunde ej uppdatera direktbetalning", "Order kunde ej uppdateras som skickad från verkkomaksut i filen CVerkkomaksut.php. Sql-frågan: \n" . $update);					
+						SmtpMail::send("admin@cyberphoto.se", "Obs!! Kunde ej uppdatera direktbetalning", "Order kunde ej uppdateras som skickad från verkkomaksut i filen CVerkkomaksut.php. Sql-frågan: \n" . $update);					
 					} //*/					
 						
 					//echo "<p>" . $update;

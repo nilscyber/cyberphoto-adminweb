@@ -370,7 +370,7 @@ class PasswordEncryption {
         $text1 .= "\n\n" . l('Click the link below to reset your password') . "\n";
         $text1 .= $this->recovery_link_create($kundnr, $_SESSION['sourcePage'], $email) . "\n";
         //$text1 = str_replace("\n",  "<br>", $text1);
-        mail($recipient, $subj, $text1, implode("\r\n", $headers));
+        SmtpMail::send($recipient, $subj, $text1, implode("\r\n", $headers));
     }
 	
 	// ***************************** NEDAN GÄLLER ADMIN *****************************

@@ -376,7 +376,7 @@ Class CAllocated {
 		$text1 .= "\nMer info här\n";
 		$text1 .= "http://www.cyberphoto.se/order/admin/allokerat.php\n\n";
 		
-		mail($recipient, $subj, $text1, $extra);
+		SmtpMail::send($recipient, $subj, $text1, $extra);
 
 	}
 	
