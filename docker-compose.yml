@@ -3,7 +3,7 @@ services:
     build: .
     ports:
       - "8081:80"
-      - "8443:443"
+      - "443:443"
     volumes:
       - ./app:/var/www/html
       - ./docker/cert:/etc/ssl/app:ro
