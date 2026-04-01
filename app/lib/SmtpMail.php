@@ -173,6 +173,10 @@ class SmtpMail {
     }
 
     private static function dotStuff(string $body): string {
-        return str_replace("\r\n.", "\r\n..", str_replace("\n", "\r\n", $body));
+        // Normalize to \n first (handles both \n and \r\n input), then convert to \r\n
+        $body = str_replace("\r\n", "\n", $body);
+        $body = str_replace("\r", "\n", $body);
+        $body = str_replace("\n", "\r\n", $body);
+        return str_replace("\r\n.", "\r\n..", $body);
     }
 }
