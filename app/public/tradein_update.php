@@ -10,7 +10,7 @@ extract($_COOKIE, EXTR_SKIP);
 
 $tradein = new CTradeIn();
 
-if ($edit == "yes") {
+if ($edit == "yes" && !$subm) {
 	$rows = $tradein->getTradeInInfo();
 
 	$tiGREEN_TO = $rows->tiGREEN_TO;
