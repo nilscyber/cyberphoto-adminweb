@@ -6,7 +6,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Affärschef  KPI</title>
+<title>Affärschef - KPI</title>
 <style>
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0f1115;color:#e8eaed}
   .wrap{padding:20px;height:100vh;box-sizing:border-box;display:flex;flex-direction:column}
@@ -147,7 +147,7 @@
 <body>
 <div class="wrap">
   <div class="top">
-    <div class="title">Affärschef  KPI</div>
+    <div class="title">Affärschef - KPI</div>
     <div class="meta">
       <span id="statusPill" class="pill">LIVE</span>
       <span class="muted" style="margin-left:10px;">Senast uppdaterad:</span>

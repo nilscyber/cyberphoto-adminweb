@@ -47,8 +47,8 @@ if ($reason_id > 0 && !$details) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $conn       = Db::getConnection(true);
-            $email      = mysqli_real_escape_string($_COOKIE['login_mail']);
-            $artnr_in   = mysqli_real_escape_string($artnr);
+            $email      = mysqli_real_escape_string($conn, $_COOKIE['login_mail']);
+            $artnr_in   = mysqli_real_escape_string($conn, $artnr);
 
             $ordernr_raw = isset($_POST['ordernr']) ? trim($_POST['ordernr']) : '';
             $ordernr_sql = ($ordernr_raw === '' || $ordernr_raw === '0')
@@ -56,7 +56,7 @@ if ($reason_id > 0 && !$details) {
                 : (string)((int)$ordernr_raw);
 
             $reason_in  = isset($_POST['reason_id']) ? (int)$_POST['reason_id'] : 0;
-            $notes      = isset($_POST['notes']) ? mysqli_real_escape_string($_POST['notes']) : '';
+            $notes      = isset($_POST['notes']) ? mysqli_real_escape_string($conn, $_POST['notes']) : '';
 
             if ($reason_in === 0) {
                 $errors[] = "Du måste välja en orsak.";

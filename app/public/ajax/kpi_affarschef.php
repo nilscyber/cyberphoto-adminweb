@@ -29,6 +29,7 @@ $sql = "
   FROM kpi_cache
   WHERE kpi_key IN ($inSql)
   ORDER BY updated_at DESC
+  LIMIT 10
 ";
 
 $rows = array();

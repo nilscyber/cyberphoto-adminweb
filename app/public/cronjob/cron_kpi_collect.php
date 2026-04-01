@@ -18,7 +18,7 @@ $kpi->upsertKpiJson('products.discontinued', null, $disc, 'pg');
 
 echo json_encode(array(
   'ok' => true,
-  'sales_today' => $out,
+  'sales_today' => $salesToday,
   'orders_printed' => $printed,
   'orders_not_printed' => $notPrinted,
   'products_created' => $created['count'],
