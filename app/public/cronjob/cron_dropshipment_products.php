@@ -103,5 +103,5 @@ $toMail = "stefan@cyberphoto.se, emil.lindberg@cyberphoto.se";
 $rawSubject = $title . " | Levererat: " . substr($from, 0, 10) . "" . substr($toInclusive, 0, 10);
 $subject = '=?UTF-8?B?' . base64_encode($rawSubject) . '?=';
 
-SmtpMail::send($toMail, $subject, $body);
+SmtpMail::send($toMail, $subject, $body, "Content-Type: text/html; charset=UTF-8");
 ?>

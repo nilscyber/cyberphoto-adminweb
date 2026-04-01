@@ -11,26 +11,27 @@
  *   SMTP_PASS  (default: empty, no auth)
  *
  * Usage: SmtpMail::send($to, $subject, $message, $headers)
+ * Supports: HTML, multipart (attachments), BCC, CC, multiple recipients
  */
 class SmtpMail {
 
     /**
-     * Send email via SMTP. Same signature as PHP's built-in mail().
+     * Send email via SMTP.
      *
-     * @param string $to           Recipient email address
-     * @param string $subject      Email subject
-     * @param string $message      Email body
-     * @param string $headers      Additional headers (From, etc.)
-     * @return bool                True on success, false on failure
+     * @param string $to       Recipient(s), comma-separated
+     * @param string $subject  Email subject (may be MIME-encoded)
+     * @param string $message  Email body (plain text, HTML, or pre-built multipart)
+     * @param string $headers  Additional headers: From, Cc, Bcc, Content-Type, etc.
+     * @return bool            True on success, false on failure
      */
     public static function send(string $to, string $subject, string $message, string $headers = ''): bool {
         $host = getenv('SMTP_HOST') ?: 'smtp.cyberphoto.se';
         $port = (int)(getenv('SMTP_PORT') ?: 25);
 
-        // Parse From header
+        // Parse From
         $fromEmail = 'no-reply@cyberphoto.se';
         $fromName  = '';
-        if (preg_match('/From:\s*(.+?)(?:\r?\n|$)/i', $headers, $m)) {
+        if (preg_match('/^From:\s*(.+)$/im', $headers, $m)) {
             $fromValue = trim($m[1]);
             if (preg_match('/^(.+?)\s*<(.+?)>$/', $fromValue, $parts)) {
                 $fromName  = trim($parts[1]);
@@ -40,10 +41,24 @@ class SmtpMail {
             }
         }
 
-        $to = trim($to);
-        $errno = 0;
-        $errstr = '';
+        // Collect all envelope recipients (To + Cc + Bcc)
+        $allRecipients = self::parseAddresses($to);
+        if (preg_match('/^Cc:\s*(.+)$/im', $headers, $m)) {
+            $allRecipients = array_merge($allRecipients, self::parseAddresses(trim($m[1])));
+        }
+        if (preg_match('/^Bcc:\s*(.+)$/im', $headers, $m)) {
+            $allRecipients = array_merge($allRecipients, self::parseAddresses(trim($m[1])));
+        }
 
+        // Parse Content-Type from headers (if caller has pre-built MIME body)
+        $contentType = '';
+        if (preg_match('/^Content-Type:\s*(.+)$/im', $headers, $m)) {
+            $contentType = trim($m[1]);
+        }
+
+        // SMTP connection
+        $errno  = 0;
+        $errstr = '';
         $smtp = @fsockopen($host, $port, $errno, $errstr, 10);
         if (!$smtp) {
             error_log("SmtpMail: could not connect to $host:$port — $errstr ($errno)");
@@ -64,7 +79,7 @@ class SmtpMail {
             return $response();
         };
 
-        // Read greeting
+        // Greeting
         $response();
 
         // EHLO/HELO
@@ -95,11 +110,13 @@ class SmtpMail {
             return false;
         }
 
-        $reply = $send("RCPT TO:<$to>");
-        if (!str_starts_with($reply, '250')) {
-            error_log("SmtpMail: RCPT TO rejected — $reply");
-            fclose($smtp);
-            return false;
+        foreach ($allRecipients as $rcpt) {
+            $reply = $send("RCPT TO:<$rcpt>");
+            if (!str_starts_with($reply, '250')) {
+                error_log("SmtpMail: RCPT TO <$rcpt> rejected — $reply");
+                fclose($smtp);
+                return false;
+            }
         }
 
         $reply = $send("DATA");
@@ -109,18 +126,25 @@ class SmtpMail {
             return false;
         }
 
-        // Build message
-        $date = date('r');
+        // Build DATA headers
         $fromHeader = $fromName ? "$fromName <$fromEmail>" : $fromEmail;
-        $msg  = "Date: $date\r\n";
+        $msg  = "Date: " . date('r') . "\r\n";
         $msg .= "From: $fromHeader\r\n";
         $msg .= "To: $to\r\n";
         $msg .= "Subject: $subject\r\n";
         $msg .= "MIME-Version: 1.0\r\n";
-        $msg .= "Content-Type: text/plain; charset=utf-8\r\n";
-        $msg .= "\r\n";
-        // Dot-stuff the body (lines starting with . get an extra .)
-        $msg .= str_replace("\r\n.", "\r\n..", str_replace("\n", "\r\n", $message));
+
+        if ($contentType !== '') {
+            // Caller has pre-built MIME body — use their Content-Type and pass body as-is
+            $msg .= "Content-Type: $contentType\r\n";
+            $msg .= "\r\n";
+            $msg .= self::dotStuff($message);
+        } else {
+            // Default: plain text
+            $msg .= "Content-Type: text/plain; charset=utf-8\r\n";
+            $msg .= "\r\n";
+            $msg .= self::dotStuff($message);
+        }
         $msg .= "\r\n.";
 
         $reply = $send($msg);
@@ -132,7 +156,23 @@ class SmtpMail {
 
         $send("QUIT");
         fclose($smtp);
-
         return true;
+    }
+
+    private static function parseAddresses(string $addr): array {
+        $result = [];
+        foreach (array_map('trim', explode(',', $addr)) as $p) {
+            if ($p === '') continue;
+            if (preg_match('/<(.+?)>/', $p, $m)) {
+                $result[] = trim($m[1]);
+            } else {
+                $result[] = $p;
+            }
+        }
+        return $result;
+    }
+
+    private static function dotStuff(string $body): string {
+        return str_replace("\r\n.", "\r\n..", str_replace("\n", "\r\n", $body));
     }
 }

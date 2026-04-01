@@ -17,6 +17,8 @@ $recipients = array(
 $to = implode(', ', $recipients);
 $cc = ''; // valfritt
 
+$to = 'stefan@cyberphoto.se'; // tillfällig override under testning
+
 $rows = $sales->getFocusProductsSimple($days);
 
 // Skippa mail om tom lista
@@ -127,6 +129,6 @@ $body .= chunk_split(base64_encode($csv)) . "\r\n";
 $body .= "--{$boundary}--\r\n";
 
 // Skicka
-$ok = mail($to, $subject, $body, implode("\r\n", $headers));
+$ok = SmtpMail::send($to, $subject, $body, implode("\r\n", $headers));
 
 echo $ok ? "OK\n" : "FAILED\n";
