@@ -98,5 +98,5 @@ $body .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
 $body .= $htmlQP . "\r\n\r\n";
 $body .= "--{$boundary}--\r\n";
 
-$ok = mail($to, $subject, $body, implode("\r\n", $headers));
+$ok = SmtpMail::send($to, $subject, $body, implode("\r\n", $headers));
 echo $ok ? "OK\n" : "FAILED\n";

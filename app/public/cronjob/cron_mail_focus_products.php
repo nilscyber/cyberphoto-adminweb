@@ -17,7 +17,7 @@ $recipients = array(
 $to = implode(', ', $recipients);
 $cc = ''; // valfritt
 
-$to = 'stefan@cyberphoto.se'; // tillfällig override under testning
+// $to = 'stefan@cyberphoto.se'; // tillfällig override under testning
 
 $rows = $sales->getFocusProductsSimple($days);
 

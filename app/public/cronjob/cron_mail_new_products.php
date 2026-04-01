@@ -132,5 +132,5 @@ $body .= "Content-Disposition: attachment; filename=\"{$csvFilename}\"\r\n\r\n";
 $body .= chunk_split(base64_encode($csvLatin1)) . "\r\n";
 $body .= "--{$boundary}--\r\n";
 
-$ok = mail($to, $subject, $body, implode("\r\n", $headers));
+$ok = SmtpMail::send($to, $subject, $body, implode("\r\n", $headers));
 echo $ok ? "OK\n" : "FAILED\n";
