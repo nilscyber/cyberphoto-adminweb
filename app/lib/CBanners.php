@@ -1277,6 +1277,8 @@ Class CBanners {
 			
 		} elseif ($section == 202) {
 			$this->getBannerNoFrame(201,1,true,"no",1);
+		} elseif ($section == 203) {
+			$this->getBannerNoFrame(201,1,true,"no",1);
 		} elseif ($section == 204) {
 			$this->getBannerNoFrame(201,1,true,"no",1);
 		}

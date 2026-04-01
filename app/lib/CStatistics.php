@@ -998,7 +998,7 @@ public function getDailyReportByArticle($hours = 24)
 
     $result = mysqli_query($conn, $sql);
 
-    $html  = "<h2>Senaste $hours timmar  per artikel</h2>";
+    $html  = "<h2>Senaste $hours timmar - per artikel</h2>";
     $html .= "<p>Period: $start till $end</p>";
     $html .= "<table class='stat-table'>";
     $html .= "<tr>"
