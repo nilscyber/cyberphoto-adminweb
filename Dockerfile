@@ -1,8 +1,8 @@
 FROM php:8.3-apache
 
 # Install PHP extensions
-RUN apt-get update && apt-get install -y libpq-dev && rm -rf /var/lib/apt/lists/*
-RUN docker-php-ext-install mysqli pdo pdo_mysql pgsql calendar
+RUN apt-get update && apt-get install -y libpq-dev libxml2-dev && rm -rf /var/lib/apt/lists/*
+RUN docker-php-ext-install mysqli pdo pdo_mysql pgsql calendar soap
 
 # Enable Apache mod_rewrite and SSL
 RUN a2enmod rewrite ssl
