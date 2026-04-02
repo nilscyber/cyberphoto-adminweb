@@ -273,7 +273,7 @@ if ($subm) {
 
     if ($addprice <> $init_price) {
         $check_addprice = "yes";
-        $diffprice      = $addprice - $init_price;
+        $diffprice      = (float)$addprice - (float)$init_price;
     }
 
     if ($addfrom != "") {
@@ -314,7 +314,7 @@ if ($subm) {
 
         if ($addprice_campaign <> $init_price) {
             $check_addprice_campaign = "yes";
-            $diffprice_campaign      = $addprice_campaign - $init_price;
+            $diffprice_campaign      = (float)$addprice_campaign - (float)$init_price;
         }
 
         if ($addprice_campaign == "" || $addprice_campaign == 0) {
