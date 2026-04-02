@@ -7,7 +7,7 @@
 
 	// 2018-11-27, hänvisar allt från och med nu till nya adressen
 	// ob_start(); // starta output buffering
-	// header('Content-Type: text/html; charset=utf-8');
+	header('Content-Type: text/html; charset=utf-8');
 
 
 	use Liuch\DmarcSrg\Statistics;

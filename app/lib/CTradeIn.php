@@ -2685,9 +2685,9 @@ ORDER BY manu.name ASC, prod.name ASC
     echo '<thead><tr>
             <th>Artikel</th>
             <th>Produkt</th>
-            <th class="nowrap">S�ljstart</th>
+            <th class="nowrap">Säljstart</th>
             <th>Plats</th>
-            <th style="text-align:right">�tg�rd</th>
+            <th style="text-align:right">Åtgärd</th>
           </tr></thead><tbody>';
 
     $count = 0;
@@ -2722,13 +2722,13 @@ ORDER BY manu.name ASC, prod.name ASC
         echo '<td>';
         echo '<a href="'.$h($urlPublic).'" target="_blank" rel="noopener">'.$h($fullName).'</a>';
         if ($isDup) {
-            echo '<span class="dup-badge" title="Likadan produkt kan finnas ute redan">M�jlig dubblett</span>';
+            echo '<span class="dup-badge" title="Likadan produkt kan finnas ute redan">Möjlig dubblett</span>';
         }
         echo '</td>';
         echo '<td class="nowrap">'.$h(substr($r['salestart'],0,10)).'</td>';
         echo '<td>'.$h($r['locator_value']).'</td>';
         echo '<td style="text-align:right">'
-           . '<a class="cta" href="'.$h($urlAdmin).'" onclick="return openProductPopup(this.href);" rel="noopener">L�gg ut</a>'
+           . '<a class="cta" href="'.$h($urlAdmin).'" onclick="return openProductPopup(this.href);" rel="noopener">Lägg ut</a>'
            . '</td>';
         echo '</tr>';
     }
