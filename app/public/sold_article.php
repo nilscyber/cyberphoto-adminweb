@@ -143,6 +143,7 @@ if ($showBundle && $artikelNr !== '') {
           AND o.issotrx = 'Y'
           AND o.docstatus NOT IN ('VO','RE')
           AND o.c_doctypetarget_id NOT IN (1000027, 1000026)
+          AND ol.qtydelivered > 0
     ";
     $rsC = ($pg) ? @pg_query_params($pg, $sqlCount, array($product_id)) : false;
     $total        = 0;
@@ -172,6 +173,7 @@ if ($showBundle && $artikelNr !== '') {
           AND o.issotrx = 'Y'
           AND o.docstatus NOT IN ('VO','RE')
           AND o.c_doctypetarget_id NOT IN (1000027, 1000026)
+          AND ol.qtydelivered > 0
         ORDER BY ol.created DESC, ol.c_orderline_id DESC
         LIMIT " . (int)$limit . " OFFSET " . (int)$offset . "
     ";
