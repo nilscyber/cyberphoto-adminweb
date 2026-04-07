@@ -252,70 +252,87 @@ Class CProduct {
 	}
 	
 	function getArticleInfo ($artnr) {
-		global $fi, $sv, $no;
-	
-		$select  = "SELECT Artiklar.artnr, Artiklar_fi.artnr_fi, Artiklar.beskrivning, Artiklar_fi.beskrivning_fi, Artiklar.utpris, Artiklar_fi.utpris_fi, Tillverkare.tillverkare, ";
-		$select .= "Artiklar.utpris_no, Artiklar.art_id, Artiklar.art_id_no, Artiklar_fi.art_id_fi, ";
-		$select .= "Artiklar.no_buy, Artiklar.lagersaldo, Artiklar.kommentar, Artiklar_fi.kommentar_fi, Moms.momssats, Moms.momssats_fi, Moms.momssats_no, Artiklar.utgangen, Artiklar_fi.utgangen_fi, ";
-		$select .= "Artiklar.artnr_lev, Artiklar.m_product_id, Artiklar.isSalesBundle, Artiklar.spec20, Artiklar.bild, Artiklar.tillverkar_id, ";
-		$select .= "Artiklar.searchTerms, Artiklar.passartill, Artiklar.isTradeIn, Artiklar.beskrivning_no, Artiklar.kommentar_no, ";
-		$select .= "Artiklar.upc ";
-		$select .= "FROM Artiklar ";
-		$select .= "INNER JOIN Tillverkare ON Artiklar.tillverkar_id = Tillverkare.tillverkar_id ";
-		$select .= "LEFT JOIN Leverantor ON Artiklar.grossist_id = Leverantor.grossist_id ";
-		$select .= "INNER JOIN Moms ON Artiklar.momskod = Moms.moms_id ";
-		$select .= "LEFT JOIN Artiklar_fi ON Artiklar.artnr = Artiklar_fi.artnr_fi ";
-		$select .= "WHERE Artiklar.tillverkar_id=Tillverkare.tillverkar_id AND Artiklar.momskod = Moms.moms_id ";
-		$select .= "AND Artiklar.artnr='$artnr' ";
-	
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo $select;
-		}
-		$res = mysqli_query(Db::getConnection(), $select);
-	
-		$rows = mysqli_fetch_object($res);
+		$artnr = pg_escape_string($artnr);
 
-		return $rows;
-	
+		$select = "
+			SELECT
+				p.value              AS artnr,
+				p.name               AS beskrivning,
+				p.description        AS kommentar,
+				manu.name            AS tillverkare,
+				p.xc_manufacturer_id AS tillverkar_id,
+				p.m_product_id,
+				p.upc,
+				p.isselfservice,
+				p.discontinued       AS utgangen,
+				CASE WHEN p.istradein = 'Y' THEN -1 ELSE 0 END AS isTradeIn,
+				''                   AS bild,
+				COALESCE(pp.pricestd, 0)                                    AS utpris,
+				COALESCE(pp.pricelimit, COALESCE(c.currentcostprice, 0))    AS art_id,
+				COALESCE((
+					SELECT t.rate / 100.0
+					  FROM c_tax t
+					 WHERE t.c_taxcategory_id = p.c_taxcategory_id
+					   AND t.c_country_id = 313
+					 ORDER BY t.isdefault DESC NULLS LAST
+					 LIMIT 1
+				), (
+					SELECT t.rate / 100.0
+					  FROM c_tax t
+					 WHERE t.c_taxcategory_id = p.c_taxcategory_id
+					   AND t.isdefault = 'Y'
+					 ORDER BY t.c_tax_id
+					 LIMIT 1
+				), 0) AS momssats
+			FROM m_product p
+			LEFT JOIN xc_manufacturer manu
+				ON manu.xc_manufacturer_id = p.xc_manufacturer_id
+			LEFT JOIN m_productprice pp
+				ON pp.m_product_id = p.m_product_id
+				AND pp.m_pricelist_version_id = 1000000
+			LEFT JOIN (
+				SELECT mc2.m_product_id, mc2.currentcostprice
+				  FROM m_cost mc2
+				 WHERE mc2.updated = (
+					 SELECT MAX(mc3.updated)
+					   FROM m_cost mc3
+					  WHERE mc3.m_product_id = mc2.m_product_id
+				 )
+			) c ON c.m_product_id = p.m_product_id
+			WHERE p.value = '$artnr'
+		";
+
+		$conn = Db::getConnectionAD(false);
+		$res  = $conn ? @pg_query($conn, $select) : false;
+
+		return $res ? pg_fetch_object($res) : null;
 	}
 
 	function getIfArticleExist($artnr) {
-	
-		$select  = "SELECT Artiklar.artnr ";
-		$select .= "FROM Artiklar ";
-		$select .= "WHERE Artiklar.artnr='$artnr' AND ej_med = 0 AND utgangen = 0 AND utpris > 10 ";
-	
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo $select;
-		}
-		
-		$res = mysqli_query(Db::getConnection(), $select);
-		// $rows = mysqli_fetch_object($res);
-		
-		if (mysqli_num_rows($res) > 0) {
+		$artnr = pg_escape_string($artnr);
+
+		$select = "SELECT m_product_id FROM m_product WHERE value='$artnr' AND isactive='Y' AND discontinued='N'";
+
+		$conn = Db::getConnectionAD(false);
+		$res  = $conn ? @pg_query($conn, $select) : false;
+
+		if ($res && pg_num_rows($res) > 0) {
 			return true;
 		} else {
 			return false;
 		}
-
 	}
 	
 	function getMProductID ($artnr) {
-		global $fi, $sv, $no;
-	
-		$select  = "SELECT Artiklar.m_product_id ";
-		$select .= "FROM Artiklar ";
-		$select .= "WHERE Artiklar.artnr='$artnr' ";
-	
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo $select;
-	
-		}
-		$res = mysqli_query(Db::getConnection(), $select);
-		$rows = mysqli_fetch_object($res);
-	
-		return $rows->m_product_id;
-	
+		$artnr = pg_escape_string($artnr);
+
+		$select = "SELECT m_product_id FROM m_product WHERE value='$artnr'";
+
+		$conn = Db::getConnectionAD(false);
+		$res  = $conn ? @pg_query($conn, $select) : false;
+		$rows = $res ? pg_fetch_object($res) : null;
+
+		return $rows ? $rows->m_product_id : null;
 	}
 
 	function getArtnr ($MproductID) {
@@ -335,26 +352,22 @@ Class CProduct {
 	
 	}
 
-	function verifyMProductID ($artnr,$m_product_id) {
-		global $fi, $sv, $no;
-	
-		$select  = "SELECT Artiklar.m_product_id ";
-		$select .= "FROM Artiklar ";
-		$select .= "WHERE Artiklar.artnr='$artnr' AND Artiklar.m_product_id='$m_product_id' ";
-	
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo $select;
-	
-		}
-		$res = mysqli_query(Db::getConnection(), $select);
-		$rows = mysqli_fetch_object($res);
-		
-		if (mysqli_num_rows($res) > 0) {
+	function verifyMProductID ($artnr, $m_product_id) {
+		$artnr        = pg_escape_string($artnr);
+		$m_product_id = (int)$m_product_id;
+
+		$select  = "SELECT m_product_id ";
+		$select .= "FROM m_product ";
+		$select .= "WHERE value='$artnr' AND m_product_id=$m_product_id ";
+
+		$conn = Db::getConnectionAD(false);
+		$res  = $conn ? @pg_query($conn, $select) : false;
+
+		if ($res && pg_num_rows($res) > 0) {
 			return true;
 		} else {
 			return false;
 		}
-	
 	}
 	
 	function getExtraComment($artnr,$show_add,$show_campaign = false) {

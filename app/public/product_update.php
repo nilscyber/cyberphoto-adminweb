@@ -599,15 +599,15 @@ if ($calc) {
         }
 
         // Skriv tillbaka värden i samma format
-        if ($netto !== null)  { $calcnetto  = number_format($netto, 2, '.', ''); }
-        if ($margin !== null) { $calcmargin = number_format($margin, 2, '.', ''); }
-        if ($price !== null)  { $calcprice  = number_format($price, 0, '.', ''); }
+        if ($netto !== null)  { $calcnetto  = number_format($netto, 2, ',', ''); }
+        if ($margin !== null) { $calcmargin = number_format($margin, 2, ',', ''); }
+        if ($price !== null)  { $calcprice  = number_format($price, 0, ',', ''); }
     }
 } else {
     // Förvalda värden första gången sidan laddas
-    if ($calcnetto === "")  $calcnetto  = number_format($netto_se, 2, '.', '');
-    if ($calcmargin === "") $calcmargin = number_format($marginal_se, 2, '.', '');
-    if ($calcprice === "")  $calcprice  = number_format($utpris_moms_se, 0, '.', '');
+    if ($calcnetto === "")  $calcnetto  = number_format($netto_se, 2, ',', '');
+    if ($calcmargin === "") $calcmargin = number_format($marginal_se, 2, ',', '');
+    if ($calcprice === "")  $calcprice  = number_format($utpris_moms_se, 0, ',', '');
 }
 
 ?>
@@ -1015,16 +1015,16 @@ if ($calc) {
       </tr>
       <tr>
         <td><img border="0" src="sv_mini.jpg" alt="">&nbsp;</td>
-        <td align="right"><?php echo $netto_se; ?></td>
-        <td align="right">&nbsp;(<?php echo round($netto_moms); ?>)&nbsp; SEK</td>
+        <td align="right"><?php echo number_format($netto_se, 2, ',', ' '); ?></td>
+        <td align="right">&nbsp;(<?php echo number_format(round($netto_moms), 0, ',', ' '); ?>)&nbsp; SEK</td>
         <td align="right">&nbsp;</td>
-        <td align="right"><?php echo round($utpris_se); ?></td>
-        <td align="right">&nbsp;(<?php echo round($utpris_moms_se); ?>)&nbsp; SEK</td>
+        <td align="right"><?php echo number_format(round($utpris_se), 0, ',', ' '); ?></td>
+        <td align="right">&nbsp;(<?php echo number_format(round($utpris_moms_se), 0, ',', ' '); ?>)&nbsp; SEK</td>
         <td align="right">&nbsp;</td>
-        <td align="right" class="<?php echo $fontcolor_se; ?>"><?php echo round($marginal_se, 2); ?>&nbsp;%</td>
+        <td align="right" class="<?php echo $fontcolor_se; ?>"><?php echo number_format($marginal_se, 2, ',', '.'); ?>&nbsp;%</td>
         <td align="right">&nbsp;</td>
-        <td align="right" class="<?php echo $fontcolor_se; ?>"><?php echo round($marginal_tb_se, 2); ?></td>
-        <td align="right" class="<?php echo $fontcolor_se; ?>">&nbsp;(<?php echo round($marginal_tb_moms_se); ?>)&nbsp; SEK</td>
+        <td align="right" class="<?php echo $fontcolor_se; ?>"><?php echo number_format($marginal_tb_se, 2, ',', ' '); ?></td>
+        <td align="right" class="<?php echo $fontcolor_se; ?>">&nbsp;(<?php echo number_format(round($marginal_tb_moms_se), 0, ',', ' '); ?>)&nbsp; SEK</td>
       </tr>
       <tr>
         <td colspan="11" class="small-muted">Priser inom parentes anger inkl. moms.</td>

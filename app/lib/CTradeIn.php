@@ -2708,7 +2708,7 @@ ORDER BY manu.name ASC, prod.name ASC
 
         $isDup = !$raw;
 
-        $urlAdmin = 'https://admin.cyberphoto.se/product_update.php'
+        $urlAdmin = '/product_update.php'
             . '?artnr=' . rawurlencode($r['artnr'])
             . '&m_product_id=' . rawurlencode($r['m_product_id']);
 
