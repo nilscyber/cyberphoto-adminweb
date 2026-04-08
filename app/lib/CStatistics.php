@@ -709,26 +709,17 @@ GROUP BY owl.user_id, owl.user_name
 ORDER BY antal_inkopsordrar DESC, salesrep;
 ";
 
-    if ($conn instanceof PDO) {
-        // Byt till namngivna parametrar för PDO
-        $sql_pdo = str_replace(array('$1','$2'), array(':from',':to'), $sql_pg);
-        $stmt = $conn->prepare($sql_pdo);
-        $stmt->bindValue(':from', $from);
-        $stmt->bindValue(':to',   $to);
-        $stmt->execute();
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } elseif (is_resource($conn)) {
-        $res = ($conn) ? @pg_query_params($conn, $sql_pg, array($from, $to)) : false;
-        if ($res === false) {
-            error_log('getPurchaseStats: '.($conn ? pg_last_error($conn) : 'no connection'));
-            return array();
-        }
-        $rows = pg_fetch_all($res);
-        if (!$rows) $rows = array();
-    } else {
-        error_log('getPurchaseStats: Unknown connection type');
+    if (!$conn) {
+        error_log('getPurchaseStats: no connection');
         return array();
     }
+    $res = @pg_query_params($conn, $sql_pg, array($from, $to));
+    if ($res === false) {
+        error_log('getPurchaseStats: ' . pg_last_error($conn));
+        return array();
+    }
+    $rows = pg_fetch_all($res);
+    if (!$rows) $rows = array();
 
     if ($debug) {
         error_log('getPurchaseStats OK: rows='.count($rows).' from='.$from.' to='.$to.' (doctype=1000016)');
@@ -747,8 +738,8 @@ public function getSalesStats($from = null, $to = null, $debug = false) {
     if (strtotime($from) > strtotime($to)) { $t=$from; $from=$to; $to=$t; }
 
     $conn = Db::getConnectionAD(false);
-    if (!is_resource($conn)) {
-        error_log('getSalesStats: invalid AD connection');
+    if (!$conn) {
+        error_log('getSalesStats: no connection');
         return array();
     }
 

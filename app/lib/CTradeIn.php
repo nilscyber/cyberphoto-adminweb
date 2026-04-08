@@ -2490,7 +2490,7 @@ ORDER BY DATE(prod.salestart) ASC, manu.name ASC, prod.name ASC
     foreach ($groups as $ymd => $rows) {
         $count = count($rows);
         echo '<tr class="marination-group"><td colspan="3">'
-           . $h($relative($ymd)) . ' � ' . $count . ' produkt' . ($count!==1?'er':'')
+           . $h($relative($ymd)) . ' - ' . $count . ' produkt' . ($count!==1?'er':'')
            . '</td></tr>';
 
         foreach ($rows as $r) {
