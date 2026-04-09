@@ -2275,7 +2275,7 @@ Class CTradeIn {
 				} else {
 					echo "\t\t<td width=\"300\" class=\"mark_black\">&nbsp;</td>\n";
 				}
-				echo "<td width=\"50\" align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $row->ping_ID . "\">�ndra</a></td>\n";
+				echo "<td width=\"50\" align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $row->ping_ID . "\">Ändra</a></td>\n";
 				if ($_COOKIE['login_mail'] == 'sjabo@cyberphoto.nu') {
 				}
 				echo "\t</tr>\n";

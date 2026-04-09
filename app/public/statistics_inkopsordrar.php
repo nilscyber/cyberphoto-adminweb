@@ -29,7 +29,7 @@ $total_orders = 0; $total_lines = 0; $total_totallines = 0.0;
 if ($rows) foreach ($rows as $r) { $total_orders+=(int)$r['antal_inkopsordrar']; $total_lines+=(int)$r['antal_orderrader_totalt']; $total_totallines+=(float)$r['totallines_sum']; }
 ?>
 <h1>Statistik: inköpsordrar per inköpare</h1>
-<h3>Resultat för perioden <?php echo $h($from); ?>  <?php echo $h($to); ?></h3>
+<h3>Resultat för perioden <?php echo $h($from); ?> - <?php echo $h($to); ?></h3>
 
 <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:14px">
   <thead>

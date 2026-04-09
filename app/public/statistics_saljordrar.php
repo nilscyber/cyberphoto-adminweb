@@ -47,7 +47,7 @@ if ($rows) {
 $total_tg = ($total_prodnet > 0) ? round(100 * $total_tb / $total_prodnet, 2) : 0.0;
 ?>
 <h1>Statistik: säljordrar per säljare</h1>
-<h3>Resultat för perioden <?php echo $h($from); ?>  <?php echo $h($to); ?></h3>
+<h3>Resultat för perioden <?php echo $h($from); ?> - <?php echo $h($to); ?></h3>
 
 <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:14px">
   <thead>

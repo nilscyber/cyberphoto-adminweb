@@ -5,7 +5,11 @@ spl_autoload_register(function ($class) {
 
 $tradein = new CTradeIn();
 
-if ($edit == "yes") {
+$edit     = isset($_GET['edit'])     ? $_GET['edit']     : '';
+$subm     = isset($_POST['subm'])    ? $_POST['subm']    : (isset($_GET['subm'])     ? $_GET['subm']     : '');
+$konumber = isset($_POST['konumber'])? $_POST['konumber']: (isset($_GET['konumber']) ? $_GET['konumber'] : '');
+
+if ($edit == "yes" && !$subm) {
 	// $rows = $tradein->getKoSystemInfo($ID);
 	// $konumber = substr($rows->koNR, -2);
 	$konumber = 0;
@@ -171,7 +175,7 @@ if ($wrongmess) {
 ?>
 <div>
 <?php if (!$uppdate_ok) { ?>
-<form name="update_form">
+<form name="update_form" method="post">
 <input type="hidden" value=true name="subm">
 <input type="hidden" value="<?php echo $artnr; ?>" name="artnr">
 <table border="0" cellpadding="2" cellspacing="0">
