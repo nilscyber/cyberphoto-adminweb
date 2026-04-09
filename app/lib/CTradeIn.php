@@ -216,7 +216,7 @@ Class CTradeIn {
 		
 		} else {
 		
-			echo "<div class=\"count_data italic bold\">V�ntar p� att f�rsta produkten skall bokas</div>\n";
+			echo "<div class=\"count_data italic bold\">Väntar på att första produkten skall bokas</div>\n";
 		
 		}
 			
@@ -1208,7 +1208,7 @@ Class CTradeIn {
 		
 		if ($res && pg_num_rows($res) > 0) {
 		
-			echo "<div class=\"count_data bold italic\">Dubbelbokade produkter som m�ste �tg�rdas omedelbart!</div>\n";
+			echo "<div class=\"count_data bold italic\">Dubbelbokade produkter som måste åtgärdas omedelbart!</div>\n";
 			echo "<table id=\"begg_double\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
 		
 			while ($res && $row = pg_fetch_object($res)) {
