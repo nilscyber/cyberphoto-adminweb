@@ -154,7 +154,7 @@ if (!function_exists('salesPctDiffData')) {
         </div>
 
         <h2 class="panel-title">
-            Leveranser från CyberPhoto  <?= htmlspecialchars($dagensdatum); ?>
+            Leveranser från CyberPhoto - <?= htmlspecialchars($dagensdatum); ?>
         </h2>
 
         <?php if ($details === 'yes'): ?>
@@ -373,7 +373,7 @@ if (!function_exists('salesPctDiffData')) {
 						<?= ($dayDiffPercent >= 0 ? '+' : '') . number_format($dayDiffPercent, 1, ',', ' '); ?>%
 					</div>
 					<div class="gauge-scale">
-						0  100% vs <?= htmlspecialchars($compareYear); ?>
+						0 - 100% vs <?= htmlspecialchars($compareYear); ?>
 					</div>
 				</div>
 
