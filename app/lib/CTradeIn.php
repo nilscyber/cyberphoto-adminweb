@@ -423,7 +423,7 @@ Class CTradeIn {
 				
 				} else {
 				
-					echo "<div class=\"count_data italic\">V�ntar p� att f�rsta produkten skall s�ljas</div>\n";
+					echo "<div class=\"count_data italic\">Väntar på att första produkten skall skickas</div>\n";
 				
 				}
 				
@@ -1534,7 +1534,7 @@ Class CTradeIn {
 		
 		} else {
 		
-			echo "<div class=\"count_data italic\">V�ntar p� att f�rsta produkten skall bokas</div>\n";
+			echo "<div class=\"count_data italic\">Väntar på att första produkten skall bokas</div>\n";
 		
 		}
 			
@@ -1576,7 +1576,7 @@ Class CTradeIn {
 				echo "</audio>\n";
 			}
 		
-			echo "<div class=\"count_data bold italic\">Produkter som saknar ink�p Inbyte, �tg�rdas omedelbart!</div>\n";
+			echo "<div class=\"count_data bold italic\">Produkter som saknar inköp Inbyte, åtgärdas omedelbart!</div>\n";
 			echo "<table id=\"begg_miss5555\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
 		
 			while ($res && $row = pg_fetch_object($res)) {
@@ -1624,25 +1624,16 @@ Class CTradeIn {
 		$select .= "AND cbp.value = '5555' AND prod_po.iscurrentvendor = 'Y' ";
 		$select .= "AND NOT prod.value IN('filter','IB_FV_1','IB_FV_2','IB_FV_3') ";
 		// $select .= "GROUP BY prod.m_product_parent_id, pstock.qtyonhand, prod2.name, manu.name ";
-		$select .= "GROUP BY prod.m_product_parent_id, pstock.qtyonhand, prod.name, manu.name ";
+		$select .= "GROUP BY prod.m_product_parent_id, prod.name, manu.name ";
 		if ($all) {
-			$select .= "HAVING count(prod.value) > 1";
+			$select .= "HAVING count(prod.value) > 1 ";
 		} else {
-			$select .= "HAVING count(prod.value) > 2";
+			$select .= "HAVING count(prod.value) > 2 ";
 		}
 		// $select .= "ORDER BY antaldubletter DESC, manu.name ASC, prod2.name ASC";
 		$select .= "ORDER BY antaldubletter DESC, manu.name ASC, prod.name ASC";
 
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo $select;
-			exit;
-		}
-
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo ($res ? pg_num_rows($res) : 0);
-			// exit;
-		}
 
 		if (date("d", time()) == 07 && date("H", time()) == 14 && date("i", time()) == 24 && date("s", time()) < 30) {
 			echo "<audio autoplay>\n";
