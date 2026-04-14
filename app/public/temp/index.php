@@ -131,93 +131,87 @@ td
 .search_line2 {
     background-color: #FFFFFF;
 }
-.chooser {
-	margin-left:auto; 
-	margin-right:auto;
-	width: 920px;
+.nav-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 14px 16px;
+	background: #f0f4f8;
+	border-bottom: 2px solid #d0d8e4;
+	margin-bottom: 20px;
+}
+.nav-btn {
+	display: inline-block;
+	padding: 7px 16px;
+	border-radius: 20px;
+	border: 1px solid #b0bec5;
+	background: #ffffff;
+	color: #37474f;
+	font-family: Verdana, sans-serif;
+	font-size: 12px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background 0.15s, color 0.15s, border-color 0.15s;
+	white-space: nowrap;
+}
+.nav-btn:hover {
+	background: #e3eaf0;
+	border-color: #78909c;
+}
+.nav-btn.active {
+	background: #1a3a6b;
+	color: #ffffff;
+	border-color: #1a3a6b;
+	font-weight: bold;
+}
+.nav-btn.diagram {
+	background: #2e7d32;
+	color: #ffffff;
+	border-color: #2e7d32;
+	font-weight: bold;
+}
+.nav-btn.diagram:hover {
+	background: #1b5e20;
+	border-color: #1b5e20;
+}
+.nav-divider {
+	width: 1px;
+	height: 28px;
+	background: #b0bec5;
+	margin: 0 4px;
 }
 </style>
 </head>
 
 <body>
 <?php
-	echo "<div class=\"chooser\">\n";
-	echo "<form method=\"GET\">\n";
-	echo "<input type=\"hidden\" name=\"showtemp\" value=\"yes\">\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "1") {
-		echo "Server <input type=\"radio\" name=\"sensor\" value=\"1\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Server <input type=\"radio\" name=\"sensor\" value=\"1\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "2") {
-		echo "Ute <input type=\"radio\" name=\"sensor\" value=\"2\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Ute <input type=\"radio\" name=\"sensor\" value=\"2\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "3") {
-		echo "Nya norra <input type=\"radio\" name=\"sensor\" value=\"3\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Nya norra <input type=\"radio\" name=\"sensor\" value=\"3\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "4") {
-		echo "Nya södra <input type=\"radio\" name=\"sensor\" value=\"4\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Nya södra <input type=\"radio\" name=\"sensor\" value=\"4\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "5") {
-		echo "Köket <input type=\"radio\" name=\"sensor\" value=\"5\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Köket <input type=\"radio\" name=\"sensor\" value=\"5\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "6") {
-		echo "Inbyte <input type=\"radio\" name=\"sensor\" value=\"6\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Inbyte <input type=\"radio\" name=\"sensor\" value=\"6\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "7") {
-		echo "Service <input type=\"radio\" name=\"sensor\" value=\"7\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Service <input type=\"radio\" name=\"sensor\" value=\"7\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "8") {
-		echo "Packsal <input type=\"radio\" name=\"sensor\" value=\"8\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Packsal <input type=\"radio\" name=\"sensor\" value=\"8\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 100px;\">\n";
-	if ($sensor == "9") {
-		echo "Flyttbar <input type=\"radio\" name=\"sensor\" value=\"9\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Flyttbar <input type=\"radio\" name=\"sensor\" value=\"9\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	
-	echo "</form>\n";
-	echo "</div>\n";
-	echo "<div class=\"clear\"></div>\n";
-
-	/* 2014-08-15 Logga temperaturen i serverrummet */
-
 	$temperature = (isset($_GET['temperature']) ? $_GET['temperature'] : null);
-	$humidity = (isset($_GET['humidity']) ? $_GET['humidity'] : null);
-	$sensor = (isset($_GET['sensor']) ? $_GET['sensor'] : null);
-	$showtemp = (isset($_GET['showtemp']) ? $_GET['showtemp'] : null);
+	$humidity    = (isset($_GET['humidity'])    ? $_GET['humidity']    : null);
+	$sensor      = (isset($_GET['sensor'])      ? $_GET['sensor']      : null);
+	$showtemp    = (isset($_GET['showtemp'])    ? $_GET['showtemp']    : null);
+
+	$sensorList = [
+		1 => 'Server',
+		2 => 'Ute',
+		3 => 'Nya norra',
+		4 => 'Nya södra',
+		5 => 'Köket',
+		6 => 'Inbyte',
+		7 => 'Service',
+		8 => 'Packsal',
+		9 => 'Flyttbar',
+	];
+
+	echo "<div class=\"nav-bar\">\n";
+	echo "<a href=\"index.php\" class=\"nav-btn diagram\">&#9642; Visa diagram</a>\n";
+	echo "<div class=\"nav-divider\"></div>\n";
+	foreach ($sensorList as $id => $namn) {
+		$active = ($sensor == $id) ? ' active' : '';
+		echo "<a href=\"index.php?showtemp=yes&sensor=$id\" class=\"nav-btn$active\">$namn</a>\n";
+	}
+	echo "</div>\n";
 	
 	spl_autoload_register(function ($class) {
 		include $class . '.php';
@@ -239,14 +233,131 @@ td
 	if ($showtemp == "yes") {
 		$temp->showTempList($sensor);
 	} else {
+
+		$sensors = [
+			1 => ['namn' => 'Serverrum', 'farg' => '#1a3a6b'],
+			2 => ['namn' => 'Ute',       'farg' => '#2d6a4f'],
+			3 => ['namn' => 'Nya norra', 'farg' => '#7b2d8b'],
+			4 => ['namn' => 'Nya södra', 'farg' => '#0096c7'],
+			5 => ['namn' => 'Köket',     'farg' => '#80b918'],
+			6 => ['namn' => 'Inbyte',    'farg' => '#c1121f'],
+			7 => ['namn' => 'Service',   'farg' => '#780000'],
+			8 => ['namn' => 'Packsal',   'farg' => '#f77f00'],
+			9 => ['namn' => 'Flyttbar',  'farg' => '#4361ee'],
+		];
+
+		$select  = "SELECT DATE(tTime) AS dag, tSensor, ";
+		$select .= "ROUND(AVG(tTemperature), 1) AS snitt_temp, ";
+		$select .= "ROUND(AVG(tHumidity), 1) AS snitt_hum ";
+		$select .= "FROM cyberadmin.temp ";
+		$select .= "WHERE tTime >= NOW() - INTERVAL 30 DAY ";
+		$select .= "AND HOUR(tTime) BETWEEN 7 AND 18 ";
+		$select .= "GROUP BY dag, tSensor ";
+		$select .= "ORDER BY dag ASC, tSensor ASC";
+
+		$res = @mysqli_query(Db::getConnection(false), $select);
+
+		// Bygg upp: $data[sensorId][datum] = värde
+		$tempData = [];
+		$humData  = [];
+		$dates    = [];
+		while ($row = mysqli_fetch_object($res)) {
+			$tempData[$row->tSensor][$row->dag] = $row->snitt_temp;
+			$humData[$row->tSensor][$row->dag]  = $row->snitt_hum;
+			$dates[$row->dag] = true;
+		}
+		ksort($dates);
+		$labels = array_keys($dates);
+
+		// Formatera labels som "d-M" (t.ex. "14-Apr")
+		$labelsFormatted = array_map(fn($d) => date('d-M', strtotime($d)), $labels);
+
+		// Bygg datasets för temperatur och luftfuktighet
+		$tempDatasets = [];
+		$humDatasets  = [];
+		foreach ($sensors as $id => $s) {
+			if (empty($tempData[$id])) continue;
+			$tempPoints = [];
+			$humPoints  = [];
+			foreach ($labels as $dag) {
+				$tempPoints[] = isset($tempData[$id][$dag]) ? $tempData[$id][$dag] : 'null';
+				$humPoints[]  = isset($humData[$id][$dag])  ? $humData[$id][$dag]  : 'null';
+			}
+			$tempDatasets[] = [
+				'label'       => $s['namn'],
+				'data'        => $tempPoints,
+				'borderColor' => $s['farg'],
+				'fill'        => false,
+				'tension'     => 0.3,
+				'pointRadius' => 2,
+			];
+			$humDatasets[] = [
+				'label'       => $s['namn'],
+				'data'        => $humPoints,
+				'borderColor' => $s['farg'],
+				'fill'        => false,
+				'tension'     => 0.3,
+				'pointRadius' => 2,
+			];
+		}
+
+		$labelsJson    = json_encode($labelsFormatted);
+		$tempDsJson    = json_encode($tempDatasets);
+		$humDsJson     = json_encode($humDatasets);
+
+		echo "<script src=\"https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js\"></script>\n";
 		echo "<div class=\"top20\">\n";
 		echo "<h2>Medeltemperaturen mellan 07:00 - 18:00 - 30 dagar bakåt</h2>\n";
-		echo "<img border=\"0\" src=\"diagram_temperature.png?ver=" . date('Ymd') . "\" title=\"Genomsnitt senaste 30 dagarna\">";
+		echo "<div style=\"width:95%;margin:auto;\"><canvas id=\"chartTemp\"></canvas></div>\n";
 		echo "</div>\n";
 		echo "<div class=\"top20\">\n";
 		echo "<h2>Medelluftfuktigheten mellan 07:00 - 18:00 - 30 dagar bakåt</h2>\n";
-		echo "<img border=\"0\" src=\"diagram_humidity.png?ver=" . date('Ymd') . "\" title=\"Genomsnitt senaste 30 dagarna\">";
+		echo "<div style=\"width:95%;margin:auto;\"><canvas id=\"chartHum\"></canvas></div>\n";
 		echo "</div>\n";
+		?>
+		<script>
+		(function(){
+			var labels = <?= $labelsJson ?>;
+			var commonOptions = {
+				responsive: true,
+				interaction: { mode: 'index', intersect: false },
+				plugins: { legend: { position: 'right' } },
+				scales: {
+					x: { ticks: { maxRotation: 45, minRotation: 45 } },
+					y: { ticks: { stepSize: 1 } }
+				}
+			};
+
+			new Chart(document.getElementById('chartTemp'), {
+				type: 'line',
+				data: { labels: labels, datasets: <?= $tempDsJson ?> },
+				options: Object.assign({}, commonOptions, {
+					plugins: Object.assign({}, commonOptions.plugins, {
+						tooltip: {
+							callbacks: {
+								label: function(ctx){ return ctx.dataset.label + ': ' + ctx.parsed.y + '°'; }
+							}
+						}
+					})
+				})
+			});
+
+			new Chart(document.getElementById('chartHum'), {
+				type: 'line',
+				data: { labels: labels, datasets: <?= $humDsJson ?> },
+				options: Object.assign({}, commonOptions, {
+					plugins: Object.assign({}, commonOptions.plugins, {
+						tooltip: {
+							callbacks: {
+								label: function(ctx){ return ctx.dataset.label + ': ' + ctx.parsed.y + '%'; }
+							}
+						}
+					})
+				})
+			});
+		})();
+		</script>
+		<?php
 	}
 
 ?>

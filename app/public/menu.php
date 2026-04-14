@@ -59,6 +59,7 @@
     <li><a href="text_templates.php" <?php if (preg_match("/text_templates\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Textmallar</a></li>
 	<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
 		<li><a href="inbyte_wishlist.php" <?php if (preg_match("/inbyte_wishlist\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Önskelista</a></li>
+		<li><a href="upload_begagnat.php" <?php if (preg_match("/upload_begagnat\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Ladda upp diagram</a></li>
 	<?php } ?>
 	</ul>
 </li>
