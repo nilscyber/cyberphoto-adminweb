@@ -27,7 +27,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Diagrammet är uppdaterat! (' . date('Y-m-d H:i:s') . ')';
                 $message_type = 'success';
             } else {
-                $message = 'Kunde inte spara filen. Kontrollera rättigheter.';
+                $dir = dirname($target_file);
+                $details = [];
+                $details[] = 'Målfil: ' . $target_file;
+                $details[] = 'Katalog finns: ' . (is_dir($dir) ? 'ja' : 'NEJ');
+                $details[] = 'Katalog skrivbar: ' . (is_writable($dir) ? 'ja' : 'NEJ');
+                $details[] = 'Fil finns: ' . (file_exists($target_file) ? 'ja' : 'nej');
+                $details[] = 'Fil skrivbar: ' . (file_exists($target_file) && is_writable($target_file) ? 'ja' : 'NEJ');
+                $details[] = 'PHP-användare: ' . get_current_user() . ' / process: ' . (function_exists('posix_getpwuid') ? posix_getpwuid(posix_geteuid())['name'] : 'okänd');
+                $err = error_get_last();
+                if ($err) $details[] = 'PHP-fel: ' . $err['message'];
+                $message = implode('<br>', $details);
                 $message_type = 'error';
             }
         }
@@ -64,7 +74,7 @@ $last_modified = file_exists($target_file) ? date('Y-m-d H:i:s', filemtime($targ
         <button type="submit">Ladda upp</button>
     </form>
     <?php if ($message): ?>
-        <div class="msg <?= $message_type ?>"><?= htmlspecialchars($message) ?></div>
+        <div class="msg <?= $message_type ?>"><?= $message ?></div>
     <?php endif; ?>
     <p class="meta">Senast uppdaterad: <?= htmlspecialchars($last_modified) ?></p>
 </div>
