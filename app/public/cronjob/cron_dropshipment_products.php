@@ -53,13 +53,13 @@ if ($mode === 'prev_month') {
     $from = date('Y-m-01 00:00:00', strtotime('first day of last month'));
     $to   = date('Y-m-01 00:00:00', strtotime('first day of this month'));
     $periodLabel = date('Y-m', strtotime('first day of last month'));
-    $title = "Topp 10  Levererade dropshipment-produkter (föregående månad: ".$periodLabel.")";
+    $title = "Topp 10 - Levererade dropshipment-produkter (föregående månad: ".$periodLabel.")";
 } else {
     // 114 (to = 15:e 00:00)
     $from = date('Y-m-01 00:00:00');
     $to   = date('Y-m-15 00:00:00');
-    $periodLabel = date('Y-m')." (114)";
-    $title = "Topp 10  Levererade dropshipment-produkter (första halvan: ".$periodLabel.")";
+    $periodLabel = date('Y-m')." (1-14)";
+    $title = "Topp 10 - Levererade dropshipment-produkter (första halvan: ".$periodLabel.")";
 }
 
 // För rubrik: visa to-1 sekund så det ser inkluderande ut i text
@@ -100,7 +100,7 @@ $toMail = "stefan@cyberphoto.se, emil.lindberg@cyberphoto.se";
 // --------------------
 // Subject: CP1252 -> UTF-8 + MIME
 // --------------------
-$rawSubject = $title . " | Levererat: " . substr($from, 0, 10) . "" . substr($toInclusive, 0, 10);
+$rawSubject = $title . " | Levererat: " . substr($from, 0, 10) . "-" . substr($toInclusive, 0, 10);
 $subject = '=?UTF-8?B?' . base64_encode($rawSubject) . '?=';
 
 SmtpMail::send($toMail, $subject, $body, "Content-Type: text/html; charset=UTF-8");

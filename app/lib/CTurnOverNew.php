@@ -2356,7 +2356,7 @@ Class CTurnOverNew {
 	}
 	
 	function displayIncommingOrders($sv,$fi,$no) {
-		global $delivered, $svea, $part_delivered, $one_week, $sales_by_seller, $group_by_seller, $group_by_litium, $only_shop;
+		global $delivered, $svea, $part_delivered, $one_week, $sales_by_seller, $group_by_seller, $group_by_litium, $only_shop, $only_delivered;
 	
 		$countrow = 0;
 		$countrow_by_day = 0;
@@ -2364,40 +2364,37 @@ Class CTurnOverNew {
 		$margin = 0;
 		unset($row_note);
 	
-		echo "<div class=\"floatleft top20\">\n";
-		echo "<table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-		echo "\t<tr>\n";
+		echo "<div class=\"io-wrap\">\n";
+		echo "<table class=\"io-table\">\n";
 		if ($group_by_seller == "yes") {
-			echo "\t\t<td width=\"50\" class=\"align_center\"><b>Antal</b></td>\n";
-			echo "\t\t<td width=\"50\" class=\"align_center\"><b>Säljare</b></td>\n";
-			echo "\t\t<td width=\"100\" class=\"align_center\"><b>Ordersumma</b></td>\n";
+			echo "\t<thead><tr>\n";
+			echo "\t\t<th class=\"c\">Antal</th>\n";
+			echo "\t\t<th class=\"c\">Säljare</th>\n";
+			echo "\t\t<th class=\"r\">Ordersumma</th>\n";
+			echo "\t</tr></thead>\n";
 		} else {
-			// echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-			echo "\t\t<td width=\"110\"><b>Datum</b></td>\n";
-			echo "\t\t<td width=\"70\" class=\"align_center\"><b>Order nr</b></td>\n";
-			echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-			echo "\t\t<td width=\"320\"><b>Affärspartner</b></td>\n";
-			echo "\t\t<td width=\"190\"><b>Betalsätt</b></td>\n";
-			echo "\t\t<td width=\"100\" class=\"align_center\"><b>Ordersumma</b></td>\n";
-			echo "\t\t<td width=\"90\" class=\"align_center\"><b>TB</b></td>\n";
-			echo "\t\t<td width=\"70\" class=\"align_center\"><b>TG</b></td>\n";
-			/*
-			if ($sales_by_seller == "yes") {
-				echo "\t\t<td width=\"50\" class=\"align_center\"><b>Lagd av</b></td>\n";
-			}
-			*/
-			echo "\t\t<td width=\"50\" class=\"align_center\"><b>Lagd av</b></td>\n";
-			echo "\t\t<td width=\"80\" class=\"align_center\"><b>&nbsp;</b></td>\n";
-			echo "\t\t<td width=\"150\" class=\"align_left\">&nbsp;<b>Notering</b></td>\n";
+			echo "\t<thead><tr>\n";
+			echo "\t\t<th>Datum</th>\n";
+			echo "\t\t<th class=\"c\">Order nr</th>\n";
+			echo "\t\t<th>Affärspartner</th>\n";
+			echo "\t\t<th>Betalsätt</th>\n";
+			echo "\t\t<th class=\"r\">Ordersumma</th>\n";
+			echo "\t\t<th class=\"r\">TB</th>\n";
+			echo "\t\t<th class=\"r\">TG</th>\n";
+			echo "\t\t<th class=\"c\">Lagd av</th>\n";
+			echo "\t\t<th class=\"c\">Kundlänk</th>\n";
+			echo "\t\t<th class=\"c\">Skickad</th>\n";
+			echo "\t\t<th>Notering</th>\n";
+			echo "\t</tr></thead>\n";
 		}
-		echo "\t</tr>\n";
+		echo "\t<tbody>\n";
 		
 		if ($group_by_seller == "yes") {
 			$select  = "SELECT count(o.documentno) AS antal, SUM(o.totallines) AS summa, ad.value, curr.iso_code  ";
 		} else {
 			$select  = "SELECT o.created, o.documentno, bp.name, o.marginamt, o.totallines, curr.iso_code, o.c_currency_id,  ";
 			$select .= "o.margin, o.order_url, o.isdelivered, o.ispartdelivered, pay.name AS betalning, loc.c_country_id, ad.value, ";
-			$select .= "o.deliveryviarule ";
+			$select .= "o.deliveryviarule, o.external_reference ";
 		}
 		$select .= "FROM c_order o ";
 		$select .= "JOIN c_bpartner bp ON o.c_bpartner_id = bp.c_bpartner_id ";
@@ -2441,6 +2438,9 @@ Class CTurnOverNew {
 		if ($delivered == "no") {
 			$select .= "AND isdelivered = 'N' ";
 		}
+		if ($only_delivered == "yes") {
+			$select .= "AND isdelivered = 'Y' ";
+		}
 		if ($group_by_litium == "yes") {
 			$select .= "AND o.salesrep_id = '1652736' ";
 		}
@@ -2475,18 +2475,17 @@ Class CTurnOverNew {
 			while ($res && $row = pg_fetch_object($res)) {
 	
 				if ($rowcolor == true) {
-					$backcolor = "firstrow";
+					$backcolor = "io-row-a";
 				} else {
-					$backcolor = "secondrow";
+					$backcolor = "io-row-b";
 				}
 				
 				if ($group_by_seller == "yes") {
-					
-					echo "\t<tr>";
-					// echo "\t\t<td class=\"$backcolor\" align=\"center\">$countrow</td>\n";
-					echo "\t\t<td align=\"center\" class=\"$backcolor\">" . $row->antal . "</td>\n";
-					echo "\t\t<td align=\"center\" class=\"$backcolor\">" . strtoupper($row->value) . "</td>\n";
-					echo "\t\t<td align=\"right\" class=\"$backcolor\">" . number_format($row->summa, 0, ',', ' ') . " " . $row->iso_code . "</td>\n";
+
+					echo "\t<tr class=\"$backcolor\">\n";
+					echo "\t\t<td style=\"text-align:center\">" . $row->antal . "</td>\n";
+					echo "\t\t<td style=\"text-align:center\">" . strtoupper($row->value) . "</td>\n";
+					echo "\t\t<td style=\"text-align:right\">" . number_format($row->summa, 0, ',', ' ') . " " . $row->iso_code . "</td>\n";
 					echo "\t</tr>\n";
 					
 					$countrow++;
@@ -2495,71 +2494,48 @@ Class CTurnOverNew {
 					$valuta_kod = $row->iso_code;
 
 				} else {
-					
+
 					if ($row->isdelivered == "N" && $row->ispartdelivered == "Y") {
 						$row_note .= "är dellevererad";
 					}
-					
+
 					$this_day = date("Y-m-d", strtotime($row->created));
-					// echo "f�rsta: " . $this_day . "<br>";
-					
+
 					if ($this_day != $actual_day) {
-						
+
 						if ($countrow_by_day != 0) {
-							echo "<td colspan=\"25\" class=\"align_left bold\">" . $countrow_by_day . " st</td>";
-							echo "\t<tr>\n";
-							echo "<td colspan=\"25\" class=\"align_left bold\">&nbsp;</td>";
-							echo "\t</tr>\n";
+							echo "\t<tr class=\"io-count-row\"><td colspan=\"11\">" . $countrow_by_day . " st</td></tr>\n";
 							$countrow_by_day = 0;
 						}
-							
-						echo "<tr>";
+
+						echo "\t<tr class=\"io-day-hdr\">";
 						if ($this_day == date("Y-m-d", time())) {
-							echo "<td colspan=\"25\" class=\"align_left bold\">" . CDeparture::replace_days(date("l", strtotime($row->created))) . " (idag)</td>";
+							echo "<td colspan=\"11\">" . CDeparture::replace_days(date("l", strtotime($row->created))) . " (idag)</td>";
 						} else {
-							echo "<td colspan=\"25\" class=\"align_left bold\">" . CDeparture::replace_days(date("l", strtotime($row->created))) . "</td>";
+							echo "<td colspan=\"11\">" . CDeparture::replace_days(date("l", strtotime($row->created))) . "</td>";
 						}
-						echo "</tr>";
-							
+						echo "</tr>\n";
+
 					}
-					
-					
-					$disp_day = date('l', strtotime("$row->created"));
-					$disp_day = CDeparture::replace_days($disp_day);
-					
-					
-					echo "\t<tr>";
-					// echo "\t\t<td class=\"$backcolor\" align=\"center\">$countrow</td>\n";
-					echo "\t\t<td class=\"$backcolor\">" . date("Y-m-d H:i", strtotime($row->created)) . "</td>\n";
-					echo "\t\t<td class=\"$backcolor\" align=\"center\"><a href=\"javascript:winPopupCenter(500, 1000, 'order_info.php?order=$row->documentno');\">$row->documentno</a></td>\n";
-					if ($row->iso_code == "EUR") {
-						echo "\t\t<td class=\"align_center\"><img border=\"0\" src=\"fi_mini.jpg\"></td>\n";
-					} elseif ($row->iso_code == "NOK") {
-						echo "\t\t<td class=\"align_center\"><img border=\"0\" src=\"no_mini.jpg\"></td>\n";
-					} elseif ($row->c_country_id == 167) {
-						echo "\t\t<td class=\"align_center\"><img border=\"0\" src=\"dk_mini.jpg\"></td>\n";
+
+					$neg_class = ($row->marginamt < 0) ? " io-negative" : "";
+
+					echo "\t<tr class=\"$backcolor\">\n";
+					echo "\t\t<td>" . date("Y-m-d H:i", strtotime($row->created)) . "</td>\n";
+					echo "\t\t<td style=\"text-align:center\"><a class=\"io-order-link\" target=\"_blank\" href=\"https://admin.cyberphoto.se/search_dispatch.php?mode=order&page=1&q=$row->documentno\">$row->documentno</a></td>\n";
+					echo "\t\t<td>" . $row->name . "</td>\n";
+					echo "\t\t<td>" . $row->betalning . "</td>\n";
+					echo "\t\t<td style=\"text-align:right\">" . number_format($row->totallines, 0, ',', ' ') . " " . $row->iso_code . "</td>\n";
+					echo "\t\t<td style=\"text-align:right\" class=\"$neg_class\">" . number_format($row->marginamt, 0, ',', ' ') . " " . $row->iso_code . "</td>\n";
+					echo "\t\t<td style=\"text-align:right\" class=\"$neg_class\">" . $row->margin . " %</td>\n";
+					echo "\t\t<td style=\"text-align:center\">" . strtoupper($row->value) . "</td>\n";
+					echo "\t\t<td style=\"text-align:center\"><a class=\"io-cust-btn\" target=\"_blank\" href=\"https://www.cyberphoto.se/orderstatus?order=" . $row->external_reference . "\">Kundlänk</a></td>\n";
+					if ($row->isdelivered == "Y") {
+						echo "\t\t<td style=\"text-align:center\"><span class=\"io-delivered-yes\" title=\"Skickad\">&#10003;</span></td>\n";
 					} else {
-						echo "\t\t<td class=\"align_center\"><img border=\"0\" src=\"sv_mini.jpg\"></td>\n";
+						echo "\t\t<td style=\"text-align:center\"><span class=\"io-delivered-no\">&#8211;</span></td>\n";
 					}
-					echo "\t\t<td class=\"$backcolor\">" . $row->name . "</td>\n";
-					echo "\t\t<td class=\"$backcolor\">" . $row->betalning . "</td>\n";
-					echo "\t\t<td align=\"right\" class=\"$backcolor\">" . number_format($row->totallines, 0, ',', ' ') . " " . $row->iso_code . "</td>\n";
-					echo "\t\t<td align=\"right\" class=\"$backcolor\">" . number_format($row->marginamt, 0, ',', ' ') . " " . $row->iso_code . "</td>\n";
-					echo "\t\t<td align=\"right\" class=\"$backcolor\">" . $row->margin . " %</td>\n";
-					/*
-					if ($sales_by_seller == "yes") {
-						echo "\t\t<td align=\"center\" class=\"$backcolor\">" . strtoupper($row->value) . "</td>\n";
-					}
-					*/
-					echo "\t\t<td align=\"center\" class=\"$backcolor\">" . strtoupper($row->value) . "</td>\n";
-					if ($fi) {
-						echo "\t\t<td align=\"center\" class=\"$backcolor\"><a target=\"_blank\" href=\"https://www.cyberphoto.fi/kundvagn/tilaukseni-tila?orderref=" . $row->order_url . "&order_check=" . $row->documentno . "\">Kundlänk</td>\n";
-					} elseif ($no) {
-						echo "\t\t<td align=\"center\" class=\"$backcolor\"><a target=\"_blank\" href=\"https://www.cyberphoto.no/kundvagn/min-ordrestatus?orderref=" . $row->order_url . "&order_check=" . $row->documentno . "\">Kundlänk</td>\n";
-					} else {
-						echo "\t\t<td align=\"center\" class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/kundvagn/min-orderstatus?orderref=" . $row->order_url . "&order_check=" . $row->documentno . "\">Kundlänk</td>\n";
-					}
-					echo "\t\t<td class=\"align_left italic\">&nbsp; " . $row_note . "</td>\n";
+					echo "\t\t<td class=\"io-note\">" . $row_note . "</td>\n";
 					echo "\t</tr>\n";
 
 					$countrow++;
@@ -2586,33 +2562,28 @@ Class CTurnOverNew {
 					
 		} else {
 
-				echo "\t<tr>\n";
-				echo "\t\t<td colspan=\"5\"><i>Inga träffar. Detta verkar inte rimligt.</i></td>\n";
-				echo "\t</tr>\n";
-	
-		}
-		
-			if ($group_by_seller == "yes") {
-				echo "\t<tr>\n";
-				echo "<td colspan=\"2\" class=\"align_left bold\">&nbsp;</td>";
-				echo "\t\t<td align=\"right\"><b>" . number_format($ordervarde, 0, ',', ' ') . " " . $valuta_kod . "</b></td>\n";
-				echo "\t</tr>\n";
-			} else {
-				echo "\t<tr>\n";
-				echo "<td colspan=\"25\" class=\"align_left bold\">" . $countrow_by_day . " st</td>";
-				echo "\t</tr>\n";
-				echo "\t<tr>\n";
-				echo "<td colspan=\"25\" class=\"align_left bold\">&nbsp;</td>";
-				echo "\t</tr>\n";
-				echo "\t<tr>\n";
-				echo "\t\t<td colspan=\"5\"><b>Totalt: $countrow st ordrar i denna lista</b></td>\n";
-				echo "\t\t<td align=\"right\"><b>" . number_format($ordervarde, 0, ',', ' ') . " " . $valuta_kod . "</b></td>\n";
-				echo "\t\t<td align=\"right\"><b>" . number_format($margin, 0, ',', ' ') . " " . $valuta_kod . "</b></td>\n";
-				echo "\t</tr>\n";
-			}
+			echo "\t<tr class=\"io-count-row\"><td colspan=\"11\"><i>Inga träffar.</i></td></tr>\n";
 
-			echo "</table>\n";
-			echo "</div>\n";
+		}
+
+		if ($group_by_seller == "yes") {
+			echo "\t<tr class=\"io-total-row\">\n";
+			echo "\t\t<td colspan=\"2\"></td>\n";
+			echo "\t\t<td style=\"text-align:right\">" . number_format($ordervarde, 0, ',', ' ') . " " . $valuta_kod . "</td>\n";
+			echo "\t</tr>\n";
+		} else {
+			echo "\t<tr class=\"io-count-row\"><td colspan=\"11\">" . $countrow_by_day . " st</td></tr>\n";
+			echo "\t<tr class=\"io-total-row\">\n";
+			echo "\t\t<td colspan=\"4\">Totalt: $countrow st ordrar</td>\n";
+			echo "\t\t<td style=\"text-align:right\">" . number_format($ordervarde, 0, ',', ' ') . " " . $valuta_kod . "</td>\n";
+			echo "\t\t<td style=\"text-align:right\">" . number_format($margin, 0, ',', ' ') . " " . $valuta_kod . "</td>\n";
+			echo "\t\t<td colspan=\"5\"></td>\n";
+			echo "\t</tr>\n";
+		}
+
+		echo "\t</tbody>\n";
+		echo "</table>\n";
+		echo "</div>\n";
 	}
 
 	function displaySalesPerUser() {

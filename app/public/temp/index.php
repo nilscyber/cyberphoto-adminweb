@@ -192,6 +192,9 @@ td
 	$sensor      = (isset($_GET['sensor'])      ? $_GET['sensor']      : null);
 	$showtemp    = (isset($_GET['showtemp'])    ? $_GET['showtemp']    : null);
 
+	$dateFran = (isset($_GET['fran']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['fran'])) ? $_GET['fran'] : null;
+	$dateTill = (isset($_GET['till']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['till'])) ? $_GET['till'] : null;
+
 	$sensorList = [
 		1 => 'Server',
 		2 => 'Ute',
@@ -204,13 +207,29 @@ td
 		9 => 'Flyttbar',
 	];
 
+	$franVal = $dateFran ?: date('Y-m-d', strtotime('-30 days'));
+	$tillVal = $dateTill ?: date('Y-m-d');
+	$dateParams = ($dateFran || $dateTill) ? '&fran=' . urlencode($franVal) . '&till=' . urlencode($tillVal) : '';
+
 	echo "<div class=\"nav-bar\">\n";
 	echo "<a href=\"index.php\" class=\"nav-btn diagram\">&#9642; Visa diagram</a>\n";
 	echo "<div class=\"nav-divider\"></div>\n";
 	foreach ($sensorList as $id => $namn) {
 		$active = ($sensor == $id) ? ' active' : '';
-		echo "<a href=\"index.php?showtemp=yes&sensor=$id\" class=\"nav-btn$active\">$namn</a>\n";
+		echo "<a href=\"index.php?showtemp=yes&sensor=$id$dateParams\" class=\"nav-btn$active\">$namn</a>\n";
 	}
+	echo "<div class=\"nav-divider\"></div>\n";
+	echo "<form method=\"GET\" style=\"display:flex;align-items:center;gap:6px;\">\n";
+	echo "<label style=\"font-size:12px;color:#37474f;\">Från</label>\n";
+	echo "<input type=\"date\" name=\"fran\" value=\"$franVal\" style=\"padding:5px 8px;border-radius:6px;border:1px solid #b0bec5;font-size:12px;\">\n";
+	echo "<label style=\"font-size:12px;color:#37474f;\">Till</label>\n";
+	echo "<input type=\"date\" name=\"till\" value=\"$tillVal\" style=\"padding:5px 8px;border-radius:6px;border:1px solid #b0bec5;font-size:12px;\">\n";
+	if ($showtemp) {
+		echo "<input type=\"hidden\" name=\"showtemp\" value=\"yes\">\n";
+		echo "<input type=\"hidden\" name=\"sensor\" value=\"" . htmlspecialchars($sensor) . "\">\n";
+	}
+	echo "<button type=\"submit\" class=\"nav-btn diagram\" style=\"border-radius:6px;\">Visa</button>\n";
+	echo "</form>\n";
 	echo "</div>\n";
 	
 	spl_autoload_register(function ($class) {
@@ -231,7 +250,7 @@ td
 	}
 	
 	if ($showtemp == "yes") {
-		$temp->showTempList($sensor);
+		$temp->showTempList($sensor, $dateFran ? $franVal : null, $dateTill ? $tillVal : null);
 	} else {
 
 		$sensors = [
@@ -246,11 +265,14 @@ td
 			9 => ['namn' => 'Flyttbar',  'farg' => '#4361ee'],
 		];
 
+		$sqlFran = mysqli_real_escape_string(Db::getConnection(false), $franVal);
+		$sqlTill = mysqli_real_escape_string(Db::getConnection(false), $tillVal);
+
 		$select  = "SELECT DATE(tTime) AS dag, tSensor, ";
 		$select .= "ROUND(AVG(tTemperature), 1) AS snitt_temp, ";
 		$select .= "ROUND(AVG(tHumidity), 1) AS snitt_hum ";
 		$select .= "FROM cyberadmin.temp ";
-		$select .= "WHERE tTime >= NOW() - INTERVAL 30 DAY ";
+		$select .= "WHERE DATE(tTime) BETWEEN '$sqlFran' AND '$sqlTill' ";
 		$select .= "AND HOUR(tTime) BETWEEN 7 AND 18 ";
 		$select .= "GROUP BY dag, tSensor ";
 		$select .= "ORDER BY dag ASC, tSensor ASC";
@@ -305,13 +327,15 @@ td
 		$tempDsJson    = json_encode($tempDatasets);
 		$humDsJson     = json_encode($humDatasets);
 
+		$periodRubrik = date('d-M-Y', strtotime($franVal)) . ' — ' . date('d-M-Y', strtotime($tillVal));
+
 		echo "<script src=\"https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js\"></script>\n";
 		echo "<div class=\"top20\">\n";
-		echo "<h2>Medeltemperaturen mellan 07:00 - 18:00 - 30 dagar bakåt</h2>\n";
+		echo "<h2>Medeltemperaturen 07:00–18:00 &nbsp;·&nbsp; $periodRubrik</h2>\n";
 		echo "<div style=\"width:95%;margin:auto;\"><canvas id=\"chartTemp\"></canvas></div>\n";
 		echo "</div>\n";
 		echo "<div class=\"top20\">\n";
-		echo "<h2>Medelluftfuktigheten mellan 07:00 - 18:00 - 30 dagar bakåt</h2>\n";
+		echo "<h2>Medelluftfuktigheten 07:00–18:00 &nbsp;·&nbsp; $periodRubrik</h2>\n";
 		echo "<div style=\"width:95%;margin:auto;\"><canvas id=\"chartHum\"></canvas></div>\n";
 		echo "</div>\n";
 		?>

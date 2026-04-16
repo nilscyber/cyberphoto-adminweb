@@ -154,7 +154,7 @@ $h  = function ($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); 
 $toLatin1 = function ($s) { return (string)$s; };
 $nf = function ($n, $d = 0) { return number_format((float)$n, $d, ',', ' '); };
 
-echo "<h1>Dropshipment  uppföljning</h1>";
+echo "<h1>Dropshipment - uppföljning</h1>";
 
 // Hämta data beroende på vy
 if ($view === 'lines') {

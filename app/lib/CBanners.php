@@ -892,32 +892,24 @@ Class CBanners {
 							}
 						
 							if ($frontArtNr != "") {
-							
+
 								$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
-							
-								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/banners/$frontPicture\"></a>";
-								} else {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
-								}
-						
+
+								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
+
 							} else {
-							
-								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-									echo "<img border=\"0\" src=\"/banners/$frontPicture\"></a>";
-								} else {
-									echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
-								}
-						
+
+								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
+
 							}
-						
+
 						}
-						
+
 						echo "</div>\n";
-						
+
 						unset($lastOption);
 						break;
-					
+
 					} else {
 						$lastOption = 1;
 					}
@@ -987,36 +979,28 @@ Class CBanners {
 						}
 						
 						if ($frontArtNr != "") {
-							
+
 							$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
-							
-								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/banners/$frontPicture\"></a>";
-								} else {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
-								}
-						
+
+							echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
+
 						} else {
-							
-							if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-								echo "<img border=\"0\" src=\"/banners/$frontPicture\"></a>";
-							} else {
-								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
-							}
+
+							echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 
 						}
-					
+
 					}
-			
+
 					echo "</div>\n";
-					
+
 					unset($lastOption);
 					break;
-						
+
 				}
 
 			}
-			
+
 			if ($lastOption == 1) {
 				if ($section == 204) {
 					$this->getBannerNoFrame(204,1,true,"no",1);
@@ -1146,39 +1130,31 @@ Class CBanners {
 							}
 						
 							if ($frontArtNr != "") {
-							
+
 								$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
-							
-								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/banners/$frontPicture\"></a>";
-								} else {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
-								}
-						
+
+								echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
+
 							} else {
-							
-								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-									echo "<img border=\"0\" src=\"/banners/$frontPicture\"></a>";
-								} else {
-									echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
-								}
-						
+
+								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
+
 							}
-						
+
 						}
-						
+
 						echo "</div>\n";
-						
+
 						if ($count_banner == $limit) {
 							break;
 						} else {
 							$count_banner++;
 						}
-					
+
 					}
 
 				} else {
-				
+
 					if ($float == "left") {
 						echo "<div class=\"banner_nostyle floatleft\">\n";
 					} elseif ($float == "right") {
@@ -1242,39 +1218,31 @@ Class CBanners {
 						}
 						
 						if ($frontArtNr != "") {
-							
+
 							$beskrivning = $this->getbeskrivningArtNew($frontArtNr,$site);
-							
-								if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"/banners/$frontPicture\"></a>";
-								} else {
-									echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
-								}
-						
+
+							echo "<img alt=\"$beskrivning\" border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
+
 						} else {
-							
-							if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-								echo "<img border=\"0\" src=\"/banners/$frontPicture\"></a>";
-							} else {
-								echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
-							}
+
+							echo "<img border=\"0\" src=\"{$this->buildImgSrc($frontPicture)}\"></a>";
 
 						}
-					
+
 					}
-			
+
 					echo "</div>\n";
-					
+
 					if ($count_banner == $limit) {
 						break;
 					} else {
 						$count_banner++;
 					}
-						
+
 				}
 
 			}
-			
+
 		} elseif ($section == 202) {
 			$this->getBannerNoFrame(201,1,true,"no",1);
 		} elseif ($section == 203) {

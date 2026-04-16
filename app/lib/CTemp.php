@@ -83,13 +83,23 @@ Class CTemp {
 
 	}
 	
-	function showTempList($sensor) {
-	
+	function showTempList($sensor, $fran = null, $till = null) {
+		$conn = Db::getConnection(false);
+
 		$select  = "SELECT * ";
 		$select .= "FROM cyberadmin.temp ";
-		$select .= "WHERE tSensor = $sensor ";
+		$select .= "WHERE tSensor = " . intval($sensor) . " ";
+		if ($fran && $till) {
+			$sqlFran = mysqli_real_escape_string($conn, $fran);
+			$sqlTill = mysqli_real_escape_string($conn, $till);
+			$select .= "AND DATE(tTime) BETWEEN '$sqlFran' AND '$sqlTill' ";
+		}
 		$select .= "ORDER BY tTime DESC ";
-		$select .= "LIMIT 1000 ";
+		if ($fran && $till) {
+			$select .= "LIMIT 10000 ";
+		} else {
+			$select .= "LIMIT 100 ";
+		}
 		
 		// echo $select;
 		// exit;
