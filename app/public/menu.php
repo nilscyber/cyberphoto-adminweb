@@ -85,7 +85,8 @@
 	<li><a href="discontinued_products.php" <?php if (preg_match("/discontinued_products\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Utgångna produkter</a></li>
     <li><a href="demo_products.php" <?php if (preg_match("/demo_products\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Fynd > 90d</a></li>
     <?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se' || $_COOKIE['login_mail'] == 'thomas@cyberphoto.se' || $_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.se' || $_COOKIE['login_mail'] == 'kenneth.ly@cyberphoto.se') { ?>
-    <li><a href="categories.php" <?php if (preg_match("/categories\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Kategorier ADempiere</a></li>
+    <li><a href="categories.php" <?php if (preg_match("/^categories\.php$/i", basename($_SERVER['PHP_SELF']))) { ?>id="current"<?php } ?>>Kategorier (gammal)</a></li>
+    <li><a href="categories_ad.php" <?php if (preg_match("/categories_ad\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Kategorier ADempiere</a></li>
 	<?php } ?>
 	<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
 	<?php } ?>

@@ -82,7 +82,7 @@ class CMonitorArticles {
     }
 
     private function adFetchProductNameBatch($artnrs) {
-        // Return: [artnr => name]
+        // Return: [artnr => ['name' => fullname_with_manufacturer, 'id' => m_product_id]]
         $out = array();
         if (empty($artnrs)) return $out;
 
@@ -103,12 +103,22 @@ class CMonitorArticles {
             $i++;
         }
 
-        $sql = "SELECT value AS artnr, name FROM m_product WHERE value IN (" . implode(',', $ph) . ")";
+        $sql = "
+            SELECT p.value AS artnr,
+                   p.m_product_id,
+                   CASE WHEN manu.name IS NOT NULL AND manu.name <> ''
+                        THEN manu.name || ' ' || p.name
+                        ELSE p.name
+                   END AS name
+            FROM m_product p
+            LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
+            WHERE p.value IN (" . implode(',', $ph) . ")
+        ";
         $res = ($this->ad_r) ? @pg_query_params($this->ad_r, $sql, $params) : false;
         if (!$res) return $out;
 
         while ($res && $row = pg_fetch_assoc($res)) {
-            $out[$row['artnr']] = $row['name'];
+            $out[$row['artnr']] = array('name' => $row['name'], 'id' => $row['m_product_id']);
         }
 
         return $out;
@@ -145,27 +155,28 @@ class CMonitorArticles {
     ========================= */
 
     function getActualMonitors($type = null) {
-        $rowcolor = true;
         $startcount = 0;
 
-        echo "<table>\n";
-        echo "<tr>\n";
-        echo "<td width=\"150\"><b>Artikel nr</b></td>\n";
-        echo "<td width=\"400\"><b>Benämning</b></td>\n";
-        echo "<td width=\"90\" align=\"center\"><b>Typ</b></td>\n";
-        echo "<td width=\"110\" align=\"center\"><b>Värde</b></td>\n";
-        echo "<td width=\"75\" align=\"center\"><b>Just nu</b></td>\n";
-        echo "<td width=\"110\" align=\"center\"><b>Bevakas av</b></td>\n";
-        if (!empty($_COOKIE['login_mail']) && $_COOKIE['login_mail'] == 'stefan@cyberphoto.se') {
-            echo "<td width=\"110\" align=\"center\"><b>Från IP-adress</b></td>\n";
-            echo "<td width=\"80\" align=\"center\"><b>Antal dagar</b></td>\n";
-            echo "<td width=\"40\" align=\"center\"><b>&nbsp;</b></td>\n";
+        $isStefan = (!empty($_COOKIE['login_mail']) && $_COOKIE['login_mail'] == 'stefan@cyberphoto.se');
+
+        echo "<table class=\"table-list\">\n";
+        echo "<thead><tr>\n";
+        echo "<th>Artikel nr</th>\n";
+        echo "<th>Benämning</th>\n";
+        echo "<th>Typ</th>\n";
+        echo "<th>Värde</th>\n";
+        echo "<th>Just nu</th>\n";
+        echo "<th>Bevakas av</th>\n";
+        if ($isStefan) {
+            echo "<th>Antal dagar</th>\n";
+            echo "<th></th>\n";
         }
-        echo "<td width=\"65\" align=\"center\"><b>&nbsp;</b></td>\n";
-        echo "</tr>\n";
+        echo "<th></th>\n";
+        echo "</tr></thead>\n";
+        echo "<tbody>\n";
 
         $sql = "
-            SELECT monID, monUser, monArtnr, monMoreLess, monStoreValue, monIP, monTime, monComment, monType, monCount
+            SELECT monID, monUser, monArtnr, monMoreLess, monStoreValue, monTime, monComment, monType, monCount
             FROM cyberphoto.MonitorArticles
             WHERE monActive = 1
             ORDER BY monUser ASC, monArtnr ASC
@@ -191,16 +202,14 @@ class CMonitorArticles {
                 $monArtnr = $row['monArtnr'];
                 $monMoreLess = (int)$row['monMoreLess'];
                 $monStoreValue = $row['monStoreValue'];
-                $monIP = $row['monIP'];
                 $monTime = $row['monTime'];
                 $monComment = $row['monComment'];
                 $monType = (int)$row['monType'];
                 $monCount = (int)$row['monCount'];
 
-                $backcolor = ($rowcolor ? "firstrow" : "secondrow");
-                $rowcolor = !$rowcolor;
-
-                $name = !empty($names[$monArtnr]) ? $names[$monArtnr] : "(saknas i AD)";
+                $nameData = !empty($names[$monArtnr]) ? $names[$monArtnr] : null;
+                $name = $nameData ? $nameData['name'] : '(saknas i AD)';
+                $productId = $nameData ? $nameData['id'] : '';
                 if (strlen($name) > 60) {
                     $name = substr($name, 0, 60) . "....";
                 }
@@ -211,48 +220,50 @@ class CMonitorArticles {
                     $monDays = round((time() - strtotime($monTime)) / 3600 / 24);
                 }
 
+                $productUrl = '/search_dispatch.php?mode=product&q=' . urlencode($monArtnr) . '&open=product&id=' . urlencode($productId) . '#';
+
                 echo "<tr>\n";
-                echo "<td class=\"$backcolor\">$monArtnr</td>\n";
-                echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=" . $monArtnr . "\">" . $name . "</a></td>\n";
+                echo "<td>$monArtnr</td>\n";
+                echo "<td><a target=\"_blank\" href=\"" . $productUrl . "\">" . htmlspecialchars($name) . "</a></td>\n";
 
                 if ($monType == 3) {
-                    echo "<td class=\"$backcolor\" align=\"center\">Order nr</td>\n";
+                    echo "<td>Order nr</td>\n";
                 } else {
-                    echo "<td class=\"$backcolor\" align=\"center\">Lagersaldo</td>\n";
+                    echo "<td>Lagersaldo</td>\n";
                 }
 
                 if ($monType == 3) {
-                    echo "<td class=\"$backcolor\" align=\"center\"><a href=\"javascript:winPopupCenter(500, 1000, '/order_info.php?order=$monStoreValue');\">$monStoreValue</a></td>\n";
-                    echo "<td class=\"$backcolor\" align=\"center\">$qtyNow</td>\n";
+                    $orderUrl = '/search_dispatch.php?mode=order&page=1&q=' . urlencode($monStoreValue);
+                    echo "<td><a target=\"_blank\" href=\"" . $orderUrl . "\">" . htmlspecialchars($monStoreValue) . "</a></td>\n";
+                    echo "<td style=\"text-align:center\">$qtyNow</td>\n";
                 } else {
                     if ($monMoreLess == 0) {
-                        echo "<td class=\"$backcolor\" align=\"center\">Mindre än $monStoreValue</td>\n";
+                        echo "<td>Mindre än $monStoreValue</td>\n";
                     } elseif ($monMoreLess == 1) {
-                        echo "<td class=\"$backcolor\" align=\"center\">Mer än $monStoreValue</td>\n";
+                        echo "<td>Mer än $monStoreValue</td>\n";
                     } else {
-                        echo "<td class=\"$backcolor\" align=\"center\">Alla ändringar ($monCount)</td>\n";
+                        echo "<td>Alla ändringar ($monCount)</td>\n";
                     }
-                    echo "<td class=\"$backcolor\" align=\"center\">$qtyNow</td>\n";
+                    echo "<td style=\"text-align:center\">$qtyNow</td>\n";
                 }
 
-                echo "<td class=\"$backcolor\" align=\"center\">$monUser</td>\n";
+                echo "<td>" . htmlspecialchars($monUser) . "</td>\n";
 
-                if (!empty($_COOKIE['login_mail']) && $_COOKIE['login_mail'] == 'stefan@cyberphoto.se') {
-                    echo "<td class=\"$backcolor\" align=\"center\">$monIP</td>\n";
+                if ($isStefan) {
                     if ($monDays == 0) {
-                        echo "<td class=\"$backcolor\" align=\"right\"><b>$monDays dagar</b>&nbsp;&nbsp;</td>\n";
+                        echo "<td style=\"text-align:right\"><b>$monDays dagar</b></td>\n";
                     } else {
-                        echo "<td class=\"$backcolor\" align=\"right\">$monDays dagar&nbsp;&nbsp;</td>\n";
+                        echo "<td style=\"text-align:right\">$monDays dagar</td>\n";
                     }
 
                     if ($monComment != "" && $monID > 349) {
-                        echo "<td align=\"center\"><img title=\"" . htmlspecialchars($monComment) . "\" border=\"0\" src=\"eye.png\"></td>\n";
+                        echo "<td style=\"text-align:center\"><img title=\"" . htmlspecialchars($monComment) . "\" border=\"0\" src=\"eye.png\"></td>\n";
                     } else {
-                        echo "<td>&nbsp;</td>\n";
+                        echo "<td></td>\n";
                     }
                 }
 
-                echo "<td align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $monID . "\">Ändra</a></td>\n";
+                echo "<td style=\"text-align:center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $monID . "\">Ändra</a></td>\n";
                 echo "</tr>\n";
 
                 $startcount++;
@@ -260,26 +271,28 @@ class CMonitorArticles {
 
         } else {
             echo "<tr>\n";
-            echo "<td colspan=\"5\"><font color=\"#000000\"><b>Inga artiklar kommer bevakas</b></td>\n";
+            echo "<td colspan=\"7\"><b>Inga artiklar kommer bevakas</b></td>\n";
             echo "</tr>\n";
         }
 
-        echo "<tr>\n";
-        echo "<td colspan=\"5\"><b>Just nu bevakas $startcount artiklar med olika kriterier</b></td>\n";
-        echo "</tr>\n";
+        echo "</tbody>\n";
+        echo "<tfoot><tr>\n";
+        echo "<td colspan=\"7\"><b>Just nu bevakas $startcount artiklar med olika kriterier</b></td>\n";
+        echo "</tr></tfoot>\n";
         echo "</table>\n";
     }
 
     function getNotActualMonitors() {
-        echo "<table>\n";
-        echo "<tr>\n";
-        echo "<td width=\"150\"><b>Artikel nr</b></td>\n";
-        echo "<td width=\"400\"><b>Benämning</b></td>\n";
-        echo "<td width=\"90\" align=\"center\"><b>Typ</b></td>\n";
-        echo "<td width=\"110\" align=\"center\"><b>Värde</b></td>\n";
-        echo "<td width=\"110\" align=\"center\"><b>Bevakas av</b></td>\n";
-        echo "<td width=\"160\" align=\"center\"><b>Avslutad</b></td>\n";
-        echo "</tr>\n";
+        echo "<table class=\"table-list\">\n";
+        echo "<thead><tr>\n";
+        echo "<th>Artikel nr</th>\n";
+        echo "<th>Benämning</th>\n";
+        echo "<th>Typ</th>\n";
+        echo "<th>Värde</th>\n";
+        echo "<th>Bevakas av</th>\n";
+        echo "<th>Avslutad</th>\n";
+        echo "</tr></thead>\n";
+        echo "<tbody>\n";
 
         $sql = "
             SELECT monID, monUser, monArtnr, monMoreLess, monStoreValue, monEnd, monType
@@ -299,28 +312,28 @@ class CMonitorArticles {
             }
             $names = $this->adFetchProductNameBatch($artnrs);
 
-            $rowcolor = true;
             foreach ($rows as $row) {
-                $backcolor = ($rowcolor ? "firstrow" : "secondrow");
-                $rowcolor = !$rowcolor;
-
                 $artnr = $row['monArtnr'];
-                $name  = !empty($names[$artnr]) ? $names[$artnr] : "(saknas i AD)";
-                $type  = ((int)$row['monType'] == 3) ? "Order nr" : "Lagersaldo";
+                $nameData = !empty($names[$artnr]) ? $names[$artnr] : null;
+                $name = $nameData ? $nameData['name'] : '(saknas i AD)';
+                $productId = $nameData ? $nameData['id'] : '';
+                $type = ((int)$row['monType'] == 3) ? "Order nr" : "Lagersaldo";
+                $productUrl = '/search_dispatch.php?mode=product&q=' . urlencode($artnr) . '&open=product&id=' . urlencode($productId) . '#';
 
                 echo "<tr>\n";
-                echo "<td class=\"$backcolor\">" . htmlspecialchars($artnr) . "</td>\n";
-                echo "<td class=\"$backcolor\">" . htmlspecialchars($name) . "</td>\n";
-                echo "<td class=\"$backcolor\" align=\"center\">$type</td>\n";
-                echo "<td class=\"$backcolor\" align=\"center\">" . htmlspecialchars($row['monStoreValue']) . "</td>\n";
-                echo "<td class=\"$backcolor\" align=\"center\">" . htmlspecialchars($row['monUser']) . "</td>\n";
-                echo "<td class=\"$backcolor\" align=\"center\">" . htmlspecialchars($row['monEnd']) . "</td>\n";
+                echo "<td>" . htmlspecialchars($artnr) . "</td>\n";
+                echo "<td><a target=\"_blank\" href=\"" . $productUrl . "\">" . htmlspecialchars($name) . "</a></td>\n";
+                echo "<td>$type</td>\n";
+                echo "<td>" . htmlspecialchars($row['monStoreValue']) . "</td>\n";
+                echo "<td>" . htmlspecialchars($row['monUser']) . "</td>\n";
+                echo "<td>" . htmlspecialchars($row['monEnd']) . "</td>\n";
                 echo "</tr>\n";
             }
         } else {
             echo "<tr><td colspan=\"6\">Inga avslutade bevakningar hittades.</td></tr>\n";
         }
 
+        echo "</tbody>\n";
         echo "</table>\n";
     }
 
@@ -328,16 +341,17 @@ class CMonitorArticles {
         $addArtnr = trim((string)$addArtnr);
         if ($addArtnr === '') return;
 
-        echo "<table>\n";
-        echo "<tr>\n";
-        echo "<td width=\"150\"><b>Artikel nr</b></td>\n";
-        echo "<td width=\"400\"><b>Benämning</b></td>\n";
-        echo "<td width=\"90\" align=\"center\"><b>Typ</b></td>\n";
-        echo "<td width=\"110\" align=\"center\"><b>Värde</b></td>\n";
-        echo "<td width=\"75\" align=\"center\"><b>Just nu</b></td>\n";
-        echo "<td width=\"135\" align=\"center\"><b>Bevakas av</b></td>\n";
-        echo "<td width=\"75\" align=\"center\"><b>&nbsp;</b></td>\n";
-        echo "</tr>\n";
+        echo "<table class=\"table-list\">\n";
+        echo "<thead><tr>\n";
+        echo "<th>Artikel nr</th>\n";
+        echo "<th>Benämning</th>\n";
+        echo "<th>Typ</th>\n";
+        echo "<th>Värde</th>\n";
+        echo "<th>Just nu</th>\n";
+        echo "<th>Bevakas av</th>\n";
+        echo "<th></th>\n";
+        echo "</tr></thead>\n";
+        echo "<tbody>\n";
 
         $artnrEsc = $this->esc($addArtnr);
 
@@ -351,15 +365,14 @@ class CMonitorArticles {
 
         $names = $this->adFetchProductNameBatch(array($addArtnr));
         $qtys  = $this->adFetchQtyAvailableBatch(array($addArtnr));
-        $name  = !empty($names[$addArtnr]) ? $names[$addArtnr] : "(saknas i AD)";
+        $nameData = !empty($names[$addArtnr]) ? $names[$addArtnr] : null;
+        $name = $nameData ? $nameData['name'] : '(saknas i AD)';
+        $productId = $nameData ? $nameData['id'] : '';
         $qtyNow = isset($qtys[$addArtnr]) ? (int)$qtys[$addArtnr] : 0;
+        $productUrl = '/search_dispatch.php?mode=product&q=' . urlencode($addArtnr) . '&open=product&id=' . urlencode($productId) . '#';
 
         if ($res && mysqli_num_rows($res) > 0) {
-            $rowcolor = true;
             while ($row = mysqli_fetch_assoc($res)) {
-                $backcolor = ($rowcolor ? "firstrow" : "secondrow");
-                $rowcolor = !$rowcolor;
-
                 $monID = (int)$row['monID'];
                 $monUser = $row['monUser'];
                 $monMoreLess = (int)$row['monMoreLess'];
@@ -368,32 +381,34 @@ class CMonitorArticles {
                 $monCount = (int)$row['monCount'];
 
                 echo "<tr>\n";
-                echo "<td class=\"$backcolor\">" . htmlspecialchars($addArtnr) . "</td>\n";
-                echo "<td class=\"$backcolor\">" . htmlspecialchars($name) . "</td>\n";
-                echo "<td class=\"$backcolor\" align=\"center\">" . (($monType == 3) ? "Order nr" : "Lagersaldo") . "</td>\n";
+                echo "<td>" . htmlspecialchars($addArtnr) . "</td>\n";
+                echo "<td><a target=\"_blank\" href=\"" . $productUrl . "\">" . htmlspecialchars($name) . "</a></td>\n";
+                echo "<td>" . (($monType == 3) ? "Order nr" : "Lagersaldo") . "</td>\n";
 
                 if ($monType == 3) {
-                    echo "<td class=\"$backcolor\" align=\"center\">$monStoreValue</td>\n";
-                    echo "<td class=\"$backcolor\" align=\"center\">$qtyNow</td>\n";
+                    $orderUrl = '/search_dispatch.php?mode=order&page=1&q=' . urlencode($monStoreValue);
+                    echo "<td><a target=\"_blank\" href=\"" . $orderUrl . "\">" . htmlspecialchars($monStoreValue) . "</a></td>\n";
+                    echo "<td style=\"text-align:center\">$qtyNow</td>\n";
                 } else {
                     if ($monMoreLess == 0) {
-                        echo "<td class=\"$backcolor\" align=\"center\">Mindre än $monStoreValue</td>\n";
+                        echo "<td>Mindre än $monStoreValue</td>\n";
                     } elseif ($monMoreLess == 1) {
-                        echo "<td class=\"$backcolor\" align=\"center\">Mer än $monStoreValue</td>\n";
+                        echo "<td>Mer än $monStoreValue</td>\n";
                     } else {
-                        echo "<td class=\"$backcolor\" align=\"center\">Alla ändringar ($monCount)</td>\n";
+                        echo "<td>Alla ändringar ($monCount)</td>\n";
                     }
-                    echo "<td class=\"$backcolor\" align=\"center\">$qtyNow</td>\n";
+                    echo "<td style=\"text-align:center\">$qtyNow</td>\n";
                 }
 
-                echo "<td class=\"$backcolor\" align=\"center\">" . htmlspecialchars($monUser) . "</td>\n";
-                echo "<td align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $monID . "\">ändra</a></td>\n";
+                echo "<td>" . htmlspecialchars($monUser) . "</td>\n";
+                echo "<td style=\"text-align:center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $monID . "\">Ändra</a></td>\n";
                 echo "</tr>\n";
             }
         } else {
             echo "<tr><td colspan=\"7\">Inga aktiva bevakningar på denna artikel.</td></tr>\n";
         }
 
+        echo "</tbody>\n";
         echo "</table>\n";
     }
 
