@@ -1,10 +1,10 @@
 /* ============================================================
    ADMIN CORE CSS
-   Gemensamma stilar för hela adminmiljön
+   Gemensamma stilar fï¿½r hela adminmiljï¿½n
    ============================================================ */
 
 /* ------------------------------------------------------------
-   1. ROOT-VARIABLER – färger, tabelltema, badgefärger
+   1. ROOT-VARIABLER ï¿½ fï¿½rger, tabelltema, badgefï¿½rger
    ------------------------------------------------------------ */
 :root {
     --tbl-border:        #e5e7eb;
@@ -91,6 +91,15 @@
     font-weight: 700;
 }
 
+/* Totalrad (t.ex. sista raden i en rapport) */
+.total-row td {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    font-weight: 700;
+    border-top: 2px solid #0f172a;
+}
+.total-row a { color: #93c5fd; }
+
 /* ------------------------------------------------------------
    3. GLOBALE BADGES
    ------------------------------------------------------------ */
@@ -112,7 +121,7 @@
     border: 1px solid var(--tbl-border);
 }
 
-/* Särskilda badge-varianter */
+/* Sï¿½rskilda badge-varianter */
 .badge-used {
     background: var(--badge-used-bg);
     color: var(--badge-used-color);
@@ -167,7 +176,7 @@
     color: var(--badge-new-color);
 }
 
-/* Åldersbadgen (begagnat/fyndvara) */
+/* ï¿½ldersbadgen (begagnat/fyndvara) */
 .badge-age {
     padding: 2px 6px;
     border-radius: 4px;
@@ -217,11 +226,78 @@
 /* ------------------------------------------------------------
    6. UTILITY-KLASSER
    ------------------------------------------------------------ */
-.text-right { text-align: right; }
-.text-center { text-align: center; }
-.nowrap      { white-space: nowrap; }
+.text-right    { text-align: right; }
+.text-center   { text-align: center; }
+.nowrap        { white-space: nowrap; }
+.muted         { color: #6b7280; }
+.text-negative { color: #dc2626 !important; }
 
-.muted       { color: #6b7280; }
+/* Tabell â€“ kolumnjustering */
+.table-list th.r, .table-list td.r { text-align: right; }
+.table-list th.c, .table-list td.c { text-align: center; }
+
+/* Dag/grupp-rubrikrad i tabell */
+.cat-head td {
+    background: #f3f4f6 !important;
+    font-weight: 700;
+    color: #111;
+    border-top: 2px solid var(--tbl-border);
+    padding: 6px 10px;
+}
+
+/* Info-/rÃ¤knerad (t.ex. "5 st") */
+.info-row td {
+    background: #fafafa !important;
+    color: #6b7280;
+    font-style: italic;
+    font-size: 12px;
+    border-bottom: 2px solid var(--tbl-border);
+}
+
+/* Liten inline lÃ¤nk-knapp */
+.btn-link-sm {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 4px;
+    font-size: 11px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.btn-link-sm:hover { background: #bfdbfe; }
+
+/* ------------------------------------------------------------
+   FILTER-FÃ„LT (checkbox-rad ovanfÃ¶r tabeller)
+   ------------------------------------------------------------ */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 2.5rem;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid var(--tbl-border);
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem 1rem;
+    margin-bottom: 1rem;
+}
+.filter-bar label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 13px;
+    color: #475569;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.filter-bar input[type=checkbox] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    accent-color: #0d9488;
+    flex-shrink: 0;
+}
 
 /* ------------------------------------------------------------
    7. GLOBALA LAYOUTDELAR

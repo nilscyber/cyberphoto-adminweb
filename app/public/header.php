@@ -12,7 +12,7 @@
 	$admin->displayPageTitle();
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"global.css?ver=ad" . date("ynjGi") . "\">\n";
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_badges.css?ver=ad" . date("ynjGi") . "\">\n";
-	// echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
 	// echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_search_product.css?ver=ad" . date("ynjGi") . "\">\n";
 	// echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_drawer.css?ver=ad" . date("ynjGi") . "\">\n";
 	echo "<script type=\"text/javascript\" src=\"/javascript/winpop.js\"></script>\n";
