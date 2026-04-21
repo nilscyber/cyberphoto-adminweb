@@ -9,9 +9,11 @@
 	// echo "<link rel=\"shortcut icon\" href=\"https://admin.cyberphoto.se/admin.ico\">\n";
 	echo "<link rel=\"icon\" type=\"image/png\" href=\"https://admin.cyberphoto.se/favicon.png\">\n";
 	echo "<meta charset=\"utf-8\">\n";
+	echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n";
 	$admin->displayPageTitle();
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"global.css?ver=ad" . date("ynjGi") . "\">\n";
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_badges.css?ver=ad" . date("ynjGi") . "\">\n";
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"responsive.css?ver=ad" . date("ynjGi") . "\">\n";
 	// echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
 	// echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_search_product.css?ver=ad" . date("ynjGi") . "\">\n";
 	// echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_drawer.css?ver=ad" . date("ynjGi") . "\">\n";
@@ -457,7 +459,9 @@ h2 {
 	echo "<div id=\"centermiddle\">\n";
 	echo "<div id=\"content\">\n";
 
+	echo '<input type="checkbox" id="nav-toggle" class="nav-toggle">';
 	echo '<div id="admin-top">';
+	echo '<label for="nav-toggle" class="nav-toggle-btn" aria-label="Meny"><span></span><span></span><span></span></label>';
 	echo '<a href="https://' . $_SERVER['HTTP_HOST'] . '" class="brand">';
 	echo '    <img src="/img/admin-logo-new-5.png" alt="Admin" class="brand-icon">';
 	echo '  </a>';

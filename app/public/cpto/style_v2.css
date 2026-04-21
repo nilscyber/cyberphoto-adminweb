@@ -1,0 +1,127 @@
+body  {
+	font-family: "Century Gothic", Verdana, Arial, sans-serif;
+	background: #464646; 
+	padding: 0; 
+	margin: 0;
+	font-size: 14px;
+}
+h1 { 
+	font-size: 16px; 
+	text-align: center;
+	padding: 5px; 
+}
+h2 { 
+	font-size: 16px; 
+	text-align: center;
+	padding: 5px; 
+}
+h3 { 
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+}
+.top5 {
+	margin-top: 5px;
+}
+.top10 {
+	margin-top: 10px;
+}
+.top20 {
+	margin-top: 20px;
+}
+#maincontainer {
+	width: 100%;
+	margin-right: auto; 
+	margin-left: auto;
+}
+#incontainer {
+	background: #efefef; 
+	background-image: url(img/in.png); 
+	background-repeat: no-repeat; 
+	background-position: left; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	-webkit-text-shadow: 2px 2px #cccccc; /* for chrome */
+	-text-shadow: 2px 2px #cccccc; /* for all browser*/
+	-ms-text-shadow: 2px 2px #cccccc; /* for ie 9+ */
+	-moz-text-shadow: 2px 2px #cccccc; /* for firefox */
+	-o-text-shadow: 2px 2px #cccccc; /* for opera */
+	-khtml-text-shadow: 2px 2px #cccccc; /* for gecko based browser*/
+	text-shadow: 2px 2px #cccccc; /* same as above*/
+}
+#outcontainer {
+	background: #efefef; 
+	background-image: url(img/in.png); 
+	background-repeat: no-repeat; 
+	background-position: right; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	text-shadow: 2px 2px #cccccc;
+}
+#greencontainer {
+	background: #efefef; 
+	background-image: url(img/arr_green.png); 
+	background-repeat: no-repeat; 
+	background-position: right; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	text-shadow: 2px 2px #cccccc;
+}
+#redcontainer {
+	background: #efefef; 
+	background-image: url(img/arr_red.png); 
+	background-repeat: no-repeat; 
+	background-position: right; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	text-shadow: 2px 2px #cccccc;
+}
+.plaincontainer {
+	background: #efefef; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	margin: 3px 0px 0px 0px;
+	font-size: 20px; 
+	text-align: center;
+	padding: 5px; 
+	text-shadow: 2px 2px #cccccc;
+}
+#footcontainer {
+	margin-top: 20px;
+	text-align: center;
+	color: #f4f4f4;
+}
+.logopanel {
+	background: #808080;
+	background-image: url(img/top.png); 
+	background-repeat: repeat-x; 
+	text-align: center;
+	padding: 0px;
+}
+.logo {
+	background-image: url(img/logo.png); 
+	background-repeat: no-repeat; 
+	background-position: center center; 
+	height: 45px;
+}
