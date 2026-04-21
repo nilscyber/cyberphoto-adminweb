@@ -6,6 +6,16 @@
 - **`app/public/admin_core.css`** – primary shared stylesheet (tables, badges, CSS variables)
 - **`app/public/global.css`** – legacy global styles (still in use, do not remove)
 
+`admin_core.css` is **NOT** loaded globally in `header.php` (kept commented out to avoid breaking legacy pages that use `firstrow`/`secondrow` row colors). Instead, include it explicitly per page directly after `include_once("header.php")`:
+
+```php
+echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
+```
+
+Pages that currently include `admin_core.css`:
+- `monitor_articles.php`
+- `incomingOrders.php`
+
 Always use the classes from `admin_core.css` for new or modernised pages. Do **not** create page-specific `<style>` blocks that duplicate or override these.
 
 ### Tables

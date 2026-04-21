@@ -1,7 +1,8 @@
-<?php 
+<?php
 // error_reporting(E_ALL & ~E_NOTICE);
 	include_once("top.php");
 	include_once("header.php");
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
 	
 	echo "<h1>Bevaka nivåer på enskilda artiklar</h1>\n";
 	if ($wrongmess) {
