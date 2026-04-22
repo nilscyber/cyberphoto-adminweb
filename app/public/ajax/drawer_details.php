@@ -288,6 +288,8 @@ if ($type === 'customer') {
 
 	  .dw-table{width:100%;border-collapse:collapse;font-size:13px}
 	  .dw-table th,.dw-table td{padding:4px 6px;border-bottom:1px solid #ddd;text-align:left}
+	  .dw-country{display:inline-block;padding:1px 5px;border-radius:4px;font-size:11px;font-weight:700;background:#e5e7eb;color:#374151}
+	  .text-center{text-align:center}
 
 	  .dw-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 	  .dw-btn{display:inline-block;padding:6px 10px;border:1px solid #cfd6e0;border-radius:6px;background:#fff;text-decoration:none;color:#111}
@@ -399,7 +401,8 @@ if ($type === 'customer') {
 	  .dw-stock-grid .dw-row-full .dw-label { margin: 0; }
 	  .dw-stock-grid .dw-row-full .dw-val   { white-space: nowrap; }
 
-	  .dw-card-stock { margin-bottom: 12px; }
+	  .dw-card-stock { margin-bottom: 0; }
+	  #dw-queue-block, #dw-purch-block { background:#f0f9ff; border-color:#bae6fd; margin-bottom: 16px; }
 
 	  .dw-card-meta{
 		font-size:13px;
@@ -573,6 +576,53 @@ if ($type === 'customer') {
 	$waitUrl  = 'https://admin.cyberphoto.se/waitinglist.php?artnr='.$artWait;
 	$purchUrl = 'https://admin.cyberphoto.se/purchaselist.php?artnr='.$artWait;
 
+	// === Kö-rader (inline i drawern) ===
+	$queueRows = array();
+	$sqlQueue = "
+		SELECT col.created, o.documentno, bp.name, col.qtyordered, col.qtyallocated,
+		       col.description, xc.name AS status_name, us.name AS locked_user,
+		       loc.c_country_id, o.priorityrule
+		FROM c_orderline col
+		JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id
+		JOIN c_order o ON col.c_order_id = o.c_order_id
+		JOIN m_product p ON col.m_product_id = p.m_product_id
+		JOIN c_bpartner_location bpl ON bpl.c_bpartner_location_id = o.c_bpartner_location_id
+		JOIN c_location loc ON loc.c_location_id = bpl.c_location_id
+		JOIN c_country con ON con.c_country_id = loc.c_country_id
+		LEFT JOIN xc_sales_order_status xc ON xc.xc_sales_order_status_id = o.xc_sales_order_status_id
+		LEFT JOIN AD_User us ON us.AD_User_ID = o.locked_to_id
+		WHERE o.c_doctype_id = 1000030
+		  AND o.docstatus NOT IN ('VO')
+		  AND col.qtyordered > col.qtydelivered
+		  AND p.value = \$1
+		  AND c_doctypetarget_id NOT IN (1000027)
+		ORDER BY o.priorityrule ASC, col.created ASC
+	";
+	if ($rsQ = ($conn) ? @pg_query_params($conn, $sqlQueue, array($artValue)) : false) {
+		while ($rsQ && $qr = pg_fetch_assoc($rsQ)) $queueRows[] = $qr;
+		pg_free_result($rsQ);
+	}
+
+	// === Inköpsorder-rader (inline i drawern) ===
+	$purchRows = array();
+	$sqlPurch = "
+		SELECT o.created, o.documentno, bp.name, col.qtyordered, col.qtydelivered,
+		       col.datepromisedprecision, col.datepromised, col.description
+		FROM c_orderline col
+		JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id
+		JOIN c_order o ON col.c_order_id = o.c_order_id
+		JOIN m_product p ON col.m_product_id = p.m_product_id
+		WHERE o.c_doctype_id = 1000016
+		  AND o.docstatus NOT IN ('VO')
+		  AND col.qtyordered > col.qtydelivered
+		  AND p.value = \$1
+		ORDER BY o.created ASC
+	";
+	if ($rsP = ($conn) ? @pg_query_params($conn, $sqlPurch, array($artValue)) : false) {
+		while ($rsP && $pr = pg_fetch_assoc($rsP)) $purchRows[] = $pr;
+		pg_free_result($rsP);
+	}
+
 	$shelfTxt = (isset($shelf) && $shelf!=='') ? $shelf : 'Standard';
 
 	/* Badges */
@@ -594,8 +644,7 @@ if ($type === 'customer') {
 
 		  echo '<div class="dw-row"><span class="dw-label">Allokerade:</span><span class="dw-val">';
 		  if ($allocated > 0) {
-			echo '<a href="#" class="dw-vallink"
-					 onclick="window.open(\''.$waitUrl.'\',\'waiting_'.$pid.'\',\'width=1000,height=600,menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1\');return false;">'.$allocBadge.'</a>';
+			echo '<a href="#" class="dw-vallink" onclick="dwToggleBlock(\'dw-queue-block\');return false;">'.$allocBadge.'</a>';
 		  } else {
 			echo $allocBadge;
 		  }
@@ -603,17 +652,15 @@ if ($type === 'customer') {
 
 		  echo '<div class="dw-row"><span class="dw-label">Kö:</span><span class="dw-val">';
 		  if ($hasQueueLink) {
-			echo '<a href="#" class="dw-vallink"
-					 onclick="window.open(\''.$waitUrl.'\',\'waiting_'.$pid.'\',\'width=1000,height=600,menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1\');return false;">'.$queueBadge.'</a>';
+			echo '<a href="#" class="dw-vallink" onclick="dwToggleBlock(\'dw-queue-block\');return false;">'.$queueBadge.'</a>';
 		  } else {
 			echo $queueBadge;
 		  }
 		  echo '</span></div>';
 
 		  echo '<div class="dw-row"><span class="dw-label">Beställda:</span><span class="dw-val">';
-		  if ($ordered > -1000) {
-			echo '<a href="#" class="dw-vallink"
-					 onclick="window.open(\''.$purchUrl.'\',\'purch_'.$pid.'\',\'width=800,height=400,menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1\');return false;">'.$orderedBadge.'</a>';
+		  if ($ordered > 0) {
+			echo '<a href="#" class="dw-vallink" onclick="dwToggleBlock(\'dw-purch-block\');return false;">'.$orderedBadge.'</a>';
 		  } else {
 			echo $orderedBadge;
 		  }
@@ -655,9 +702,121 @@ if ($type === 'customer') {
 
 	  echo '</div>'; // grid
 	echo '</div>'; // dw-card
-	
+
+	// ===== Inline: Kö =====
+	if (!empty($queueRows)) {
+		$countryLabel = function($cid) {
+			$cid = (int)$cid;
+			if ($cid === 181 || $cid === 50000) return '<span class="dw-country">FI</span>';
+			if ($cid === 167) return '<span class="dw-country">DK</span>';
+			if ($cid === 269) return '<span class="dw-country">NO</span>';
+			return '<span class="dw-country">SE</span>';
+		};
+
+		echo '<div id="dw-queue-block" class="dw-card" style="display:none">';
+		  echo '<div class="dw-card-title">Kö <span class="dw-muted">('.count($queueRows).' st)</span></div>';
+		  echo '<table class="dw-table" style="font-size:12px">';
+		    echo '<thead><tr>'
+		       . '<th>#</th><th>Skapad</th><th>Order</th><th></th><th>Namn</th>'
+		       . '<th class="text-center">Best</th><th class="text-center">Allok</th><th>Status</th>'
+		       . '</tr></thead><tbody>';
+		  $i = 1;
+		  foreach ($queueRows as $qr) {
+			$created  = $h(substr((string)$qr['created'], 0, 10));
+			$docno    = $h($qr['documentno']);
+			$name     = $h($qr['name']);
+			$desc     = $qr['description'] !== '' ? ' <b>('.$h($qr['description']).')</b>' : '';
+			$best     = (int)$qr['qtyordered'];
+			$allok    = (int)$qr['qtyallocated'];
+			$prio     = (int)$qr['priorityrule'];
+			$locked   = trim((string)$qr['locked_user']);
+			$status   = trim((string)$qr['status_name']);
+			$country  = $countryLabel($qr['c_country_id']);
+
+			$statusTxt = '';
+			if ($best === $allok) $statusTxt = '<i>Väntar på att skickas</i>';
+			elseif ($locked !== '') $statusTxt = '<span title="'.$h($status).'">&#128274; '.$h($locked).'</span>';
+
+			$prioTxt = '';
+			if ($prio === 1) $prioTxt = '<span title="Högsta prio" style="color:#b91c1c;font-weight:700">&#9650;&#9650;</span>';
+			elseif ($prio === 3) $prioTxt = '<span title="Hög prio" style="color:#d97706;font-weight:700">&#9650;</span>';
+
+			$orderLink = '<a href="/search_dispatch.php?mode=order&page=1&q='.$docno.'" target="_blank" rel="noopener">'.$docno.'</a>';
+
+			echo '<tr>';
+			echo '<td>'.$i.'</td>';
+			echo '<td style="white-space:nowrap">'.$created.'</td>';
+			echo '<td style="white-space:nowrap">'.$orderLink.'</td>';
+			echo '<td>'.$country.'</td>';
+			echo '<td>'.$name.$desc.'</td>';
+			echo '<td class="text-center">'.$best.'</td>';
+			echo '<td class="text-center">'.$allok.'</td>';
+			echo '<td style="white-space:nowrap">'.$prioTxt.' '.$statusTxt.'</td>';
+			echo '</tr>';
+			$i++;
+		  }
+		  echo '</tbody></table>';
+		echo '</div>';
+	}
+
+	// ===== Inline: Inköpsordrar =====
+	if (!empty($purchRows)) {
+		$fmtDelivDate = function($dat, $prec) {
+			$dat = trim((string)$dat);
+			if ($dat === '') return 'Okänt datum';
+			$d  = substr($dat, 0, 10);
+			$ts = strtotime($d);
+			$months = array('','jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec');
+			if ($prec === 'D') return date('Y-m-d', $ts);
+			if ($prec === 'W') return 'Vecka '.date('W', $ts);
+			if ($prec === 'U') return 'Leveransdatum okänt';
+			if ($prec === 'M') return $months[(int)date('n', $ts)].' '.date('Y', $ts);
+			if ($prec === 'P') {
+				$day = (int)date('j', $ts); $m = $months[(int)date('n', $ts)];
+				if ($day <= 10) return 'Tidigt i '.$m;
+				if ($day <= 20) return 'Mitten av '.$m;
+				return 'Sent i '.$m;
+			}
+			return $d;
+		};
+
+		echo '<div id="dw-purch-block" class="dw-card" style="display:none">';
+		  echo '<div class="dw-card-title">Inköpsordrar <span class="dw-muted">('.count($purchRows).' st)</span></div>';
+		  echo '<table class="dw-table" style="font-size:12px">';
+		    echo '<thead><tr>'
+		       . '<th>#</th><th>Skapad</th><th>Order</th><th>Namn</th>'
+		       . '<th class="text-center">Antal</th><th class="text-center">Lev</th>'
+		       . '<th>Datum</th><th>Notering</th>'
+		       . '</tr></thead><tbody>';
+		  $i = 1;
+		  foreach ($purchRows as $pr) {
+			$created  = $h(substr((string)$pr['created'], 0, 10));
+			$docno    = $h($pr['documentno']);
+			$name     = $h($pr['name']);
+			$antal    = (int)$pr['qtyordered'];
+			$lev      = (int)$pr['qtydelivered'];
+			$datum    = $h($fmtDelivDate($pr['datepromised'], $pr['datepromisedprecision']));
+			$note     = $h(trim((string)$pr['description']));
+
+			echo '<tr>';
+			echo '<td>'.$i.'</td>';
+			echo '<td style="white-space:nowrap">'.$created.'</td>';
+			echo '<td><a href="/search_dispatch.php?mode=order&page=1&q='.$docno.'" target="_blank" rel="noopener">'.$docno.'</a></td>';
+			echo '<td>'.$name.'</td>';
+			echo '<td class="text-center">'.$antal.'</td>';
+			echo '<td class="text-center">'.$lev.'</td>';
+			echo '<td style="white-space:nowrap">'.$datum.'</td>';
+			echo '<td>'.($note !== '' ? $note : '').'</td>';
+			echo '</tr>';
+			$i++;
+		  }
+		  echo '</tbody></table>';
+		echo '</div>';
+	}
+
 
     // ===== Sparkline + Sålt över tid =====
+    echo '<div style="height:12px"></div>';
     if ($st) {
         $qtyweek    = (int)$st['qtyweek'];
         $qtymonth   = (int)$st['qtymonth'];
@@ -740,7 +899,7 @@ if ($type === 'customer') {
         echo '</div>';
 
     } else {
-        echo '<div class="dw-section dw-muted" style="margin-top:6px">Inga säldsiffror i statistiken</div>';
+        echo '<div class="dw-section dw-muted" style="margin-top:6px">Inga säljsiffror i statistiken</div>';
     }
 
     // ===== RMA: antal kopplade till artikeln =====
@@ -852,16 +1011,17 @@ if ($type === 'customer') {
             }
             echo '</div>';
 
-			echo '<div class="kv-key">Lev. art.nr:</div><div class="kv-val">'
-			   . ($sVnoRaw !== ''
-					? '<span class="copy-chip" data-copy="'.$h($sVnoRaw).'" title="Kopiera lev. art.nr">'.$sVno.'</span>'
-					: '-' )
-			   . '</div>';
-
-            echo '<div class="kv-key">Användare:</div><div class="kv-val">'.($sUser !== '' ? '<span class="copy-chip" data-copy="'.$sUser.'" title="Kopiera användar-namn">'.$sUser.'</span>' : '-').'</div>';
-            echo '<div class="kv-key">Lösenord:</div><div class="kv-val">'.($sPass !== '' ? '<span class="copy-chip" data-copy="'.$sPass.'" title="Kopiera lösenord">'.$sPass.'</span>' : '-').'</div>';
-            echo '<div class="kv-key">Hemsida:</div><div class="kv-val">'.($sUrl !== '' ? '<a href="'.$h($sUrl).'" target="_blank" rel="noopener">'.$h($sUrl).'</a>' : '-').'</div>';
-            echo '<div class="kv-key">Inköpar:</div><div class="kv-val">'.($sBuyer !== '' ? $h($sBuyer) : '-').'</div>';
+            if (!in_array($sCode, array('5555', '4444'), true)) {
+                echo '<div class="kv-key">Lev. art.nr:</div><div class="kv-val">'
+                   . ($sVnoRaw !== ''
+                        ? '<span class="copy-chip" data-copy="'.$h($sVnoRaw).'" title="Kopiera lev. art.nr">'.$sVno.'</span>'
+                        : '-' )
+                   . '</div>';
+                echo '<div class="kv-key">Användare:</div><div class="kv-val">'.($sUser !== '' ? '<span class="copy-chip" data-copy="'.$sUser.'" title="Kopiera användar-namn">'.$sUser.'</span>' : '-').'</div>';
+                echo '<div class="kv-key">Lösenord:</div><div class="kv-val">'.($sPass !== '' ? '<span class="copy-chip" data-copy="'.$sPass.'" title="Kopiera lösenord">'.$sPass.'</span>' : '-').'</div>';
+                echo '<div class="kv-key">Hemsida:</div><div class="kv-val">'.($sUrl !== '' ? '<a href="'.$h($sUrl).'" target="_blank" rel="noopener">'.$h($sUrl).'</a>' : '-').'</div>';
+                echo '<div class="kv-key">Inköpar:</div><div class="kv-val">'.($sBuyer !== '' ? $h($sBuyer) : '-').'</div>';
+            }
 
           echo '</div>';
         echo '</div>';
@@ -1062,7 +1222,7 @@ if ($type === 'customer') {
 	echo '</div>';
 
     echo '</div>'; // dw-wrap
-	
+
 	exit;
 }
 

@@ -153,6 +153,11 @@
   // Exponera API globalt
   window.openDrawer = openDrawer;
   window.drawerClose = closeDrawer;
+  window.dwToggleBlock = function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+  };
 })();
 </script>
 
