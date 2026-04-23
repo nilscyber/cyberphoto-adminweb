@@ -829,28 +829,29 @@ if ($type === 'customer') {
         $hasTrend = ($qtyweek + $qtymonth + $qty3month + $qty6month + $qty12month + $qty36month) > 0;
 
         if ($hasTrend) {
+            // Diagrammet visar de senaste 6 månaderna (1v, 1mån, 3mån, 6mån)
             $perWeek = array(
-              array('label'=>'1 v',    'v'=> $qtyweek / 1.0),
-              array('label'=>'1 man',  'v'=> ($qtymonth   * 7.0) / 30.0),
-              array('label'=>'3 man',  'v'=> ($qty3month  * 7.0) / 90.0),
-              array('label'=>'6 man',  'v'=> ($qty6month  * 7.0) / 180.0),
-              array('label'=>'12 man', 'v'=> ($qty12month * 7.0) / 365.0),
-              array('label'=>'36 man', 'v'=> ($qty36month * 7.0) / 1095.0),
+              array('label'=>'1 v',   'qty'=> $qtyweek,  'disp'=> $qtyweek  / 7.0,   'v'=> $qtyweek / 1.0),
+              array('label'=>'1 mån', 'qty'=> $qtymonth, 'disp'=> $qtymonth / 30.0,  'v'=> ($qtymonth  * 7.0) / 30.0),
+              array('label'=>'3 mån', 'qty'=> $qty3month,'disp'=> $qty3month / 90.0,  'v'=> ($qty3month * 7.0) / 90.0),
+              array('label'=>'6 mån', 'qty'=> $qty6month,'disp'=> $qty6month / 180.0, 'v'=> ($qty6month * 7.0) / 180.0),
             );
-            $values = array($perWeek[0]['v'],$perWeek[1]['v'],$perWeek[2]['v'],$perWeek[3]['v'],$perWeek[4]['v'],$perWeek[5]['v']);
+            $values = array_column($perWeek, 'v');
             $max = 0.0; foreach ($values as $vv) { if ($vv > $max) $max = $vv; }
             if ($max < 1) $max = 1;
 
-            $W = 560; $H = 150; $pad = 8; $innerW = $W - 2*$pad; $innerH = $H - 2*$pad;
+            $xPad = 24; $yPad = 16; $xAxisH = 20;
+            $W = 560; $H = 150;
+            $innerW = $W - 2*$xPad; $innerH = $H - $yPad - $xAxisH;
             $n = count($perWeek); $dx = ($n>1) ? $innerW/($n-1) : 0;
 
             $coords = array();
             for ($i=0; $i<$n; $i++){
-                $x = $pad + $i*$dx;
+                $x = $xPad + $i*$dx;
                 $v = $perWeek[$i]['v'];
                 $norm = $v / $max; if ($norm<0) $norm=0; if ($norm>1) $norm=1;
-                $y = $pad + (1.0 - $norm) * $innerH;
-                $coords[] = array($x,$y);
+                $y = $yPad + (1.0 - $norm) * $innerH;
+                $coords[] = array($x, $y);
             }
             $path = '';
             for ($k=0; $k<count($coords); $k++){
@@ -859,25 +860,39 @@ if ($type === 'customer') {
             }
 
             $lastIdx = $n-1;
-            $lastLbl = $perWeek[$lastIdx]['label'];
-            $lastValTxt = number_format($perWeek[$lastIdx]['v'], 1, ',', ' ');
+            $baseY = $yPad + $innerH;
 
             echo '<div class="dw-charts dw-spark-wrap">';
               echo '<div class="dw-spark-title"><strong>Försäljning (trend)</strong>'
-                 . '<span class="dw-spark-meta">Senaste: '.$lastLbl.' '.$lastValTxt.' st/vecka &middot; Totalt: '.$qtytotal.' st</span></div>';
+                 . '<span class="dw-spark-meta">Senaste 6 mån: '.$qty6month.' st</span></div>';
 
-              echo '<svg width="100%" height="'.$H.'" viewBox="0 0 '.$W.' '.$H.'" role="img" aria-label="Försäljning sparkline (per vecka)">';
+              echo '<svg width="100%" height="'.($H).'" viewBox="0 0 '.$W.' '.$H.'" role="img" aria-label="Försäljning sparkline (per vecka)">';
+                // Horisontella stödlinjer
                 for ($g = 1; $g <= 3; $g++) {
-                    $gy = $pad + ($innerH * ($g / 4.0));
-                    echo '<line x1="'.$pad.'" y1="'.round($gy,1).'" x2="'.($W-$pad).'" y2="'.round($gy,1).'" stroke="#eef2f7" stroke-width="1"/>';
+                    $gy = $yPad + ($innerH * ($g / 4.0));
+                    echo '<line x1="'.$xPad.'" y1="'.round($gy,1).'" x2="'.($W-$xPad).'" y2="'.round($gy,1).'" stroke="#eef2f7" stroke-width="1"/>';
                 }
-                echo '<line x1="'.$pad.'" y1="'.($H-$pad).'" x2="'.($W-$pad).'" y2="'.($H-$pad).'" stroke="#e5e7eb" stroke-width="1"/>';
-                $area = $path.' L '.($W-$pad).',' . ($H-$pad) . ' L '.$pad.',' . ($H-$pad) . ' Z';
+                // X-axeln
+                echo '<line x1="'.$xPad.'" y1="'.$baseY.'" x2="'.($W-$xPad).'" y2="'.$baseY.'" stroke="#e5e7eb" stroke-width="1"/>';
+                // Yta + linje
+                $area = $path.' L '.($W-$xPad).','.$baseY.' L '.$xPad.','.$baseY.' Z';
                 echo '<path d="'.$area.'" fill="#e6f6ea"/>';
                 echo '<path d="'.$path.'" fill="none" stroke="#065f46" stroke-width="2.5"/>';
+                // Punkter + etiketter
                 for ($i=0; $i<count($coords); $i++){
-                    $c = $coords[$i];
-                    echo '<circle cx="'.round($c[0],1).'" cy="'.round($c[1],1).'" r="3" fill="#065f46"/>';
+                    $c    = $coords[$i];
+                    $cx   = round($c[0], 1);
+                    $cy   = round($c[1], 1);
+                    $disp = number_format((float)$perWeek[$i]['disp'], 2, ',', '');
+                    $anchor = ($i === 0) ? 'start' : (($i === $lastIdx) ? 'end' : 'middle');
+
+                    echo '<circle cx="'.$cx.'" cy="'.$cy.'" r="3" fill="#065f46"/>';
+                    // Värdetext ovanför pricken (per dag)
+                    echo '<text x="'.$cx.'" y="'.($cy - 6).'" font-size="11" fill="#065f46" font-weight="600" text-anchor="'.$anchor.'">'.$disp.'</text>';
+                    // Tick-streck
+                    echo '<line x1="'.$cx.'" y1="'.$baseY.'" x2="'.$cx.'" y2="'.($baseY+4).'" stroke="#9ca3af" stroke-width="1"/>';
+                    // X-axeletikett
+                    echo '<text x="'.$cx.'" y="'.($baseY+15).'" font-size="11" fill="#6b7280" text-anchor="'.$anchor.'">'.$h($perWeek[$i]['label']).'</text>';
                 }
               echo '</svg>';
             echo '</div>';
@@ -886,7 +901,7 @@ if ($type === 'customer') {
         echo '<div class="dw-section">';
         echo '<div class="dw-label" style="margin-bottom:6px">Sålt över tid</div>';
         echo '<table class="dw-table"><thead><tr>
-              <th>1 v</th><th>1 man</th><th>3 man</th><th>6 man</th><th>12 man</th><th>36 man</th><th>Totalt</th>
+              <th>1 v</th><th>1 mån</th><th>3 mån</th><th>6 mån</th><th>12 mån</th><th>36 mån</th><th>Totalt</th>
               </tr></thead><tbody><tr>';
         echo '<td>'.$qtyweek.'</td>';
         echo '<td>'.$qtymonth.'</td>';
