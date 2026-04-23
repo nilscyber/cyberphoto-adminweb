@@ -60,35 +60,7 @@ Class CTradeIn {
 		$select .= "JOIN c_bpartner bp ON bp.c_bpartner_id = po.c_bpartner_id ";
 		$select .= "JOIN m_locator mloc ON mloc.m_locator_id = p.m_locator_id ";
 		$select .= "WHERE o.docstatus IN ('CO','IP') AND o.deliveryViaRule IN ('S','P') AND o.isSOTrx = 'Y' AND o.isActive='Y' AND o.AD_Client_ID=1000000 ";
-		// $select .= "AND date(col.updated)>='$dagensdatum 00:00:00' AND date(col.updated)<='$dagensdatum 23:59:59' ";
-		// $select .= "AND date(col.created) >= '$look_backward' ";
-		if ($specialdatum == "2018-12-27") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '6 days' ";
-		} elseif ($specialdatum == "2022-12-27") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '4 days' ";
-		} elseif ($specialdatum == "2023-12-27") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '5 days' ";
-		} elseif ($specialdatum == "2023-04-11") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '5 days' ";
-		} elseif ($specialdatum == "2023-05-19") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '2 days' ";
-		} elseif ($specialdatum == "2024-01-02") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '3 days' ";
-		} elseif ($specialdatum == "2024-04-02") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '5 days' ";
-		} elseif ($specialdatum == "2024-05-02") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '2 days' ";
-		} elseif ($specialdatum == "2024-05-10") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '2 days' ";
-		} elseif ($specialdatum == "2024-06-07") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '2 days' ";
-		} elseif ($specialdatum == "2024-06-24") {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '4 days' ";
-		} elseif (date('N') == 1) {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '3 days' ";
-		} else {
-			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '1 days' ";
-		}
+		// Ingen tidsfilter -- visar alltid de senaste 60 uppbokade, sorterat pa col.created DESC
 		// $select .= "AND bp.value = '5555' AND (col.qtyallocated > 0 OR col.qtydelivered > 0) ";
 		$select .= "AND bp.value = '5555' AND NOT (col.qtyordered <> col.qtyallocated) AND col.qtydelivered = 0 AND col.qtyordered > 0 ";
 		$select .= "AND NOT mloc.m_locator_id IN (1004179) ";  // tar bor om vi bokat upp som testkamera = IBT
@@ -97,54 +69,26 @@ Class CTradeIn {
 		// $select .= "AND NOT p.value IN ('filter') ";  // tar bort diverse
 		// $select .= "AND NOT p.value IN ('dagshyra','dagshyra_objektiv','Dagshyra_system','veckohyra','veckohyra_objektiv') ";  // tar bort hyra
 		$select .= "AND NOT o.bill_bpartner_id IN (1013455,1013492) ";  // tar bort ordrar inbytesg�nget
-		$select .= "ORDER BY col.created DESC ";
-
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo $select;
-			// echo "dag: " . date('N');
-			// exit;
-		}
+		$select .= "ORDER BY col.created DESC LIMIT 60 ";
 
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo ($res ? pg_num_rows($res) : 0);
-			// exit;
-		}
 		
 		
 		if ($res && pg_num_rows($res) > 0) {
 		
-			if ($specialdatum == "2018-12-27") {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste 6 dygnen, ej skickat</div>\n";
-			} elseif ($specialdatum == "2023-04-11") {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste 5 dygnen, ej skickat</div>\n";
-			} elseif ($specialdatum == "2023-12-27") {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste 5 dygnen, ej skickat</div>\n";
-			} elseif ($specialdatum == "2023-05-19") {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste 2 dygnen, ej skickat</div>\n";
-			} elseif ($specialdatum == "2024-01-02") {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste 3 dygnen, ej skickat</div>\n";
-			} elseif ($specialdatum == "2024-04-02") {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste 5 dygnen, ej skickat</div>\n";
-			} elseif ($specialdatum == "2024-06-24") {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste 4 dygnen, ej skickat</div>\n";
-			} elseif (date('N') == 1) {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste 3 dygnen, ej skickat</div>\n";
-			} else {
-				echo "<div class=\"count_data bold italic\">Uppbokade senaste dygnet, ej skickat</div>\n";
-			}
+			echo "<div class=\"count_data bold italic\">Uppbokade, ej skickat</div>\n";
 			echo "<table id=\"begg_booked\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
 		
 			while ($res && $row = pg_fetch_object($res)) {
 
 				$trimmaprodukten = $row->tillverkare . " " . $row->beskrivning;
-				
+
 				if (strlen($trimmaprodukten) >= 42)
 					$trimmaprodukten = substr ($trimmaprodukten, 0, 42) . "...";
-				
+
 				$time_since = (time() - strtotime($row->created));
 				$booked_date_short = date("Y-m-d", strtotime($row->created));
-				
+
 				if ($dagensdatum_notify == $booked_date_short && $_SERVER['REMOTE_ADDR'] != "192.168.1.89") {
 					$this->addNotify($row->artnr,$trimmaprodukten,2);
 				}
@@ -174,7 +118,6 @@ Class CTradeIn {
 						echo "\t\t<td width=\"14\" class=\"mark_black bold blink_text_black\"><img border=\"\" src=\"factory.png\"></td>\n";
 					}
 					echo "\t\t<td width=\"35\" class=\"mark_black bold blink_text_black\">" . $this->replace_char(date("D", strtotime($row->created))) . "</td>\n";
-					// echo "\t\t<td width=\"35\" class=\"mark_black bold blink_text_black\">" . $this->replace_char(date("D", strtotime($row->created))) . "</td>\n";
 					echo "\t\t<td width=\"45\" class=\"mark_black bold blink_text_black\">" . date("H:i", strtotime($row->created)) . "</td>\n";
 					echo "\t\t<td width=\"80\" class=\"mark_black bold blink_text_black\">$row->artnr</td>\n";
 					echo "\t\t<td class=\"mark_black bold blink_text_black\">$trimmaprodukten</td>\n";
@@ -192,7 +135,6 @@ Class CTradeIn {
 						echo "\t\t<td width=\"14\" class=\"\"><img border=\"\" src=\"factory.png\"></td>\n";
 					}
 					echo "\t\t<td width=\"35\" class=\"\">" . $this->replace_char(date("D", strtotime($row->created))) . "</td>\n";
-					// echo "\t\t<td width=\"35\" class=\"\">" . $this->replace_char(date("D", strtotime($row->created))) . "</td>\n";
 					// echo "\t\t<td width=\"35\" class=\"\">" . $booked_date_short . "</td>\n";
 					echo "\t\t<td width=\"45\" class=\"\">" . date("H:i", strtotime($row->created)) . "</td>\n";
 					echo "\t\t<td width=\"80\" class=\"\">$row->artnr</td>\n";
