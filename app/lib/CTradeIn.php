@@ -60,15 +60,17 @@ Class CTradeIn {
 		$select .= "JOIN c_bpartner bp ON bp.c_bpartner_id = po.c_bpartner_id ";
 		$select .= "JOIN m_locator mloc ON mloc.m_locator_id = p.m_locator_id ";
 		$select .= "WHERE o.docstatus IN ('CO','IP') AND o.deliveryViaRule IN ('S','P') AND o.isSOTrx = 'Y' AND o.isActive='Y' AND o.AD_Client_ID=1000000 ";
-		// Ingen tidsfilter -- visar alltid de senaste 60 uppbokade, sorterat pa col.created DESC
+		if (date('N') == 1) {
+			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '3 days' ";  // mandag: visa fre+helg
+		} else {
+			$select .= "AND col.created > CURRENT_TIMESTAMP - INTERVAL '1 days' ";  // tis-fre: senaste 24h
+		}
 		// $select .= "AND bp.value = '5555' AND (col.qtyallocated > 0 OR col.qtydelivered > 0) ";
 		$select .= "AND bp.value = '5555' AND NOT (col.qtyordered <> col.qtyallocated) AND col.qtydelivered = 0 AND col.qtyordered > 0 ";
 		$select .= "AND NOT mloc.m_locator_id IN (1004179) ";  // tar bor om vi bokat upp som testkamera = IBT
 		$select .= "AND NOT p.value IN ('sensorcleaning','services','filter','valuation','updmjukvara','service123') ";
 		$select .= "AND NOT p.value IN ('dagshyra','dagshyra_objektiv','Dagshyra_system','veckohyra','veckohyra_objektiv') ";  // tar bort hyra
-		// $select .= "AND NOT p.value IN ('filter') ";  // tar bort diverse
-		// $select .= "AND NOT p.value IN ('dagshyra','dagshyra_objektiv','Dagshyra_system','veckohyra','veckohyra_objektiv') ";  // tar bort hyra
-		$select .= "AND NOT o.bill_bpartner_id IN (1013455,1013492) ";  // tar bort ordrar inbytesg�nget
+		$select .= "AND NOT o.bill_bpartner_id IN (1013455,1013492) ";
 		$select .= "ORDER BY col.created DESC LIMIT 60 ";
 
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
@@ -76,7 +78,11 @@ Class CTradeIn {
 		
 		if ($res && pg_num_rows($res) > 0) {
 		
-			echo "<div class=\"count_data bold italic\">Uppbokade, ej skickat</div>\n";
+			if (date('N') == 1) {
+				echo "<div class=\"count_data bold italic\">Uppbokade senaste 3 dygnen, ej skickat</div>\n";
+			} else {
+				echo "<div class=\"count_data bold italic\">Uppbokade senaste dygnet, ej skickat</div>\n";
+			}
 			echo "<table id=\"begg_booked\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
 		
 			while ($res && $row = pg_fetch_object($res)) {
