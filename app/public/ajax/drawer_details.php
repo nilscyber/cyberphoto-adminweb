@@ -424,6 +424,20 @@ if ($type === 'customer') {
 	  }
 	  .dw-prisjakt-link:hover{ opacity:1; }
 	  .dw-prisjakt-link img{ height:14px; width:auto; display:block; }
+
+	  /* === Prishistorik-toggle === */
+	  .dw-ph-toggle{ cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:5px; }
+	  .dw-ph-toggle:hover{ color:#1d4ed8; }
+	  .dw-ph-chevron{ transition:transform .2s; }
+	  .dw-ph-chevron.open{ transform:rotate(180deg); }
+	  .dw-ph-box{ display:none; margin-top:10px; border-top:1px solid #e5e7eb; padding-top:10px; }
+	  .dw-ph-box.open{ display:block; }
+	  .dw-ph-table{ width:100%; border-collapse:collapse; font-size:12px; }
+	  .dw-ph-table th{ padding:4px 8px; background:#f3f4f6; font-weight:600; color:#374151; border-bottom:1px solid #e5e7eb; text-align:left; }
+	  .dw-ph-table td{ padding:4px 8px; border-bottom:1px solid #f3f4f6; }
+	  .dw-ph-table td:nth-child(2){ text-align:right; white-space:nowrap; font-weight:700; }
+	  .dw-ph-badge{ display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; font-weight:700; background:#fef3c7; border:1px solid #fde68a; color:#92400e; }
+	  .dw-ph-empty{ color:#6b7280; font-size:13px; }
 	</style>';
 
     $artRaw = !empty($row['article']) ? $row['article'] : (!empty($row['value']) ? $row['value'] : '');
@@ -536,6 +550,29 @@ if ($type === 'customer') {
     }
     if ($lines) echo '<div style="margin:0 0 10px 0">'.implode(' &ndash; ', $lines).'</div>';
 
+    // ===== Prishistorik från MySQL (hämtas tidigt för att renderas i Priser-kortet) =====
+    $mysql       = Db::getConnection(false);
+    $priceHistory = array();
+    $fmtPH = function($p) {
+        $f = (float)$p;
+        if (floor($f) == $f) return number_format((int)$f, 0, ',', ' ') . ' kr';
+        return number_format($f, 2, ',', ' ') . ' kr';
+    };
+    if ($mysql && $artRaw !== '') {
+        $artEsc = mysqli_real_escape_string($mysql, $artRaw);
+        $sqlPH  = "
+            SELECT changed_at, price, is_campaign
+            FROM cyberadmin.product_price_history
+            WHERE sku = '" . $artEsc . "'
+              AND changed_at >= '2026-04-27 11:10:30'
+            ORDER BY changed_at DESC, id DESC
+        ";
+        if ($rsPH = @mysqli_query($mysql, $sqlPH)) {
+            while ($rowPH = @mysqli_fetch_assoc($rsPH)) $priceHistory[] = $rowPH;
+            @mysqli_free_result($rsPH);
+        }
+    }
+
     // ===== Kort: PRISER =====
     $tbClass = ($tb < 0) ? 'dw-val bad' : 'dw-val good';
     $tgClass = ($tg < 0) ? 'dw-val bad' : 'dw-val good';
@@ -551,7 +588,13 @@ if ($type === 'customer') {
     }
 
     echo '<div class="dw-card dw-card-priser">';
-      echo '<h3>Priser</h3>' . $prisjakHtml;
+      $phOnclick = "var b=document.getElementById('dw-ph-box'),c=document.getElementById('dw-ph-chevron');if(b){b.classList.toggle('open');if(c)c.classList.toggle('open');}";
+      echo '<h3>'
+         . '<span class="dw-ph-toggle" onclick="' . $h($phOnclick) . '" title="Visa prishistorik">'
+         . 'Priser'
+         . '<svg id="dw-ph-chevron" class="dw-ph-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>'
+         . '</span>'
+         . '</h3>' . $prisjakHtml;
       echo '<div class="row">';
         echo '<div><span class="dw-label">Pris exkl: </span><strong class="dw-val nowrap">'.$fmt($priceEx).' kr</strong></div>';
         echo '<div><span class="dw-label">Pris inkl: </span><strong class="dw-val nowrap">'.$fmt($priceIn).' kr</strong></div>';
@@ -560,7 +603,33 @@ if ($type === 'customer') {
         echo '<div><span class="dw-label">TG: </span><strong class="'.$tgClass.'">'.number_format($tg, 1, ',', ' ').'%</strong></div>';
         echo '<div><span class="dw-label">TB: </span><strong class="'.$tbClass.' nowrap">'.$fmt($tb).' kr</strong></div>';
       echo '</div>';
+
+      // Prishistorik (kollapsad som standard)
+      echo '<div id="dw-ph-box" class="dw-ph-box">';
+      if (!empty($priceHistory)) {
+          echo '<table class="dw-ph-table">';
+          echo '<thead><tr><th>Datum</th><th style="text-align:right">Pris</th><th>Typ</th></tr></thead>';
+          echo '<tbody>';
+          foreach ($priceHistory as $ph) {
+              $dt = $ph['changed_at'] ? substr($ph['changed_at'], 0, 16) : '-';
+              $pris = $fmtPH($ph['price']);
+              $typ  = ((int)$ph['is_campaign'] === 1)
+                    ? '<span class="dw-ph-badge">Kampanj</span>'
+                    : '';
+              echo '<tr>'
+                 . '<td style="white-space:nowrap">' . $h($dt) . '</td>'
+                 . '<td>' . $h($pris) . '</td>'
+                 . '<td>' . $typ . '</td>'
+                 . '</tr>';
+          }
+          echo '</tbody></table>';
+      } else {
+          echo '<div class="dw-ph-empty">Ingen prishistorik hittades.</div>';
+      }
+      echo '</div>';
+
     echo '</div>';
+
 
 	/* ===== Kort: LAGER (Kö visas alltid) ===== */
 	$availableRaw = isset($row['available_qty']) ? (int)$row['available_qty'] : 0;
@@ -1047,7 +1116,7 @@ if ($type === 'customer') {
     $totalCount = 0;
     $lastOverallTsTxt = '';
 
-    $mysql = Db::getConnection(false); // ext/mysql-länk
+    if (!isset($mysql)) $mysql = Db::getConnection(false);
     if ($mysql && !empty($row['article'])) {
         $artEsc = mysqli_real_escape_string($mysql, $row['article']);
         $sqlG = "
