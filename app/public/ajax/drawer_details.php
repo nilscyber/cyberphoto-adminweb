@@ -273,6 +273,22 @@ if ($type === 'customer') {
         pg_free_result($resS);
     }
 
+    // Interna kommentarer på produkten (ad_table_id = 208)
+    $chatRows = array();
+    $sqlChat = "
+        SELECT ch.created, ad.name, ch.characterdata
+        FROM cm_chat c
+        JOIN cm_chatentry ch ON ch.cm_chat_id = c.cm_chat_id
+        JOIN ad_user ad ON ad.ad_user_id = ch.updatedby
+        WHERE c.ad_table_id = 208
+          AND c.record_id = \$1
+        ORDER BY ch.created ASC
+    ";
+    if ($resChat = ($conn) ? @pg_query_params($conn, $sqlChat, array($pid)) : false) {
+        while ($resChat && $chatRow = pg_fetch_assoc($resChat)) $chatRows[] = $chatRow;
+        pg_free_result($resChat);
+    }
+
     // ====== Render start ======
 	echo '<style>
 	  .dw-wrap{font-size:14px;max-height:calc(90vh - 28px);overflow-y:auto}
@@ -325,6 +341,11 @@ if ($type === 'customer') {
 
 	  .dw-icon-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #cfd6e0;border-radius:6px;margin-left:6px;color:#374151;background:#fff;text-decoration:none}
 	  .dw-icon-btn:hover{background:#f2f6ff;border-color:#b7c4da}
+	  .dw-chat-btn{color:#ea580c;border-color:#fed7aa;background:#fff7ed}
+	  .dw-chat-btn:hover{background:#ffedd5;border-color:#fb923c}
+	  .order-chat-entry{margin-bottom:10px;padding:8px 10px;background:#f9fafb;border-radius:6px;border:1px solid #e5e7eb}
+	  .order-chat-meta{font-size:12px;color:#6b7280;margin-bottom:4px}
+	  .order-chat-body{font-size:13px;color:#111;line-height:1.5}
 	  .dw-title-actions{display:inline-flex;vertical-align:middle;margin-left:6px}
 
 	  .dw-inline-link{color:inherit;text-decoration:none;font-size:inherit;line-height:inherit;font-weight:inherit}
@@ -454,6 +475,15 @@ if ($type === 'customer') {
        .       '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>'
        .     '</svg>'
        .   '</a>'
+       . (!empty($chatRows)
+           ? '<a href="#product-chat-section" class="dw-icon-btn dw-chat-btn"'
+           . ' onclick="document.getElementById(\'product-chat-section\').scrollIntoView({behavior:\'smooth\'});return false;"'
+           . ' title="Interna kommentarer ('.count($chatRows).' st)">'
+           .   '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+           .     '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>'
+           .   '</svg>'
+           . '</a>'
+           : '')
        . '</span>'
        . '</h2>';
 
@@ -1296,6 +1326,23 @@ if ($type === 'customer') {
 
 	$createdByLabel = $createdBy !== '' ? $h($createdBy) : 'Okänd';
 	$createdLabel   = $createdLabel !== '' ? $h($createdLabel) : '-';
+
+	// Interna kommentarer
+	if (!empty($chatRows)) {
+		echo '<div id="product-chat-section" class="dw-card">';
+		echo '<h3>Interna kommentarer <svg style="vertical-align:middle;color:#ea580c" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></h3>';
+		foreach ($chatRows as $c) {
+			$cCreated = $c['created'];
+			if (strlen($cCreated) > 19) $cCreated = substr($cCreated, 0, 19);
+			$cUser = $h($c['name']);
+			$cText = nl2br($h($c['characterdata']));
+			echo '<div class="order-chat-entry">';
+			echo '  <div class="order-chat-meta">' . $h($cCreated) . ' &nbsp;&nbsp; <i>' . $cUser . '</i></div>';
+			echo '  <div class="order-chat-body">' . $cText . '</div>';
+			echo '</div>';
+		}
+		echo '</div>';
+	}
 
 	echo '<div class="dw-card dw-card-meta" style="margin-top:10px;">';
     echo '<h3>Metadata</h3>';

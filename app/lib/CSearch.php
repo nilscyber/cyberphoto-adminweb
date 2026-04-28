@@ -1769,6 +1769,29 @@ public static function renderOrderDetailsAD($orderNo)
     $billLocId = isset($order['bill_location_id']) ? (int)$order['bill_location_id'] : 0;
     $sameAddress = ($shipLocId > 0 && $shipLocId === $billLocId);
 
+    // Interna kommentarer (hämtas tidigt för att kunna visa ikon i titelraden)
+    $chatRows = array();
+    $orderDocNoInt = (int)$order['c_order_id'];
+    $sqlChat = "
+        SELECT
+            ch.created,
+            ad.name,
+            ch.characterdata
+        FROM cm_chat c
+            JOIN cm_chatentry ch ON ch.cm_chat_id = c.cm_chat_id
+            JOIN ad_user ad      ON ad.ad_user_id = ch.updatedby
+        WHERE c.ad_table_id = 259
+          AND c.record_id   = \$1
+        ORDER BY ch.created ASC
+    ";
+    $resChat = ($pg) ? @pg_query_params($pg, $sqlChat, array($orderDocNoInt)) : false;
+    if ($resChat) {
+        while ($resChat && $row = pg_fetch_assoc($resChat)) {
+            $chatRows[] = $row;
+        }
+        pg_free_result($resChat);
+    }
+
     // ----- CSS -----
     $html  = '<style>
     .dw-table-orderlines{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto}
@@ -1785,9 +1808,12 @@ public static function renderOrderDetailsAD($orderNo)
     .dw-table-orderlines tr.ol-main.is-delivered:hover{background:#a7f3d0 !important}
     .dw-table-orderlines tr.ol-sub.is-delivered:hover{background:#d1fae5 !important}
     .order-chat-header{font-weight:700;margin-bottom:4px}
-    .order-chat-entry{padding:5px 8px;margin-top:8px;background:#ffefdf;border-bottom:1px solid #d0d1d5;border-right:1px solid #d0d1d5;font-size:12px}
-    .order-chat-meta{margin-bottom:3px;font-size:11px}
+    .order-chat-entry{margin-bottom:10px;padding:8px 10px;background:#f9fafb;border-radius:6px;border:1px solid #e5e7eb}
+    .dw-chat-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #fed7aa;border-radius:6px;margin-left:6px;color:#ea580c;background:#fff7ed;text-decoration:none;vertical-align:middle}
+    .dw-chat-btn:hover{background:#ffedd5;border-color:#fb923c}
+    .order-chat-meta{font-size:12px;color:#6b7280;margin-bottom:4px}
     .order-chat-meta i{font-style:italic}
+    .order-chat-body{font-size:13px;color:#111;line-height:1.5}
     .order-customer-link{margin-top:10px;font-size:13px}
     .order-customer-link a{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;border:1px solid #1d4ed8;background:#eff6ff;color:#1d4ed8;text-decoration:none;font-weight:700}
     .order-customer-link a:hover{background:#dbeafe;border-color:#1d4ed8}
@@ -1829,6 +1855,15 @@ public static function renderOrderDetailsAD($orderNo)
     $html .= '<h2 class="dw-title">Säljorder '
            . '<span class="copy-chip" data-copy="'.$eh($orderNoDisp).'"'
            . ' title="Kopiera ordernummer">'.$eh($orderNoDisp).'</span>'
+           . (!empty($chatRows)
+               ? '<a href="#order-chat-section" class="dw-chat-btn"'
+               . ' onclick="document.getElementById(\'order-chat-section\').scrollIntoView({behavior:\'smooth\'});return false;"'
+               . ' title="Interna kommentarer ('.count($chatRows).' st)">'
+               .   '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+               .     '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>'
+               .   '</svg>'
+               . '</a>'
+               : '')
            . '</h2>';
     $html .= '<div class="order-status-wrap">'
           .  '<span class="'.$eh($statusClass).'">'.$eh($statusLabel).'</span>'
@@ -2146,33 +2181,9 @@ public static function renderOrderDetailsAD($orderNo)
     $html .= '</div>';
 
     // Interna kommentarer
-    $chatRows = array();
-    $orderDocNoInt = (int)$order['c_order_id'];
-
-    $sqlChat = "
-        SELECT 
-            ch.created,
-            ad.name,
-            ch.characterdata
-        FROM cm_chat c
-            JOIN cm_chatentry ch ON ch.cm_chat_id = c.cm_chat_id
-            JOIN ad_user ad      ON ad.ad_user_id = ch.updatedby
-        WHERE c.ad_table_id = 259
-          AND c.record_id   = $1
-        ORDER BY ch.created ASC
-    ";
-
-    $resChat = ($pg) ? @pg_query_params($pg, $sqlChat, array($orderDocNoInt)) : false;
-    if ($resChat) {
-        while ($resChat && $row = pg_fetch_assoc($resChat)) {
-            $chatRows[] = $row;
-        }
-        pg_free_result($resChat);
-    }
-
     if (!empty($chatRows)) {
-        $html .= '<div class="dw-section">';
-        $html .= '<div class="order-chat-header">Interna kommentarer</div>';
+        $html .= '<div id="order-chat-section" class="dw-section">';
+        $html .= '<div class="order-chat-header">Interna kommentarer <svg style="vertical-align:middle;color:#ea580c" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>';
 
         foreach ($chatRows as $c) {
             $cCreated = $c['created'];
