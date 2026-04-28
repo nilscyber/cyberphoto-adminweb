@@ -724,6 +724,10 @@ public static function searchCustomersAD($q, $limit = 50, $page = 1){
     $hasDigits5 = (strlen($digits) >= 5);
     $hasLetters = (bool)preg_match('/[A-Za-zÅÄÖåäö]/', $q_l1);
 
+    // Multi-token: "tilda jonsson" ska matcha "Tilda Miranda Elvira Jonsson"
+    $tokens       = preg_split('/\s+/', trim($q_l1), -1, PREG_SPLIT_NO_EMPTY);
+    $isMultiToken = (count($tokens) > 1);
+
     // Normaliserat sökvärde för taxid (tar bort bindestreck och mellanslag)
     // Gör att "556741-5772", "5567415772" och "556741 5772" alla matchar varandra
     $taxidClean     = preg_replace('/[-\s]/', '', $q_l1);
@@ -789,6 +793,16 @@ public static function searchCustomersAD($q, $limit = 50, $page = 1){
         $orParts[] = "(bp.name ILIKE $".$pi." OR bp.name2 ILIKE $".($pi+1).")";
         $params[] = $like; $params[] = $like; $pi += 2;
 
+        // Multi-token: alla ord måste finnas i bp.name (hanterar mellannamn)
+        if ($isMultiToken) {
+            $tConds = array();
+            foreach ($tokens as $tok) {
+                $tConds[] = "bp.name ILIKE $".$pi;
+                $params[]  = '%'.$tok.'%'; $pi++;
+            }
+            $orParts[] = "(" . implode(' AND ', $tConds) . ")";
+        }
+
         // Kontaktpersoners fullnamn
         $orParts[] = "EXISTS (
             SELECT 1 FROM ad_user u
@@ -797,6 +811,21 @@ public static function searchCustomersAD($q, $limit = 50, $page = 1){
               AND ( (COALESCE(u.firstname,'') || ' ' || COALESCE(u.lastname,'')) ILIKE $".$pi." )
         )";
         $params[] = $like; $pi++;
+
+        // Multi-token: kontaktpersoner (hanterar mellannamn i förnamn/efternamn)
+        if ($isMultiToken) {
+            $tConds = array();
+            foreach ($tokens as $tok) {
+                $tConds[] = "TRIM(COALESCE(u2.firstname,'') || ' ' || COALESCE(u2.lastname,'')) ILIKE $".$pi;
+                $params[]  = '%'.$tok.'%'; $pi++;
+            }
+            $orParts[] = "EXISTS (
+                SELECT 1 FROM ad_user u2
+                WHERE u2.c_bpartner_id = bp.c_bpartner_id
+                  AND u2.isactive='Y'
+                  AND (" . implode(' AND ', $tConds) . ")
+            )";
+        }
     }
 
     // Taxid / org.nr / personnummer - ALLTID söka på detta, oavsett format
