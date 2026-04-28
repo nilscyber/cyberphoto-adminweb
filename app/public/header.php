@@ -434,6 +434,76 @@ h2 {
   border-color:#fecaca;
   background:#fef2f2;
 }
+
+/* Info-block uppe till höger */
+#admin-info{
+  float: right;
+  text-align: right;
+  padding: 6px 0 4px 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #6b7280;
+}
+.ai-time{
+  font-weight: 700;
+  font-size: 13px;
+  color: #111827;
+  letter-spacing: .01em;
+}
+.ai-temp{ color: #6b7280; }
+.ai-temp-value{
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity .15s;
+}
+.ai-temp-value:hover{ opacity: .75; }
+.ai-user{ color: #6b7280; }
+.ai-name{
+  color: #1d4ed8;
+  font-weight: 600;
+  text-decoration: none;
+}
+.ai-name:hover{ text-decoration: underline; }
+.ai-logout{
+  color: #6b7280;
+  text-decoration: none;
+}
+.ai-logout:hover{
+  color: #111827;
+  text-decoration: underline;
+}
+.ai-warning{
+  color: #dc2626;
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* Snabblänkar till externa system */
+.ext-links{
+  display:flex; align-items:center; gap:6px; margin-left:4px;
+}
+.ext-link-btn{
+  display:inline-flex; align-items:center; gap:5px;
+  height:36px; padding:0 12px;
+  border:1px solid #cfd6e0; border-radius:8px;
+  font-size:13px; font-weight:600; text-decoration:none;
+  white-space:nowrap; transition:background .15s, border-color .15s;
+}
+.ext-link-btn.insights{
+  background:#eef2ff; color:#3730a3; border-color:#c7d2fe;
+}
+.ext-link-btn.insights:hover{
+  background:#e0e7ff; border-color:#a5b4fc;
+}
+.ext-link-btn.otrs{
+  background:#ecfdf5; color:#065f46; border-color:#a7f3d0;
+}
+.ext-link-btn.otrs:hover{
+  background:#d1fae5; border-color:#6ee7b7;
+}
+/* Extern pil-ikon */
+.ext-link-btn svg{ flex-shrink:0; opacity:.7; }
 </style>
 
     <?php
@@ -497,21 +567,56 @@ h2 {
 		<path d="M3 4h18l-7 8v6l-4 2v-8L3 4z"/>
 	  </svg>
 	</button>
+
+	<!-- Snabblänkar externa system -->
+	<div class="ext-links">
+	  <a href="http://insights.cyberphoto.se/" target="_blank" rel="noopener" class="ext-link-btn insights"
+	     title="Intern analyssida">
+	    <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true">
+	      <path d="M2 11h2v3H2v-3zm3-4h2v7H5V7zm3-3h2v10H8V4zm3-3h2v13h-2V1z"/>
+	    </svg>
+	    Insights
+	  </a>
+	  <a href="https://otrs.cyberphoto.se/znuny/" target="_blank" rel="noopener" class="ext-link-btn otrs"
+	     title="Kundhanteringssystem">
+	    <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true">
+	      <path d="M2.5 2A1.5 1.5 0 0 0 1 3.5v9A1.5 1.5 0 0 0 2.5 14h11a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 13.5 2h-11zm0 1h11a.5.5 0 0 1 .5.5V5H2V3.5a.5.5 0 0 1 .5-.5zM2 6h12v6.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V6zm2 2v1h8V8H4zm0 2.5v1h5v-1H4z"/>
+	    </svg>
+	    OTRS
+	  </a>
+	</div>
 	<?php
 
 	echo '  </div>';
 	echo '</div>';
 
-	echo "<div class=\"dateheading\">" . date("H:i") . " - " . $admin->weekday(date("N")) . " " . date("j") . " " . $admin->monthname(date("n")) . " " . date("Y") . " - Temperatur just nu: " . $temp->showLastTemp(2) . " &#8451;</div>\n";
+	// Temperatur med färgkodning
+	$tempRaw   = $temp->showLastTemp(2);
+	$tempFloat = floatval($tempRaw);
+	if      ($tempFloat < -10) $tempColor = '#1d4ed8'; // djupblå  – iskallt
+	elseif  ($tempFloat <   0) $tempColor = '#3b82f6'; // blå      – minusgrader
+	elseif  ($tempFloat <  10) $tempColor = '#0891b2'; // cyan     – kallt
+	elseif  ($tempFloat <  16) $tempColor = '#16a34a'; // grön     – svalt
+	elseif  ($tempFloat <  22) $tempColor = '#ca8a04'; // amber    – lagom varmt
+	elseif  ($tempFloat <  28) $tempColor = '#ea580c'; // orange   – varmt
+	else                        $tempColor = '#dc2626'; // röd      – riktigt varmt
+
+	$timeStr = date("H:i") . " · " . $admin->weekday(date("N")) . " " . date("j") . " " . $admin->monthname(date("n")) . " " . date("Y");
+
+	echo "<div id=\"admin-info\">\n";
+	echo "  <div class=\"ai-time\">" . $timeStr . "</div>\n";
+	echo "  <div class=\"ai-temp\">Temperatur Umeå: <a href=\"https://admin.cyberphoto.se/temp/\" target=\"_blank\" rel=\"noopener\" class=\"ai-temp-value\" style=\"color:" . $tempColor . "\">" . $tempRaw . " &#8451;</a></div>\n";
+
 	if ($_COOKIE['login_ok'] == "true") {
 		if ($_COOKIE['login_userid'] == 99) {
-			echo "<div class=\"dateheading\">Inloggad: <a class=\"user_name\" class=\"logout\" href=\"/profile.php\">" . $_COOKIE['login_name'] . "</a> (KOPPLINGEN TILL ADEMPIERE SAKNAS) - IP-adress: <span class=\"ipnr\">" . $_SERVER['REMOTE_ADDR'] . "</span> - <a class=\"logout\" href=\"logout.php\">Logga ut</a></div>\n";
+			echo "  <div class=\"ai-user\">Inloggad: <a href=\"/profile.php\" class=\"ai-name\">" . $_COOKIE['login_name'] . "</a> <span class=\"ai-warning\">(saknar ADempiere)</span> &middot; <a href=\"logout.php\" class=\"ai-logout\">Logga ut</a></div>\n";
 		} else {
-			echo "<div class=\"dateheading\">Inloggad: <a class=\"user_name\" class=\"logout\" href=\"/profile.php\">" . $_COOKIE['login_name'] . "</a> - IP-adress: <span class=\"ipnr\">" . $_SERVER['REMOTE_ADDR'] . "</span> - <a class=\"logout\" href=\"logout.php\">Logga ut</a></div>\n";
+			echo "  <div class=\"ai-user\">Inloggad: <a href=\"/profile.php\" class=\"ai-name\">" . $_COOKIE['login_name'] . "</a> &middot; <a href=\"logout.php\" class=\"ai-logout\">Logga ut</a></div>\n";
 		}
 	} else {
-		echo "<div class=\"dateheading\"><a href=\"$auth_link\"> Logga in</a> - IP-adress: <span class=\"ipnr\">" . $_SERVER['REMOTE_ADDR'] . "</span></div>\n";
+		echo "  <div class=\"ai-user\"><a href=\"" . $auth_link . "\" class=\"ai-name\">Logga in</a></div>\n";
 	}
+	echo "</div>\n";
 
 	echo "<div class=\"clear hr_gray\"></div>\n";
 

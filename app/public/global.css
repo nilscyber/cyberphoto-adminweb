@@ -347,19 +347,21 @@ a:hover {
 	font-weight:bold; 
 }
 #menypanel {
-	padding: 7px; 
-	float: left; 
-	width: 145px; 
-	background: #ffffff;
+	padding: 8px 6px;
+	float: left;
+	width: 165px;
+	background: #f9fafb;
+	border-right: 1px solid #e5e7eb;
+	box-sizing: border-box;
 }
 #mainpanel {
-	padding: 7px; 
-	float: left; 
-	min-height: 900px; 
-	background: #ffffff; 
-	border-left: 1px solid #999999;
-	width: 1300px;
-	max-width: 1300px;
+	padding: 7px;
+	float: left;
+	min-height: 900px;
+	background: #ffffff;
+	border-left: none;
+	width: 1280px;
+	max-width: 1280px;
 }
 /* CSS menymall */
 #meny {

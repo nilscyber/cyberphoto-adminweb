@@ -41,6 +41,7 @@
         padding: 8px;
         box-sizing: border-box;
         border-left: none;
+        border-right: none;
     }
 
     /* Menu hidden by default on mobile, shown when hamburger is checked */

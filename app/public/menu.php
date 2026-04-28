@@ -26,10 +26,8 @@
 <div class="bottom5"><a class="bold uppercase span_red" href="https://www2.cyberphoto.se/fel" target="_blank">FELRAPPORT LITIUM</a></div>
 -->
 
-<a href="javascript:ddtreemenu.flatten('treemenuadmin', 'expand')">Expandera</a> | <a href="javascript:ddtreemenu.flatten('treemenuadmin', 'contact')">Minimera</a>
-
 <ul id="treemenuadmin" class="treeview">
-<li>Administrera
+<li><span class="menu-cat-icon">⚙️</span> Administrera
 	<ul>
     <li><a href="banners.php?choose_site=1&choose_department=1&choose_section=201" <?php if (preg_match("/banners\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>TV:s butiken</a></li>
     <li><a href="check_incoming.php" <?php if (preg_match("/check_incoming\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Filter inkommande</a></li>
@@ -39,8 +37,8 @@
 	</ul>
 </li>
 
-<?php if (CCheckIP::checkIfLoginIsTradeIn($_SERVER['REMOTE_ADDR'])) { ?>	
-<li>Inbyte
+<?php if (CCheckIP::checkIfLoginIsTradeIn($_SERVER['REMOTE_ADDR'])) { ?>
+<li><span class="menu-cat-icon">🔄</span> Inbyte
 	<ul>
     <li><a href="inbyte_booked_not_shipped.php" <?php if (preg_match("/inbyte_booked_not_shipped\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Uppbokat, EJ skickat</a></li>
 	<li><a href="marination.php" <?php if (preg_match("/marination\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Marinering</a></li>
@@ -66,7 +64,7 @@
 <?php } ?>
 
 
-<li>Butiken
+<li><span class="menu-cat-icon">🏪</span> Butiken
 	<ul>
     <li><a href="WarehouseOrders.php?delivered=no&only_shop=yes" <?php if (preg_match("/WarehouseOrders\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Ordrar butiken</a></li>
 	<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se' || $_COOKIE['login_mail'] == 'albin@cyberphoto.se') { ?>
@@ -78,7 +76,7 @@
 	</ul>
 </li>
 
-<li>Produkter
+<li><span class="menu-cat-icon">📦</span> Produkter
 	<ul>
     <li><a href="not_refined.php" <?php if (preg_match("/not_refined\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Ej förädlade</a></li>
 	<li><a href="new_products.php" <?php if (preg_match("/new_products\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Nya produkter</a></li>
@@ -93,7 +91,7 @@
 	</ul>
 </li>
 
-<li>Försäljning
+<li><span class="menu-cat-icon">📈</span> Försäljning
 	<ul>
     <li><a href="salesreport.php" <?php if (preg_match("/salesreport\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Försäljningsrapport</a></li>
 	<li><a href="salesreport_salesman.php" <?php if (preg_match("/salesreport_salesman\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Rapport säljare</a></li>
@@ -111,8 +109,8 @@
 	</ul>
 </li>
 
-<?php if ($_COOKIE['login_mail'] == 'markus@cyberphoto.nu') { ?>	
-<li>Tekniska data
+<?php if ($_COOKIE['login_mail'] == 'markus@cyberphoto.nu') { ?>
+<li><span class="menu-cat-icon">🔬</span> Tekniska data
 	<ul>
     <li><a href="Tekn_cameras.php" <?php if (preg_match("/Tekn_cameras\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Kompaktkameror</a></li>
     <li><a href="Tekn_dslr.php" <?php if (preg_match("/Tekn_dslr\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Systemkameror</a></li>
@@ -125,7 +123,7 @@
 </li>
 <?php } ?>
 
-<li>Statistik
+<li><span class="menu-cat-icon">📊</span> Statistik
 	<ul>
     <li><a href="mestsalda.php" <?php if (preg_match("/mestsalda\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Mest sålda</a></li>
     <li><a href="mestsalda_kat.php" <?php if (preg_match("/mestsalda_kat\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Mest sålda kategorier</a></li>
@@ -142,7 +140,7 @@
 </li>
 
 <?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se' || $_COOKIE['login_mail'] == 'patrick@cyberphoto.se' || $_COOKIE['login_mail'] == 'sebastian.pihl@cyberphoto.se') { ?>
-<li>Intern statistik
+<li><span class="menu-cat-icon">🔒</span> Intern statistik
 	<ul>
 	<li><a href="statistics_inkopsordrar.php" <?php if (preg_match("/statistics_inkopsordrar\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Inköpsordrar</a></li>
 	<li><a href="statistics_saljordrar.php" <?php if (preg_match("/statistics_saljordrar\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Säljordrar</a></li>
@@ -150,7 +148,7 @@
 </li>
 <?php } ?>
 
-<li>Lagervärden
+<li><span class="menu-cat-icon">💰</span> Lagervärden
 	<ul>
     <li><a href="lagerstatus_grupperat.php" <?php if (preg_match("/lagerstatus_grupperat\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Grupperat</a></li>
     <li><a href="lagerstatus.php" <?php if (preg_match("/lagerstatus\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Kategori</a></li>
@@ -164,7 +162,7 @@
 	</ul>
 </li>
 
-<li>Loggar
+<li><span class="menu-cat-icon">📋</span> Loggar
 	<ul>
     <li><a href="allokerat.php" <?php if (preg_match("/allokerat\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Låsta produkter</a></li>
     <li><a href="not_priced.php" <?php if (preg_match("/not_priced\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Ej prissatta produkter</a></li>
@@ -176,7 +174,7 @@
 	</ul>
 </li>
 
-<li>Logistik
+<li><span class="menu-cat-icon">🚚</span> Logistik
 	<ul>
     <li><a href="logistik.php" <?php if (preg_match("/logistik\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Logistikflöden</a></li>
     <li><a href="goods_expectation.php" <?php if (preg_match("/goods_expectation\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Förväntad godsvolym</a></li>
@@ -184,7 +182,7 @@
 	</ul>
 </li>
 
-<li>Övrigt
+<li><span class="menu-cat-icon">🔧</span> Övrigt
 	<ul>
     <li><a href="supliers.php" <?php if (preg_match("/supliers\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Aktuella leverantörer</a></li>
     <li><a href="cache.php" <?php if (preg_match("/cache\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Status på cachning</a></li>
@@ -192,7 +190,7 @@
 </li>
 
 <?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
-<li>Development
+<li><span class="menu-cat-icon">🛠️</span> Development
 	<ul>
     <li><a href="random_employees.php" <?php if (preg_match("/random_employees\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Slumpgeneratorn</a></li>
     <li><a href="check_external.php" <?php if (preg_match("/check_external\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Intern/Extern</a></li>
