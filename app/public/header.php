@@ -402,7 +402,7 @@ h2 {
 .qs-bar{ display:flex; gap:10px; flex:1; justify-content:flex-end; flex-wrap:wrap; }
 .qs-form{ margin:0; }
 .qs-form input[type="text"]{
-  height:36px; padding:0 12px; min-width:230px;
+  height:36px; padding:0 12px; min-width:180px;
   border:1px solid #cfd6e0; border-radius:8px; font-size:14px;
 }
 .qs-form input[type="text"]:focus{
@@ -410,7 +410,7 @@ h2 {
 }
 
 .qs-bar input{
-  height:36px; padding:0 12px; min-width:230px;
+  height:36px; padding:0 12px; min-width:180px;
   border:1px solid #cfd6e0; border-radius:8px;
   font-size:14px; background:#fff;
 }
@@ -420,7 +420,7 @@ h2 {
 
 /* Responsivt */
 @media (max-width: 1100px){
-  .qs-bar input{ min-width:200px; }
+  .qs-bar input{ min-width:150px; }
 }
 @media (max-width: 800px){
   #admin-top{ flex-direction:column; align-items:stretch; gap:8px; }
@@ -501,6 +501,12 @@ h2 {
 }
 .ext-link-btn.otrs:hover{
   background:#d1fae5; border-color:#6ee7b7;
+}
+.ext-link-btn.webtool{
+  background:#fff7ed; color:#9a3412; border-color:#fed7aa;
+}
+.ext-link-btn.webtool:hover{
+  background:#ffedd5; border-color:#fdba74;
 }
 /* Extern pil-ikon */
 .ext-link-btn svg{ flex-shrink:0; opacity:.7; }
@@ -583,6 +589,13 @@ h2 {
 	      <path d="M2.5 2A1.5 1.5 0 0 0 1 3.5v9A1.5 1.5 0 0 0 2.5 14h11a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 13.5 2h-11zm0 1h11a.5.5 0 0 1 .5.5V5H2V3.5a.5.5 0 0 1 .5-.5zM2 6h12v6.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V6zm2 2v1h8V8H4zm0 2.5v1h5v-1H4z"/>
 	    </svg>
 	    OTRS
+	  </a>
+	  <a href="http://insights.cyberphoto.se:3000/" target="_blank" rel="noopener" class="ext-link-btn webtool"
+	     title="Webbplattformsverktyg">
+	    <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true">
+	      <path d="M9.972 2.508a.5.5 0 0 0-.16-.556l-.178-.129a5.009 5.009 0 0 0-2.076-.783C6.215.862 4.504 1.229 2.84 3.133H1.786a.5.5 0 0 0-.354.147L.146 4.567a.5.5 0 0 0 0 .706l2.571 2.579a.5.5 0 0 0 .708 0l1.286-1.29a.5.5 0 0 0 .146-.353v-.725l1.356-1.355.3.299a.5.5 0 0 0 .706 0l.642-.642a.5.5 0 0 0 .147-.35 4.983 4.983 0 0 0-.036-.585 7.93 7.93 0 0 1-.124-1.23zM.706 11.854a.5.5 0 0 0 .708 0l5.5-5.5a.5.5 0 1 0-.707-.707l-5.5 5.5a.5.5 0 0 0 0 .707z"/>
+	    </svg>
+	    WebTool
 	  </a>
 	</div>
 	<?php
