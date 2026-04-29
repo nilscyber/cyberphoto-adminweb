@@ -123,12 +123,12 @@ echo "<h1>Textmallar att använda</h1>";
 <div class="tm-wrapper">
 
     <div class="tm-tip">
-        Klicka på valfri rad för att kopiera texten till urklipp  klistra sedan in direkt på produkten.
+        Klicka på valfri rad för att kopiera texten till urklipp - klistra sedan in direkt på produkten.
     </div>
 
     <!-- SKICK MED ORIGINALKARTONG -->
     <div class="tm-section">
-        <h2>Skick  Med originalkartong</h2>
+        <h2>Skick - Med originalkartong</h2>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i superskick (5/5). 6 månaders garanti!</span>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i mycket fint skick (4/5). 6 månaders garanti!</span>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i fint skick (3/5). 6 månaders garanti!</span>
@@ -138,7 +138,7 @@ echo "<h1>Textmallar att använda</h1>";
 
     <!-- SKICK UTAN ORIGINALKARTONG -->
     <div class="tm-section">
-        <h2>Skick  Saknar originalkartong</h2>
+        <h2>Skick - Saknar originalkartong</h2>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i superskick (5/5), saknar originalkartong. 6 månaders garanti!</span>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i mycket fint skick (4/5), saknar originalkartong. 6 månaders garanti!</span>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i fint skick (3/5), saknar originalkartong. 6 månaders garanti!</span>
