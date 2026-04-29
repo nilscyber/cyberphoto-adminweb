@@ -1,11 +1,17 @@
 services:
   web:
     build: .
-    ports:
-      - "8081:80"
-      - "443:443"
+    container_name: cyberphoto-adminweb
+    # Reachable via the reverse proxy (proxy-net), not directly on the host.
+    # Apache inside still listens on 80; the proxy reaches it over the docker network.
+    networks:
+      - proxy-net
     volumes:
       - ./app:/var/www/html
       - ./docker/cert:/etc/ssl/app:ro
     env_file:
       - .env
+
+networks:
+  proxy-net:
+    external: true

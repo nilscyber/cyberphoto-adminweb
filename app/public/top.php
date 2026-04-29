@@ -20,13 +20,13 @@
 	$HTTPS=$_SERVER['HTTPS']; // behövs för php5.4, $HTTPS funkar inte längre
 	// echo $HTTPS;
 
-	if ($HTTPS != "on") {
-		$host     = $_SERVER['HTTP_HOST'];
-		$script   = $_SERVER['REQUEST_URI'];
-		$currentUrl = 'https://' . $host . $script;
-
-		header("Location: $currentUrl");
-	}
+	// if ($HTTPS != "on") {
+	// 	$host     = $_SERVER['HTTP_HOST'];
+	// 	$script   = $_SERVER['REQUEST_URI'];
+	// 	$currentUrl = 'https://' . $host . $script;
+	//
+	// 	header("Location: $currentUrl");
+	// }
 	
 	// echo phpinfo();
 	spl_autoload_register(function ($class) {
