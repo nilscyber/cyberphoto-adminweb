@@ -47,4 +47,12 @@ $last_modified = file_exists($target_file) ? date('Y-m-d H:i:s', filemtime($targ
 
 <p class="gray italic">Senast uppdaterad: <?= htmlspecialchars($last_modified) ?></p>
 
+<?php if (file_exists($target_file)): ?>
+    <div style="margin-top:24px;">
+        <img src="banner_images/Begagnatlogg_Diagram_chart1.svg?t=<?= filemtime($target_file) ?>"
+             alt="Begagnatdiagram"
+             style="max-width:100%;border:1px solid #e5e7eb;border-radius:6px;">
+    </div>
+<?php endif; ?>
+
 <?php include_once("footer.php"); ?>
