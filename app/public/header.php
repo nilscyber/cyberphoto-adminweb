@@ -576,7 +576,7 @@ h2 {
 
 	<!-- Snabblänkar externa system -->
 	<div class="ext-links">
-	  <a href="http://insights.cyberphoto.se/" target="_blank" rel="noopener" class="ext-link-btn insights"
+	  <a href="https://insights.cyberphoto.se/" target="_blank" rel="noopener" class="ext-link-btn insights"
 	     title="Intern analyssida">
 	    <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true">
 	      <path d="M2 11h2v3H2v-3zm3-4h2v7H5V7zm3-3h2v10H8V4zm3-3h2v13h-2V1z"/>

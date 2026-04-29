@@ -4,6 +4,10 @@ services:
     container_name: cyberphoto-adminweb
     # Reachable via the reverse proxy (proxy-net), not directly on the host.
     # Apache inside still listens on 80; the proxy reaches it over the docker network.
+    # Also published to the host on 8091/8444 for direct local access.
+    ports:
+      - "8091:80"
+      - "8443:443"
     networks:
       - proxy-net
     volumes:
