@@ -68,7 +68,7 @@
     /* Vänster border placeras under ikonens mitt:
        pill-padding (5px) + halva ikonbredden (9px) = 14px */
     border-left: 2px solid #d1fae5;
-    margin-left: 14px;
+    margin-left: 8px;
 }
 
 /* ---------- Meny-länkarna ---------- */
@@ -81,7 +81,7 @@
 
 #treemenuadmin ul li a {
     display: block;
-    padding: 4px 6px 4px 14px;   /* utrymme för punkt-tecknet */
+    padding: 4px 6px 4px 10px;   /* utrymme för punkt-tecknet */
     background: none !important;
     font-weight: 400;
     color: #374151;
@@ -96,7 +96,7 @@
 #treemenuadmin ul li a::before {
     content: "·";
     position: absolute;
-    left: 4px;
+    left: 2px;
     top: 2px;
     color: #9ca3af;
     font-size: 16px;
@@ -115,7 +115,7 @@
     font-style: normal;
     text-decoration: none;
     border-left: 2px solid #0d9488;
-    padding-left: 12px;
+    padding-left: 8px;
 }
 
 #treemenuadmin ul li a#current::before {
