@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once("CCheckIpNumber.php");
 require_once("Db.php");
 
@@ -1117,20 +1117,55 @@ public static function getCustomerDetailsAD($bp_id){
     if (!$r0 || !pg_num_rows($r0)) return array('ok'=>false,'msg'=>'not_found');
     $bp = $r0 ? pg_fetch_assoc($r0) : null;
 
-    // Adress  enkel/robust
+    // Adresser – steg 1: hämta adressdata (säker query utan flaggkolumner)
     $rA = ($cn) ? @pg_query_params($cn, "
         SELECT
           bl.c_bpartner_location_id,
+          COALESCE(bl.name,'') AS loc_name,
           l.address1, l.address2, l.postal, l.city,
           COALESCE(co.name,'') AS country
         FROM c_bpartner_location bl
         JOIN c_location l ON l.c_location_id = bl.c_location_id
         LEFT JOIN c_country co ON co.c_country_id = l.c_country_id
         WHERE bl.c_bpartner_id = $1
+          AND bl.isactive = 'Y'
         ORDER BY bl.created DESC
-        LIMIT 1
     ", array($bp_id)) : false;
-    $addr = ($rA && pg_num_rows($rA)) ? pg_fetch_assoc($rA) : null;
+    $addresses = array();
+    if ($rA) {
+        while ($rA && $aRow = pg_fetch_assoc($rA)) {
+            $aRow['is_ship'] = 'N'; $aRow['is_bill'] = 'N'; $aRow['is_remit'] = 'N';
+            $addresses[] = $aRow;
+        }
+        pg_free_result($rA);
+    }
+
+    // Adresser – steg 2: försök hämta typflaggor separat (misslyckas tyst om kolumnerna saknas)
+    if ($addresses) {
+        $rF = ($cn) ? @pg_query_params($cn, "
+            SELECT c_bpartner_location_id,
+                   COALESCE(isshipto,'N')   AS is_ship,
+                   COALESCE(isbillto,'N')   AS is_bill,
+                   COALESCE(isremitto,'N')  AS is_remit
+            FROM c_bpartner_location
+            WHERE c_bpartner_id = $1 AND isactive = 'Y'
+        ", array($bp_id)) : false;
+        if ($rF) {
+            $flagMap = array();
+            while ($rF && $fRow = pg_fetch_assoc($rF)) $flagMap[$fRow['c_bpartner_location_id']] = $fRow;
+            pg_free_result($rF);
+            foreach ($addresses as &$a) {
+                $id = $a['c_bpartner_location_id'];
+                if (isset($flagMap[$id])) {
+                    $a['is_ship']  = $flagMap[$id]['is_ship'];
+                    $a['is_bill']  = $flagMap[$id]['is_bill'];
+                    $a['is_remit'] = $flagMap[$id]['is_remit'];
+                }
+            }
+            unset($a);
+        }
+    }
+    $addr = $addresses ? $addresses[0] : null;
 
     // Kontakter  ENDAST aktiva
     $rU = ($cn) ? @pg_query_params($cn, "
@@ -1186,6 +1221,7 @@ public static function getCustomerDetailsAD($bp_id){
         'ok'       => true,
         'bp'       => $bp,
         'address'  => $addr,
+        'addresses'=> $addresses,
         'primary'  => $primary,
         'contacts' => $contacts,
         'owner'    => $owner,
@@ -1204,10 +1240,11 @@ public static function renderCustomerDetailsAD($bp_id){
     $d = self::getCustomerDetailsAD($bp_id);
     if (!$d['ok']) return '<div style="padding:12px;color:#b00;">Kunde inte h&auml;mta kund/leverant&ouml;r.</div>';
 
-    $bp   = $d['bp'];
-    $addr = $d['address'];
-    $prim = $d['primary'];
-    $own  = $d['owner'];
+    $bp        = $d['bp'];
+    $addr      = $d['address'];
+    $addresses = isset($d['addresses']) ? $d['addresses'] : array();
+    $prim      = $d['primary'];
+    $own       = $d['owner'];
 
     // ---------- Namn (undvik "A  A") ----------
     $nameRaw  = isset($bp['name'])  ? (string)$bp['name']  : '';
@@ -1252,26 +1289,34 @@ public static function renderCustomerDetailsAD($bp_id){
     if (!empty($bp['taxid'])) $chips[] = '<span class="copy-chip" data-copy="'.$h($bp['taxid']).'">Org.nr: '.$h($bp['taxid']).'</span>';
     $chipsHtml = $chips ? '<div class="chips">'.implode('', $chips).'</div>' : '';
 
-    // ---------- Adress ----------
-    $addrHtml = $dash;
-    if ($addr) {
-        $line1 = !empty($addr['address1']) ? $h($addr['address1']) : '';
-        $line2 = !empty($addr['address2']) ? '<br>'.$h($addr['address2']) : '';
-        $line3 = (!empty($addr['postal']) || !empty($addr['city'])) ? '<br>'.$h(trim($addr['postal'].' '.$addr['city'])) : '';
-        $line4 = !empty($addr['country']) ? '<br>'.$h($addr['country']) : '';
-        $addrHtml = $line1.$line2.$line3.$line4;
-        if (trim(strip_tags($addrHtml)) === '') $addrHtml = $dash;
-    }
+    // ---------- Adresser (grid med ikoner) ----------
+    $icoShip  = '<svg class="addr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>';
+    $icoBill  = '<svg class="addr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+    $icoRemit = '<svg class="addr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
 
-    // ---------- Primär kontakt ----------
-    $primHtml = $dash;
-    if ($prim) {
-        $nm = !empty($prim['fullname']) ? $h($prim['fullname']) : 'Kontakt';
-        $em = !empty($prim['email']) ? ' &lt;'.$h($prim['email']).'&gt;' : '';
-        $ph = !empty($prim['phone']) ? '<br>'.$h($prim['phone']) : '';
-        $mb = !empty($prim['mobile'])? '<br>'.$h($prim['mobile']) : '';
-        $primHtml = $nm.$em.$ph.$mb;
+    $addrCardsHtml = '';
+    foreach ($addresses as $a) {
+        $parts = array();
+        if (!empty($a['address1'])) $parts[] = $h($a['address1']);
+        if (!empty($a['address2'])) $parts[] = $h($a['address2']);
+        $pc = trim((!empty($a['postal']) ? $a['postal'] : '') . ' ' . (!empty($a['city']) ? $a['city'] : ''));
+        if ($pc !== '') $parts[] = $h($pc);
+        if (!empty($a['country'])) $parts[] = $h($a['country']);
+        if (!$parts) continue;
+
+        $adrText = implode('<br>', $parts);
+
+        $icons = '';
+        if (!empty($a['is_bill'])  && $a['is_bill']  === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--bill"  title="Fakturaadress">'.$icoBill.'</span>';
+        if (!empty($a['is_ship'])  && $a['is_ship']  === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--ship"  title="Leveransadress">'.$icoShip.'</span>';
+        if (!empty($a['is_remit']) && $a['is_remit'] === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--remit" title="Utbetalningsadress">'.$icoRemit.'</span>';
+
+        $addrCardsHtml .= '<div class="addr-card">'
+                        .   '<div class="addr-text">'.$adrText.'</div>'
+                        .   ($icons ? '<div class="addr-icons">'.$icons.'</div>' : '')
+                        . '</div>';
     }
+    if ($addrCardsHtml === '') $addrCardsHtml = '<span style="color:#6b7280">'.$dash.'</span>';
 
     // ---------- Ansvarig ----------
     $ownerHtml = $dash;
@@ -1413,8 +1458,22 @@ public static function renderCustomerDetailsAD($bp_id){
       .supplier-box .value .copy-chip{font-size:13px}
 
 		.order-type{white-space:nowrap}
-		.order-type--quote{color:#2563eb}       /* blå */
-		.order-type--quote-res{color:#b91c1c}   /* röd */
+		.order-type--quote{color:#2563eb}
+		.order-type--quote-res{color:#b91c1c}
+
+      /* Adressgrid */
+      .addr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+      .addr-card{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;font-size:13px;line-height:1.45}
+      .addr-text{flex:1}
+      .addr-icons{display:flex;gap:6px;flex-shrink:0;padding-top:2px}
+      .addr-icon-wrap{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;border:1px solid transparent;cursor:default;transition:background .15s}
+      .addr-ico{width:15px;height:15px;display:block}
+      .addr-icon--bill {color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe}
+      .addr-icon--bill:hover {background:#dbeafe}
+      .addr-icon--ship {color:#15803d;background:#f0fdf4;border-color:#bbf7d0}
+      .addr-icon--ship:hover {background:#dcfce7}
+      .addr-icon--remit{color:#7e22ce;background:#fdf4ff;border-color:#e9d5ff}
+      .addr-icon--remit:hover{background:#f3e8ff}
 
     </style>';
 
@@ -1455,13 +1514,15 @@ public static function renderCustomerDetailsAD($bp_id){
 		$html .= '</div>';
 	}
 
-    // Adress + Primär kontakt
-    $html .= '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">';
-    $html .=   '<div><div class="section-title">Adress</div><div>'.$addrHtml.'</div></div>';
-    $html .=   '<div><div class="section-title">Prim&auml;r kontakt</div><div>'.$primHtml.'</div></div>';
-    $html .= '</div>';
+    // Adresser
+    $html .= '<div style="margin-top:12px"><div class="section-title">Adresser</div>'
+           . '<div class="addr-grid">'.$addrCardsHtml.'</div>'
+           . '</div>';
 
-    $html .= '<div style="margin-top:10px"><div class="section-title">Ansvarig</div><div>'.$ownerHtml.'</div></div>';
+    // Ansvarig – visas bara för leverantörer
+    if ($isSupplierGroup) {
+        $html .= '<div style="margin-top:10px"><div class="section-title">Ansvarig</div><div>'.$ownerHtml.'</div></div>';
+    }
 
     // Kontakter
     $html .= '<div style="margin-top:14px"><div class="section-title">Kontakter</div>'
