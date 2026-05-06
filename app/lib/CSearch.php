@@ -1291,8 +1291,7 @@ public static function renderCustomerDetailsAD($bp_id){
 
     // ---------- Adresser (grid med ikoner) ----------
     $icoShip  = '<svg class="addr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>';
-    $icoBill  = '<svg class="addr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
-    $icoRemit = '<svg class="addr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+    $icoBill  = '<svg class="addr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
 
     $addrCardsHtml = '';
     foreach ($addresses as $a) {
@@ -1309,7 +1308,6 @@ public static function renderCustomerDetailsAD($bp_id){
         $icons = '';
         if (!empty($a['is_bill'])  && $a['is_bill']  === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--bill"  title="Fakturaadress">'.$icoBill.'</span>';
         if (!empty($a['is_ship'])  && $a['is_ship']  === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--ship"  title="Leveransadress">'.$icoShip.'</span>';
-        if (!empty($a['is_remit']) && $a['is_remit'] === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--remit" title="Utbetalningsadress">'.$icoRemit.'</span>';
 
         $addrCardsHtml .= '<div class="addr-card">'
                         .   '<div class="addr-text">'.$adrText.'</div>'
@@ -1472,8 +1470,6 @@ public static function renderCustomerDetailsAD($bp_id){
       .addr-icon--bill:hover {background:#dbeafe}
       .addr-icon--ship {color:#15803d;background:#f0fdf4;border-color:#bbf7d0}
       .addr-icon--ship:hover {background:#dcfce7}
-      .addr-icon--remit{color:#7e22ce;background:#fdf4ff;border-color:#e9d5ff}
-      .addr-icon--remit:hover{background:#f3e8ff}
 
     </style>';
 
@@ -2220,7 +2216,7 @@ public static function renderOrderDetailsAD($orderNo)
 			$html .= '</td></tr>';
 
 			// === Beräknad leverans ===
-			if (!$isQuote && $isRealProduct && !$isFullyDelivered && !$isFullyAllocated) {
+			if (!$isQuote && !$isCancelled && $isRealProduct && !$isFullyDelivered && !$isFullyAllocated) {
 				$prec = strtoupper(trim((string)$line['datepromisedprecision']));
 				$dp   = trim((string)$line['datepromised']);
 				if (strlen($dp) > 10) $dp = substr($dp, 0, 10);
