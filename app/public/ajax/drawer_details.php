@@ -1335,7 +1335,9 @@ if ($type === 'customer') {
 			$cCreated = $c['created'];
 			if (strlen($cCreated) > 19) $cCreated = substr($cCreated, 0, 19);
 			$cUser = $h($c['name']);
-			$cText = nl2br($h($c['characterdata']));
+			$cText = $h($c['characterdata']);
+			$cText = preg_replace('/(https:\/\/[^\s<>"]+)/', '<a href="$1" target="_blank" rel="noopener">$1</a>', $cText);
+			$cText = nl2br($cText);
 			echo '<div class="order-chat-entry">';
 			echo '  <div class="order-chat-meta">' . $h($cCreated) . ' &nbsp;&nbsp; <i>' . $cUser . '</i></div>';
 			echo '  <div class="order-chat-body">' . $cText . '</div>';

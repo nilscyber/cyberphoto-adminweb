@@ -1900,6 +1900,8 @@ public static function renderOrderDetailsAD($orderNo)
     .order-chat-meta{font-size:12px;color:#6b7280;margin-bottom:4px}
     .order-chat-meta i{font-style:italic}
     .order-chat-body{font-size:13px;color:#111;line-height:1.5}
+    .order-chat-body a{color:#6b9fd4;font-size:13px;font-family:inherit;text-decoration:none}
+    .order-chat-body a:hover{text-decoration:underline}
     .order-customer-link{margin-top:10px;font-size:13px}
     .order-customer-link a{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;border:1px solid #1d4ed8;background:#eff6ff;color:#1d4ed8;text-decoration:none;font-weight:700}
     .order-customer-link a:hover{background:#dbeafe;border-color:#1d4ed8}
@@ -2277,7 +2279,9 @@ public static function renderOrderDetailsAD($orderNo)
                 $cCreated = substr($cCreated, 0, 19);
             }
             $cUser  = $eh($c['name']);
-            $cText  = nl2br($eh($c['characterdata']));
+            $cText  = $eh($c['characterdata']);
+            $cText  = preg_replace('/(https:\/\/[^\s<>"]+)/', '<a href="$1" target="_blank" rel="noopener">$1</a>', $cText);
+            $cText  = nl2br($cText);
 
             $html .= '<div class="order-chat-entry">';
             $html .= '  <div class="order-chat-meta">'.$eh($cCreated).' &nbsp;&nbsp; <i>' . $cUser . '</i></div>';
