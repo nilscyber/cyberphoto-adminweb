@@ -1515,11 +1515,6 @@ public static function renderCustomerDetailsAD($bp_id){
            . '<div class="addr-grid">'.$addrCardsHtml.'</div>'
            . '</div>';
 
-    // Ansvarig – visas bara för leverantörer
-    if ($isSupplierGroup) {
-        $html .= '<div style="margin-top:10px"><div class="section-title">Ansvarig</div><div>'.$ownerHtml.'</div></div>';
-    }
-
     // Kontakter
     $html .= '<div style="margin-top:14px"><div class="section-title">Kontakter</div>'
            . '<table class="table-list drawer-contacts">'
@@ -1722,7 +1717,7 @@ public static function renderOrderDetailsAD($orderNo)
                 ON contrl2.c_country_id = con2.c_country_id 
                AND contrl2.ad_language = 'sv_SE'
 
-            LEFT JOIN ad_user ad2 ON ad2.c_bpartner_id = o.bill_bpartner_id
+            LEFT JOIN ad_user ad2 ON ad2.ad_user_id = o.ad_user_id
 
             LEFT JOIN xc_kreditor_pclass xc ON xc.xc_kreditor_pclass_id = o.xc_kreditor_pclass_id
 
