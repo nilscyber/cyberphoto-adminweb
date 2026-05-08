@@ -1295,23 +1295,18 @@ public static function renderCustomerDetailsAD($bp_id){
 
     $addrCardsHtml = '';
     foreach ($addresses as $a) {
-        $parts = array();
-        if (!empty($a['address1'])) $parts[] = $h($a['address1']);
-        if (!empty($a['address2'])) $parts[] = $h($a['address2']);
-        $pc = trim((!empty($a['postal']) ? $a['postal'] : '') . ' ' . (!empty($a['city']) ? $a['city'] : ''));
-        if ($pc !== '') $parts[] = $h($pc);
-        if (!empty($a['country'])) $parts[] = $h($a['country']);
-        if (!$parts) continue;
-
-        $adrText = implode('<br>', $parts);
+        $street = trim((!empty($a['address1']) ? $a['address1'] : '') . (!empty($a['address2']) ? ', '.$a['address2'] : ''));
+        $pc     = trim((!empty($a['postal']) ? $a['postal'] : '') . ' ' . (!empty($a['city']) ? $a['city'] : ''));
+        if ($street === '' && $pc === '') continue;
 
         $icons = '';
-        if (!empty($a['is_bill'])  && $a['is_bill']  === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--bill"  title="Fakturaadress">'.$icoBill.'</span>';
-        if (!empty($a['is_ship'])  && $a['is_ship']  === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--ship"  title="Leveransadress">'.$icoShip.'</span>';
+        if (!empty($a['is_bill']) && $a['is_bill'] === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--bill" title="Fakturaadress">'.$icoBill.'</span>';
+        if (!empty($a['is_ship']) && $a['is_ship'] === 'Y') $icons .= '<span class="addr-icon-wrap addr-icon--ship" title="Leveransadress">'.$icoShip.'</span>';
 
         $addrCardsHtml .= '<div class="addr-card">'
-                        .   '<div class="addr-text">'.$adrText.'</div>'
-                        .   ($icons ? '<div class="addr-icons">'.$icons.'</div>' : '')
+                        .   '<div class="addr-col addr-col--street">'.$h($street).'</div>'
+                        .   '<div class="addr-col addr-col--pc">'.$h($pc).'</div>'
+                        .   '<div class="addr-icons">'.$icons.'</div>'
                         . '</div>';
     }
     if ($addrCardsHtml === '') $addrCardsHtml = '<span style="color:#6b7280">'.$dash.'</span>';
@@ -1459,11 +1454,13 @@ public static function renderCustomerDetailsAD($bp_id){
 		.order-type--quote{color:#2563eb}
 		.order-type--quote-res{color:#b91c1c}
 
-      /* Adressgrid */
-      .addr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
-      .addr-card{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;font-size:13px;line-height:1.45}
-      .addr-text{flex:1}
-      .addr-icons{display:flex;gap:6px;flex-shrink:0;padding-top:2px}
+      /* Adresslista */
+      .addr-grid{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+      .addr-card{display:flex;align-items:baseline;gap:0;padding:5px 10px;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:13px}
+      .addr-col{padding-right:12px}
+      .addr-col--street{flex:0 0 180px;min-width:0;word-break:break-word}
+      .addr-col--pc{flex:1;min-width:0}
+      .addr-icons{display:flex;gap:4px;flex-shrink:0;margin-left:auto;align-self:center}
       .addr-icon-wrap{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;border:1px solid transparent;cursor:default;transition:background .15s}
       .addr-ico{width:15px;height:15px;display:block}
       .addr-icon--bill {color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe}
