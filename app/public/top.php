@@ -8,6 +8,7 @@
 	// 2018-11-27, hänvisar allt från och med nu till nya adressen
 	// ob_start(); // starta output buffering
 	header('Content-Type: text/html; charset=utf-8');
+	date_default_timezone_set('Europe/Stockholm');
 
 
 	use Liuch\DmarcSrg\Statistics;
