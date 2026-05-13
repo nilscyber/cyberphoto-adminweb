@@ -18,7 +18,8 @@ COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
 # Add lib/ to PHP include path
 RUN echo "include_path = \".:/var/www/html/lib\"" > /usr/local/etc/php/conf.d/include-path.ini && \
-    echo "error_reporting = E_ERROR | E_PARSE" > /usr/local/etc/php/conf.d/error-reporting.ini
+    echo "error_reporting = E_ERROR | E_PARSE" > /usr/local/etc/php/conf.d/error-reporting.ini && \
+    echo "date.timezone = Europe/Stockholm" > /usr/local/etc/php/conf.d/timezone.ini
 
 # Copy application files
 COPY app/ /var/www/html/
