@@ -3,7 +3,8 @@
 // Anropas direkt (standalone) eller inkluderas från index.php
 
 $RSS_FEEDS = [
-    ['name' => 'DPReview', 'url' => 'https://www.dpreview.com/feeds/latest.xml'],
+    ['name' => 'DPReview',  'url' => 'https://www.dpreview.com/feeds/latest.xml'],
+    ['name' => 'PetaPixel', 'url' => 'https://petapixel.com/feed/'],
 ];
 
 $CACHE_DIR  = __DIR__ . '/cache/rss';
