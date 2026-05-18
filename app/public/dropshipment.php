@@ -154,7 +154,23 @@ $h  = function ($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); 
 $toLatin1 = function ($s) { return (string)$s; };
 $nf = function ($n, $d = 0) { return number_format((float)$n, $d, ',', ' '); };
 
-echo "<h1>Dropshipment - uppföljning</h1>";
+echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
+
+echo '<style>
+.small-muted{color:#6b7280;font-size:12px;margin:8px 0 12px}
+.filterbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 14px;padding:8px 12px;border:1px solid #e5e7eb;background:#f9fafb;border-radius:10px}
+.filterbar label{font-size:13px;color:#374151}
+.filterbar input[type="number"]{padding:5px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;width:80px}
+.filterbar button,.view-btn{padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#111;cursor:pointer;font-size:13px;text-decoration:none;display:inline-block;font-weight:600}
+.filterbar button:hover,.view-btn:hover{background:#f3f4f6}
+.view-btn.active{background:#111827;color:#fff;border-color:#111827}
+.cat-head th{background:#f3f4f6;font-weight:700;padding:8px 10px;font-size:13px;color:#111}
+.icon-link{display:inline-flex;align-items:center;text-decoration:none}
+.icon{width:16px;height:16px;vertical-align:middle;fill:#111}
+.neg{color:#b91c1c;font-weight:700}
+.table-list td.prod-col{white-space:normal;word-break:normal}
+.copy-art{cursor:pointer;user-select:none}
+</style>';
 
 // Hämta data beroende på vy
 if ($view === 'lines') {
@@ -163,57 +179,44 @@ if ($view === 'lines') {
     $data = $ds->getDropshipOrders($days, $limit);
 }
 
-echo '<style>
-.with-drawer-gutter{margin-right:8px}
-.table-list{table-layout:fixed;width:100%;border-collapse:collapse;font-size:13px}
-.table-list th,.table-list td{padding:8px 10px;border-bottom:1px solid #e5e7eb;vertical-align:middle}
-.table-list thead th{background:#e5e7eb;color:#111;font-weight:700;text-align:left}
-.table-list tbody tr:nth-child(even){background:#f3f4f6}
-.table-list tbody tr:hover{background:#e5e7eb}
-.table-list .text-right{text-align:right}
-.table-list .text-center{text-align:center}
-.table-list td.prod-col{white-space:normal;word-break:normal}
-.small-muted{color:#6b7280;font-size:12px;margin:8px 0 12px}
-.filterbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
-.filterbar label{font-size:12px;color:#374151}
-.filterbar input{padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px}
-.filterbar button,.btn{padding:7px 10px;border:0;border-radius:6px;background:#111827;color:#fff;cursor:pointer;font-size:13px;text-decoration:none;display:inline-block}
-.btn.secondary{background:#95979b}
-.cat-head{background:#d1d5db;font-weight:700}
-.icon-link{display:inline-flex;align-items:center;text-decoration:none}
-.icon{width:16px;height:16px;vertical-align:middle;fill:#111}
-.neg{color:#b91c1c;font-weight:700}
-</style>';
+$base = '?days='.$h($days).'&limit='.$h($limit);
 
-// Filter + vyval + export
+// Exportlänk baserat på aktuell vy
+if ($view === 'orders') {
+    $exportUrl = $base.'&view=orders&export=1';
+} else {
+    $exportUrl = $base.'&view=lines&status='.$h($lineStatus).'&export_lines=1';
+}
+
+$exportBtn = '<a href="'.$exportUrl.'" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#0d9488;color:#fff;border-radius:6px;text-decoration:none;font-size:13px;font-weight:700">'
+           . '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'
+           . 'Exportera till Excel</a>';
+
+echo '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'
+   . '<h1 style="margin:0">Dropshipment - uppföljning</h1>'
+   . $exportBtn
+   . '</div>' . "\n";
+
+// Filterbar
 echo '<div class="filterbar">';
-echo '  <form method="get" action="" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">';
+echo '  <form method="get" action="" style="display:contents">';
 echo '    <input type="hidden" name="view" value="'.$h($view).'">';
 if ($view === 'lines') {
     echo '    <input type="hidden" name="status" value="'.$h($lineStatus).'">';
 }
-echo '    <label>Visa senaste <input type="number" name="days" value="'.$h($days).'" min="1" max="3650" style="width:90px;"> dagar</label>';
-echo '    <label>Max rader <input type="number" name="limit" value="'.$h($limit).'" min="10" max="5000" style="width:90px;"></label>';
+echo '    <label>Visa senaste <input type="number" name="days" value="'.$h($days).'" min="1" max="3650"> dagar</label>';
+echo '    <label>Max rader <input type="number" name="limit" value="'.$h($limit).'" min="10" max="5000"></label>';
 echo '    <button type="submit">Uppdatera</button>';
 echo '  </form>';
 
-$base = '?days='.$h($days).'&limit='.$h($limit);
+echo '  <a class="view-btn '.($view==='orders' ? 'active' : '').'" href="'.$base.'&view=orders">Orderöversikt</a>';
+echo '  <a class="view-btn '.($view==='lines'  ? 'active' : '').'" href="'.$base.'&view=lines&status='.$h($lineStatus).'">Produktlista</a>';
 
-echo '  <a class="btn '.($view==='orders' ? '' : 'secondary').'" href="'.$base.'&view=orders">Orderöversikt</a>';
-echo '  <a class="btn '.($view==='lines'  ? '' : 'secondary').'" href="'.$base.'&view=lines&status='.$h($lineStatus).'">Produktlista</a>';
-
-if ($view === 'orders') {
-    $exportUrl = $base.'&view=orders&export=1';
-    echo '  <a class="btn secondary" href="'.$exportUrl.'">Exportera Excel</a>';
-} else {
+if ($view === 'lines') {
     $uUrl = $base.'&view=lines&status=undelivered';
     $dUrl = $base.'&view=lines&status=delivered';
-
-    echo '  <a class="btn '.($lineStatus==='undelivered' ? '' : 'secondary').'" href="'.$uUrl.'">Ej levererade</a>';
-    echo '  <a class="btn '.($lineStatus==='delivered' ? '' : 'secondary').'" href="'.$dUrl.'">Levererade</a>';
-
-    $exportLinesUrl = $base.'&view=lines&status='.$h($lineStatus).'&export_lines=1';
-    echo '  <a class="btn secondary" href="'.$exportLinesUrl.'">Exportera Excel</a>';
+    echo '  <a class="view-btn '.($lineStatus==='undelivered' ? 'active' : '').'" href="'.$uUrl.'">Ej levererade</a>';
+    echo '  <a class="view-btn '.($lineStatus==='delivered'   ? 'active' : '').'" href="'.$dUrl.'">Levererade</a>';
 }
 
 echo '</div>';
@@ -292,8 +295,8 @@ if ($view === 'lines') {
             echo '<tr>';
             echo '  <td>'.$h($orderDate).'</td>';
             echo '  <td><a href="'.$h($orderUrl).'" target="_blank">'.$h($ordno).'</a></td>';
-            echo '  <td><a href="'.$h($prodUrl).'" target="_blank">'.$h($artnr).'</a></td>';
-            echo '  <td class="prod-col">'.$h($prodDisplay).'</td>';
+            echo '  <td><span class="copy-art" data-article="'.$h($artnr).'" title="Kopiera artikelnummer">'.$h($artnr).'</span></td>';
+            echo '  <td class="prod-col"><a href="'.$h($prodUrl).'" target="_blank" rel="noopener">'.$h($prodDisplay).'</a></td>';
             echo '  <td class="text-right">'.$h($qty).'</td>';
             echo '  <td class="text-right">'.$nf($limitPris, 0).' SEK</td>';
             echo '  <td class="text-right">'.$nf($prislista, 0).' SEK</td>';
@@ -360,10 +363,11 @@ if ($view === 'lines') {
             $created = date('Y-m-d H:i', $ts);
             $ordno   = (string)$r['documentno'];
 
-            //$cust = $toLatin1($r['customer_name']);
+            $cust = $toLatin1($r['customer_name']);
             $rep  = $toLatin1($r['salesrep_name']);
 
             $val = (float)$r['totallines'];
+            $tb  = (float)$r['marginamt'];
             $tg  = (float)$r['margin'];
 
             $orderUrl = 'https://admin.cyberphoto.se/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($ordno);
@@ -395,5 +399,31 @@ if ($view === 'lines') {
     echo '</div>';
 }
 
+?>
+<script>
+(function(){
+  function copyText(t,cb){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(String(t||'')).then(function(){cb&&cb(true)},function(){cb&&cb(false)});
+    }else{
+      try{var ta=document.createElement('textarea');ta.value=String(t||'');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=document.execCommand('copy');document.body.removeChild(ta);cb&&cb(ok);}catch(e){cb&&cb(false);}
+    }
+  }
+  document.addEventListener('click',function(e){
+    var el=e.target&&e.target.closest?e.target.closest('.copy-art'):null;
+    if(!el)return;
+    e.preventDefault();
+    var art=el.getAttribute('data-article')||(el.textContent||'').trim();
+    copyText(art,function(ok){
+      if(!ok)return;
+      var old=el.getAttribute('title')||'Kopiera artikelnummer';
+      el.setAttribute('title','Kopierat!');
+      el.style.outline='2px solid #a7f3d0';el.style.outlineOffset='2px';
+      setTimeout(function(){el.style.outline='';el.style.outlineOffset='';el.setAttribute('title',old);},1200);
+    });
+  },false);
+})();
+</script>
+<?php
 include_once("footer.php");
 ?>
