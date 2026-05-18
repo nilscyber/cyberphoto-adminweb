@@ -288,79 +288,111 @@ Class CWebADIntern {
 
 	function printMissingProductsFromAD() {
 
-		$rowcolor = true;
-		$countrows = 0;
-		
-		echo "<div>";
-		// echo "<table width=\"1200\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">";
-		echo "<table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">";
-		echo "<tr>";
-		echo "<td width=\"130\" class=\"rubrik\">Artnr</td>";
-		echo "<td width=\"550\" class=\"rubrik\">Benämning</td>";
-		echo "<td width=\"250\" class=\"rubrik\">Kategori</td>";
-		// echo "<td class=\"rubrik\">Benämning</td>";
-		echo "<td width=\"40\" class=\"rubrik\">Kö</td>";
-		echo "<td width=\"200\" class=\"rubrik\">Leverantör</td>";
-		echo "</tr>";
-		
-		// $select = "SELECT prod.value, cat.name AS cat_name, manu.name AS manu_name, prod.name AS prod_name, pstock.qtyavailable ";
-		$select = "SELECT prod.value, cat.name AS cat_name, manu.name AS manu_name, prod.name AS prod_name, pstock.qtyavailable, cbp.name AS lev_name ";
-		// $select .= "FROM m_product_stock_summary_v pstock ";
+		$h = function($s) {
+			return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+		};
+
+		$select  = "SELECT prod.value, prod.m_product_id, ";
+		$select .= "cat.name AS cat_name, ";
+		$select .= "manu.name AS manu_name, prod.name AS prod_name, ";
+		$select .= "pstock.qtyavailable, ";
+		$select .= "cbp.name AS lev_name, ";
+		$select .= "COALESCE(pp.pricelimit, (SELECT mc.currentcostprice FROM m_cost mc WHERE mc.m_product_id = prod.m_product_id ORDER BY mc.updated DESC LIMIT 1), 0) AS net_price ";
 		$select .= "FROM m_product_cache pstock ";
 		$select .= "LEFT JOIN m_product prod ON pstock.m_product_id = prod.m_product_id ";
 		$select .= "LEFT JOIN xc_manufacturer manu ON prod.xc_manufacturer_id = manu.xc_manufacturer_id ";
 		$select .= "LEFT JOIN m_product_category cat ON prod.m_product_category_id = cat.m_product_category_id ";
 		$select .= "LEFT JOIN m_product_po prod_po ON pstock.m_product_id = prod_po.m_product_id ";
 		$select .= "LEFT JOIN c_bpartner cbp ON cbp.c_bpartner_id = prod_po.c_bpartner_id ";
-		// $select .= "WHERE pstock.m_warehouse_id = 1000000 AND pstock.qtyavailable < -1 ";
-		$select .= "WHERE pstock.m_warehouse_id = 1000000 AND pstock.qtyavailable < -1 "; // detta ändrades 111031 på PO:s begäran
-		$select .= "AND NOT cat.value IN('314','12','700','486','1000517') ";
+		$select .= "LEFT JOIN m_productprice pp ON pp.m_product_id = prod.m_product_id AND pp.m_pricelist_version_id = 1000000 ";
+		$select .= "WHERE pstock.m_warehouse_id = 1000000 AND pstock.qtyavailable < -1 ";
+		$select .= "AND NOT cat.value IN ('314','12','700','486','1000517') ";
 		$select .= "AND prod_po.iscurrentvendor = 'Y' ";
 		$select .= "ORDER BY pstock.qtyavailable ASC, manu.name ASC ";
 
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo $select;
-			exit;
+		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
+
+		echo '<table class="table-list">';
+		echo '<colgroup>'
+		   . '<col style="width:12ch" />'
+		   . '<col />'
+		   . '<col style="width:22ch" />'
+		   . '<col style="width:6ch" />'
+		   . '<col style="width:12ch" />'
+		   . '<col style="width:20ch" />'
+		   . '</colgroup>';
+		echo '<thead><tr>'
+		   . '<th>Artnr</th>'
+		   . '<th>Benämning</th>'
+		   . '<th>Kategori</th>'
+		   . '<th class="text-right">Kö</th>'
+		   . '<th class="text-right">Kö-värde</th>'
+		   . '<th>Leverantör</th>'
+		   . '</tr></thead><tbody>';
+
+		$countrows = 0;
+		$totalValue = 0.0;
+
+		while ($res && $row = pg_fetch_object($res)) {
+			$article    = $h($row->value);
+			$pid        = (int)$row->m_product_id;
+			$product    = $h(trim(($row->manu_name ?? '') . ' ' . ($row->prod_name ?? '')));
+			$cat        = $h($row->cat_name ?? '');
+			$qty        = (int)$row->qtyavailable;
+			$lev        = $h($row->lev_name ?? '');
+			$netPrice   = (float)$row->net_price;
+			$koValue    = abs($qty) * $netPrice;
+			$totalValue += $koValue;
+
+			$productUrl  = '/search_dispatch.php?mode=product&q=' . rawurlencode($row->value) . '&open=product&id=' . $pid;
+			$koValueFmt  = number_format((int)round($koValue), 0, ',', ' ') . ' kr';
+
+			echo '<tr>';
+			echo '<td><span class="copy-art" data-article="' . $article . '" title="Kopiera artikelnummer">' . $article . '</span></td>';
+			echo '<td><a href="' . $h($productUrl) . '" target="_blank" rel="noopener">' . $product . '</a></td>';
+			echo '<td>' . $cat . '</td>';
+			echo '<td class="text-right">' . $qty . '</td>';
+			echo '<td class="text-right" style="white-space:nowrap">' . $koValueFmt . '</td>';
+			echo '<td>' . $lev . '</td>';
+			echo '</tr>';
+			$countrows++;
 		}
 
-		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-		// echo $this->conn_ad;
-		// $row = pg_fetch_array($res);
-		// echo pg_num_rows($res);
+		$totalFmt = number_format((int)round($totalValue), 0, ',', ' ') . ' kr';
+		echo '</tbody><tfoot><tr>'
+		   . '<td colspan="3"><strong>Totalt: ' . $countrows . ' st</strong></td>'
+		   . '<td></td>'
+		   . '<td class="text-right" style="white-space:nowrap"><strong>' . $totalFmt . '</strong></td>'
+		   . '<td></td>'
+		   . '</tr></tfoot>';
+		echo '</table>';
 
-			while ($res && $row = pg_fetch_object($res)) {
-
-				if ($rowcolor == true) {
-					$backcolor = "firstrow";
-				} else {
-					$backcolor = "secondrow";
-				}
-
-
-					echo "<tr>";
-					echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=" . $row->value . "\">" . $row->value . "</a></td>";
-					echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=" . $row->value . "\">" . $row->manu_name . " ". $row->prod_name . "</a></td>";
-					echo "<td class=\"$backcolor\">" . $row->cat_name . "</td>";
-					// echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"/info.php?article=" . $row->value . "\">" . $row->manu_name . " " . $row->prod_name . "</a></td>";
-					echo "<td class=\"$backcolor\">" . $row->qtyavailable . "</td>";
-					echo "<td class=\"$backcolor\">" . $row->lev_name . "</td>";
-					echo "</tr>";
-					$countrows++;
-				
-				if ($rowcolor == true) {
-					$row = true;
-					$rowcolor = false;
-				} else {
-					$row = false;
-					$rowcolor = true;
-				}
-			
-			}
-
-		echo "</table>";
-		echo "</div>";
-		echo "<div class=\"top5\"></div>\n";
-		echo "<div><b>Totalt: " . $countrows . " st</b></div>\n";
+		echo <<<JS
+<script>
+(function(){
+  function copyText(t,cb){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(String(t||'')).then(function(){cb&&cb(true)},function(){cb&&cb(false)});
+    }else{
+      try{var ta=document.createElement('textarea');ta.value=String(t||'');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=document.execCommand('copy');document.body.removeChild(ta);cb&&cb(ok);}catch(e){cb&&cb(false);}
+    }
+  }
+  document.addEventListener('click',function(e){
+    var el=e.target&&e.target.closest?e.target.closest('.copy-art'):null;
+    if(!el)return;
+    e.preventDefault();
+    var art=el.getAttribute('data-article')||(el.textContent||'').trim();
+    copyText(art,function(ok){
+      if(!ok)return;
+      var old=el.getAttribute('title')||'Kopiera artikelnummer';
+      el.setAttribute('title','Kopierat!');
+      el.style.outline='2px solid #a7f3d0';el.style.outlineOffset='2px';
+      setTimeout(function(){el.style.outline='';el.style.outlineOffset='';el.setAttribute('title',old);},1200);
+    });
+  },false);
+})();
+</script>
+JS;
 
 	}
 
