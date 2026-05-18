@@ -895,9 +895,9 @@ echo '<form id="search-filters" class="filter-bar" method="get" action="">';
 
   // Vänstra boxen  tar bara plats den behöver
   echo '<div class="filter-box">';
-    echo '<label class="filter"><input type="checkbox" name="in_stock" value="1"'.($onlyInStock?' checked':'').'><span class="tag">Endast i lager</span></label>';
-    echo '<label class="filter"><input type="checkbox" name="discontinued" value="1"'.($discontinuedOnly?' checked':'').'><span class="tag">Utgångna</span></label>';
-    echo '<label class="filter"><input type="checkbox" name="not_web" value="1"'.($notWeb?' checked':'').'><span class="tag">Ej med</span></label>';
+    echo '<label class="filter"><input type="checkbox" name="in_stock" value="1"'.($onlyInStock?' checked':'').'><span class="tag">Endast i lager (L)</span></label>';
+    echo '<label class="filter"><input type="checkbox" name="discontinued" value="1"'.($discontinuedOnly?' checked':'').'><span class="tag">Utgångna (U)</span></label>';
+    echo '<label class="filter"><input type="checkbox" name="not_web" value="1"'.($notWeb?' checked':'').'><span class="tag">Ej med (E)</span></label>';
   echo '</div>';
 
   // Högra boxen  visas ENDAST för trade-in
@@ -905,7 +905,7 @@ echo '<form id="search-filters" class="filter-bar" method="get" action="">';
     echo '<div class="filter-box">';
       echo '<label class="filter"><input type="checkbox" name="used_web" value="1"'.($usedWeb?' checked':'').'><span class="tag">Ute webb</span></label>';
       echo '<label class="filter"><input type="checkbox" name="used_offweb" value="1"'.($usedOffWeb?' checked':'').'><span class="tag">Ej webb</span></label>';
-      echo '<label class="filter"><input type="checkbox" name="old_tradeins" value="1"'.($oldTradeIns?' checked':'').'><span class="tag">Gamla inbyten</span></label>';
+      echo '<label class="filter"><input type="checkbox" name="old_tradeins" value="1"'.($oldTradeIns?' checked':'').'><span class="tag">Gamla inbyten (I)</span></label>';
     echo '</div>';
   }
 
@@ -1275,7 +1275,15 @@ echo '</tbody></table>';
   if (!f) return;
 
   // När man ändrar ett filter -> hoppa till sida 1 + submit
-  f.addEventListener('change', function(){
+  f.addEventListener('change', function(e){
+    // Utgångna och Gamla inbyten utesluter varandra
+    var cbDisc  = f.querySelector('input[name="discontinued"]');
+    var cbOld   = f.querySelector('input[name="old_tradeins"]');
+    if (cbDisc && cbOld) {
+      if (e.target === cbDisc && cbDisc.checked) cbOld.checked = false;
+      if (e.target === cbOld  && cbOld.checked)  cbDisc.checked = false;
+    }
+
     var page = document.getElementById('pageField');
     if (page) page.value = '1';
     f.submit();
@@ -1295,26 +1303,28 @@ echo '</tbody></table>';
     // inga ctrl/alt/meta-kombos, bara ren bokstav
     if (e.altKey || e.ctrlKey || e.metaKey) return;
 
-    var key = e.key || '';
-    if (key.toLowerCase() === 'i') {
-      var cb = f.querySelector('input[name="old_tradeins"]');
+    var keyMap = {
+      'i': 'old_tradeins',
+      'l': 'in_stock',
+      'u': 'discontinued',
+      'e': 'not_web'
+    };
+    var filterName = keyMap[(e.key || '').toLowerCase()];
+    if (filterName) {
+      var cb = f.querySelector('input[name="' + filterName + '"]');
       if (!cb) return;
 
-      e.preventDefault(); // så inget annat fångar I
+      e.preventDefault();
 
-      // toggla checkboxen
       cb.checked = !cb.checked;
 
-      // trigga change så vår form-logik körs (sida=1 + submit)
       if (typeof Event === 'function') {
-        var evt = new Event('change', { bubbles: true });
-        cb.dispatchEvent(evt);
+        cb.dispatchEvent(new Event('change', { bubbles: true }));
       } else if (document.createEvent) {
         var ev2 = document.createEvent('HTMLEvents');
         ev2.initEvent('change', true, false);
         cb.dispatchEvent(ev2);
       } else {
-        // supergammalt fallback
         cb.fireEvent && cb.fireEvent('onchange');
       }
     }
