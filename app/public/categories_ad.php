@@ -218,7 +218,7 @@ if ($catid && isset($categories[$catid])) {
             <tbody>
             <?php while ($resProd && $prod = pg_fetch_assoc($resProd)): ?>
                 <tr>
-                    <td><a target="_blank" href="https://localhost/search_dispatch.php?mode=product&q=<?= urlencode($prod['artnr']) ?>&open=product&id=<?= (int)$prod['m_product_id'] ?>"><?= htmlspecialchars($prod['artnr'], ENT_QUOTES, 'UTF-8') ?></a></td>
+                    <td><a target="_blank" href="/search_dispatch.php?mode=product&q=<?= urlencode($prod['artnr']) ?>&open=product&id=<?= (int)$prod['m_product_id'] ?>"><?= htmlspecialchars($prod['artnr'], ENT_QUOTES, 'UTF-8') ?></a></td>
                     <td><?= htmlspecialchars($prod['tillverkare'], ENT_QUOTES, 'UTF-8') ?></td>
                     <td><?= htmlspecialchars($prod['beskrivning'], ENT_QUOTES, 'UTF-8') ?></td>
                     <td style="text-align:right;"><?= (int)$prod['lager'] ?></td>
