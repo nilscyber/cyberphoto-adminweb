@@ -1754,12 +1754,14 @@ public static function renderOrderDetailsAD($orderNo)
             col.discount,
             col.line,
             col.datepromised,
-            col.datepromisedprecision
+            col.datepromisedprecision,
+            COALESCE(ct.rate, 0)          AS tax_rate
         FROM c_orderline col
             LEFT JOIN m_product p            ON col.m_product_id = p.m_product_id
             LEFT JOIN m_product_trl pt       ON pt.m_product_id = p.m_product_id
                                              AND pt.ad_language = 'sv_SE'
             LEFT JOIN xc_manufacturer m      ON m.xc_manufacturer_id = p.xc_manufacturer_id
+            LEFT JOIN c_tax ct               ON ct.c_tax_id = col.c_tax_id
         WHERE col.c_order_id = $1
         ORDER BY col.line ASC
     ";
@@ -1783,6 +1785,27 @@ public static function renderOrderDetailsAD($orderNo)
     $pclassLabel = '';
     if (!empty($order['pclass']) || !empty($order['pclass2'])) {
         $pclassLabel = trim($order['pclass'] . ' ' . $order['pclass2']);
+    }
+
+    // Avgör om privatkund via c_bp_group (samma logik som _renderBpGroupBadge)
+    // Gruppnamn som börjar med "privat" (case-insensitive) = privatkund
+    $isPrivateCustomer = false;
+    $billBpId = isset($order['bill_bp_id']) ? (int)$order['bill_bp_id'] : 0;
+    if ($billBpId > 0) {
+        $resGroup = ($pg) ? @pg_query_params($pg,
+            "SELECT COALESCE(g.name, '') AS group_name
+             FROM c_bpartner bp
+             LEFT JOIN c_bp_group g ON g.c_bp_group_id = bp.c_bp_group_id
+             WHERE bp.c_bpartner_id = \$1 LIMIT 1",
+            array($billBpId)) : false;
+        if ($resGroup) {
+            $rowGroup = pg_fetch_assoc($resGroup);
+            pg_free_result($resGroup);
+            if ($rowGroup) {
+                $groupName = trim((string)($rowGroup['group_name'] ?? ''));
+                $isPrivateCustomer = (stripos($groupName, 'privat') === 0);
+            }
+        }
     }
 
     // ----- Orderstatus -----
@@ -1926,6 +1949,18 @@ public static function renderOrderDetailsAD($orderNo)
     .order-action-links{margin-left:10px}
     .order-action-links a{color:#0b57d0;text-decoration:none;font-weight:600;margin-left:10px}
     .order-action-links a:hover{text-decoration:underline}
+    .badge-customer-type{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid transparent;margin-left:6px;vertical-align:middle}
+    .badge-private{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+    .badge-company{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+    .ord-summary{margin-top:10px;padding:10px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px}
+    .ord-summary-top{display:flex;gap:20px;align-items:center;font-size:13px;flex-wrap:wrap}
+    .ost-item{white-space:nowrap}
+    .ost-lbl{color:#6b7280}
+    .ost-val{font-weight:700;color:#111}
+    .ost-sep{color:#d1d5db;font-size:16px;line-height:1}
+    .ord-summary-grand{margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;display:flex;align-items:baseline;gap:10px}
+    .ost-grand-lbl{font-size:13px;font-weight:600;color:#374151;white-space:nowrap}
+    .ost-grand-val{font-size:18px;font-weight:800;color:#111;white-space:nowrap}
     </style>';
 
     $html .= '<div class="dw-wrap">';
@@ -1975,7 +2010,10 @@ public static function renderOrderDetailsAD($orderNo)
     if ($sameAddress) {
         // === SAMMA ADRESS ? EN box ===
         $html .= '<div class="dw-address-card">';
-        $html .= '<div class="dw-address-title">Kunden</div><p>';
+        $custTypeBadge = $isPrivateCustomer
+            ? '<span class="badge-customer-type badge-private">Privat</span>'
+            : '<span class="badge-customer-type badge-company">Företag</span>';
+        $html .= '<div class="dw-address-title">Kunden '.$custTypeBadge.'</div><p>';
         $custName = trim((string)$order['ship_name']); 
         $custBp   = trim((string)$order['ship_bp_value']);
         if ($custBp !== '') {
@@ -2019,7 +2057,10 @@ public static function renderOrderDetailsAD($orderNo)
 
         // Box 2: Faktura till
         $html .= '<div class="dw-address-card">';
-        $html .= '<div class="dw-address-title">Faktura till</div><p>';
+        $custTypeBadge2 = $isPrivateCustomer
+            ? '<span class="badge-customer-type badge-private">Privat</span>'
+            : '<span class="badge-customer-type badge-company">Företag</span>';
+        $html .= '<div class="dw-address-title">Faktura till '.$custTypeBadge2.'</div><p>';
         $billName = trim((string)$order['bill_name']);
         $billBp   = trim((string)$order['bill_bp_value']);
         if ($billBp !== '') {
@@ -2061,6 +2102,7 @@ public static function renderOrderDetailsAD($orderNo)
     if (!$lines) {
         $html .= '<p>Inga orderrader hittades.</p>';
     } else {
+        $colCount = 7;
         $html .= '<table class="dw-table dw-table-compact dw-table-orderlines">';
         $html .= '<thead><tr>';
         $html .= '<th>Artnr</th>';
@@ -2068,7 +2110,8 @@ public static function renderOrderDetailsAD($orderNo)
         $html .= '<th class="text-center">Best</th>';
         $html .= '<th class="text-center">Lev</th>';
         $html .= '<th class="text-center">Fakt</th>';
-        $html .= '<th class="text-right">Netto</th>';
+        $html .= '<th class="text-right">Exkl.</th>';
+        $html .= '<th class="text-right">Inkl.</th>';
         $html .= '</tr></thead>';
 
 		foreach ($lines as $line) {
@@ -2137,7 +2180,11 @@ public static function renderOrderDetailsAD($orderNo)
 				  . $qtyAllocated . '</span>';
 			}
 
-			$net = number_format((float)$line['linenetamt'], 1, ',', ' ');
+			$netAmt  = (float)$line['linenetamt'];
+			$taxRate = isset($line['tax_rate']) ? (float)$line['tax_rate'] : 0;
+			$netInclVat = $netAmt * (1 + $taxRate / 100);
+			$net     = number_format($netAmt, 2, ',', ' ');
+			$netIncl = number_format($netInclVat, 2, ',', ' ');
 			$rawDisc = ($line['discount'] !== '' && $line['discount'] !== null)
 				? (float)$line['discount'] : 0.0;
 
@@ -2158,6 +2205,7 @@ public static function renderOrderDetailsAD($orderNo)
 			$html .= '<td class="text-center">'.$qtyDelivered.'</td>';
 			$html .= '<td class="text-center">'.$qtyInvoiced.'</td>';
 			$html .= '<td class="text-right">'.$net.'</td>';
+			$html .= '<td class="text-right">'.$netIncl.'</td>';
 			$html .= '</tr>';
 
 			// === Bevaka/Rapportera-länkar ===
@@ -2193,7 +2241,7 @@ public static function renderOrderDetailsAD($orderNo)
 			}
 
 			// === Rad 2 (detaljer + länkar) ===
-			$html .= '<tr class="'.$clsSub.'"><td colspan="6">';
+			$html .= '<tr class="'.$clsSub.'"><td colspan="'.$colCount.'">';
 			$parts = array(
 				'Reserverat: '.$qtyReserved,
 				'Allokerat: '.$allocDisplay,
@@ -2238,13 +2286,13 @@ public static function renderOrderDetailsAD($orderNo)
 				}
 
 				if ($txt !== '') {
-					$html .= '<tr class="ol-promised"><td colspan="6">'
+					$html .= '<tr class="ol-promised"><td colspan="'.$colCount.'">'
 						   . '<span class="promised-pill">'.$eh($txt).'</span>'
 						   . '</td></tr>';
 				}
 			}
 
-			$html .= '<tr class="ol-sep"><td colspan="6"></td></tr>';
+			$html .= '<tr class="ol-sep"><td colspan="'.$colCount.'"></td></tr>';
 		}
 
         $html .= '</table>';
@@ -2252,12 +2300,29 @@ public static function renderOrderDetailsAD($orderNo)
 
     $html .= '</div>';
 
-    // Total
-    $html .= '<div class="dw-section dw-section-compact">';
-    $html .= '<div class="dw-row">';
-    $html .= '<span class="dw-label"><strong>Totalt ex moms:</strong></span> ';
-    $html .= '<span class="dw-value"><strong>' . $totalNet . ' SEK</strong></span>';
-    $html .= '</div>';
+    // Total – beräkna moms från orderrader
+    $totalExVat = (float)$order['totallines'];
+    $totalTaxCalc = 0.0;
+    foreach ($lines as $ln) {
+        $lnNet  = (float)$ln['linenetamt'];
+        $lnRate = isset($ln['tax_rate']) ? (float)$ln['tax_rate'] : 0;
+        $totalTaxCalc += $lnNet * ($lnRate / 100);
+    }
+    $totalInclVat = $totalExVat + $totalTaxCalc;
+    $fmtTotal = function($v) {
+        return number_format($v, 2, ',', ' ');
+    };
+
+    $html .= '<div class="ord-summary">';
+    $html .= '  <div class="ord-summary-top">';
+    $html .= '    <span class="ost-item"><span class="ost-lbl">Totalt ex. moms:</span> <strong class="ost-val">' . $fmtTotal($totalExVat) . ' kr</strong></span>';
+    $html .= '    <span class="ost-sep">&middot;</span>';
+    $html .= '    <span class="ost-item"><span class="ost-lbl">Varav moms:</span> <strong class="ost-val">' . $fmtTotal($totalTaxCalc) . ' kr</strong></span>';
+    $html .= '  </div>';
+    $html .= '  <div class="ord-summary-grand">';
+    $html .= '    <span class="ost-grand-lbl">Totalt inkl. moms:</span>';
+    $html .= '    <strong class="ost-grand-val">' . $fmtTotal($totalInclVat) . ' kr</strong>';
+    $html .= '  </div>';
     $html .= '</div>';
 
     // Interna kommentarer
