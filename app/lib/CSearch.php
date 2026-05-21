@@ -1755,7 +1755,8 @@ public static function renderOrderDetailsAD($orderNo)
             col.line,
             col.datepromised,
             col.datepromisedprecision,
-            COALESCE(ct.rate, 0)          AS tax_rate
+            COALESCE(ct.rate, 0)          AS tax_rate,
+            COALESCE(p.istradein, 'N')    AS istradein
         FROM c_orderline col
             LEFT JOIN m_product p            ON col.m_product_id = p.m_product_id
             LEFT JOIN m_product_trl pt       ON pt.m_product_id = p.m_product_id
@@ -1773,6 +1774,42 @@ public static function renderOrderDetailsAD($orderNo)
             $lines[] = $row;
         }
         pg_free_result($resLines);
+    }
+
+    // === Slå ihop begagnat-par: produktrad (istradein+packey) + efterföljande marginalrad (tom artikel+packey) ===
+    $renderLines = array();
+    $i = 0;
+    while ($i < count($lines)) {
+        $ln = $lines[$i];
+        $lnArticle   = trim((string)$ln['product_value']);
+        $lnTradeIn   = (strtoupper(trim((string)($ln['istradein'] ?? 'N'))) === 'Y');
+        $lnHasPacKey = !empty($ln['packey']);
+
+        if ($lnArticle !== '' && $lnTradeIn && $lnHasPacKey && isset($lines[$i + 1])) {
+            $next           = $lines[$i + 1];
+            $nextArticle    = trim((string)$next['product_value']);
+            $nextHasPacKey  = !empty($next['packey']);
+
+            if ($nextArticle === '' && $nextHasPacKey) {
+                // Slå ihop: summa linenetamt, respektive inkl.-pris per del
+                $net1  = (float)$ln['linenetamt'];
+                $net2  = (float)$next['linenetamt'];
+                $rate1 = isset($ln['tax_rate'])   ? (float)$ln['tax_rate']   : 0;
+                $rate2 = isset($next['tax_rate'])  ? (float)$next['tax_rate'] : 0;
+
+                $merged = $ln;
+                $merged['_merged']       = true;
+                $merged['linenetamt']    = $net1 + $net2;          // Exkl. totalt
+                $merged['_incl_merged']  = ($net1 * (1 + $rate1 / 100))
+                                         + ($net2 * (1 + $rate2 / 100)); // Inkl. totalt
+                $renderLines[] = $merged;
+                $i += 2;
+                continue;
+            }
+        }
+
+        $renderLines[] = $ln;
+        $i++;
     }
 
     $created = $order['created'];
@@ -2114,7 +2151,7 @@ public static function renderOrderDetailsAD($orderNo)
         $html .= '<th class="text-right">Inkl.</th>';
         $html .= '</tr></thead>';
 
-		foreach ($lines as $line) {
+		foreach ($renderLines as $line) {
 			$qtyOrdered   = (float)$line['qtyordered'];
 			$qtyReserved  = (float)$line['qtyreserved'];
 			$qtyAllocated = (float)$line['qtyallocated'];
@@ -2182,7 +2219,10 @@ public static function renderOrderDetailsAD($orderNo)
 
 			$netAmt  = (float)$line['linenetamt'];
 			$taxRate = isset($line['tax_rate']) ? (float)$line['tax_rate'] : 0;
-			$netInclVat = $netAmt * (1 + $taxRate / 100);
+			// Sammanslagen begagnat-rad har förberäknat inkl.-belopp, annars räkna normalt
+			$netInclVat = !empty($line['_merged'])
+				? (float)$line['_incl_merged']
+				: $netAmt * (1 + $taxRate / 100);
 			$net     = number_format($netAmt, 2, ',', ' ');
 			$netIncl = number_format($netInclVat, 2, ',', ' ');
 			$rawDisc = ($line['discount'] !== '' && $line['discount'] !== null)
