@@ -1797,11 +1797,14 @@ public static function renderOrderDetailsAD($orderNo)
                 $rate1 = isset($ln['tax_rate'])   ? (float)$ln['tax_rate']   : 0;
                 $rate2 = isset($next['tax_rate'])  ? (float)$next['tax_rate'] : 0;
 
+                // Konsumentpris = inköpspris (net1, 0% moms) + marginal inkl. moms (net2 * (1+rate2))
+                // Båda kolumnerna (Exkl. och Inkl.) visar detta konsumentpris
+                $consumerPrice = $net1 + ($net2 * (1 + $rate2 / 100));
+
                 $merged = $ln;
                 $merged['_merged']       = true;
-                $merged['linenetamt']    = $net1 + $net2;          // Exkl. totalt
-                $merged['_incl_merged']  = ($net1 * (1 + $rate1 / 100))
-                                         + ($net2 * (1 + $rate2 / 100)); // Inkl. totalt
+                $merged['linenetamt']    = $consumerPrice; // Exkl.-kolumn = konsumentpris
+                $merged['_incl_merged']  = $consumerPrice; // Inkl.-kolumn = samma
                 $renderLines[] = $merged;
                 $i += 2;
                 continue;
