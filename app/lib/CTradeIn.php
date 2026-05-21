@@ -1488,6 +1488,158 @@ Class CTradeIn {
 			
 	}
 
+	function bookedNotShippedV2() {
+
+		$pg = Db::getConnectionAD();
+		if (!$pg) return;
+
+		$sql = "
+			SELECT
+				col.created,
+				o.documentno,
+				p.value        AS artnr,
+				p.m_product_id,
+				t.name         AS tillverkare,
+				p.name         AS beskrivning,
+				col.c_tax_id,
+				-- Utpris inkl moms (från prislistan)
+				COALESCE(pp.pricestd, pp.pricelist, 0)
+				    * (1 + COALESCE(ct.rate, 0) / 100)  AS utpris_inkl,
+				-- Orderpris inkl moms: vid packey (privatperson) = inköpspris + marginal inkl moms
+				CASE
+				    WHEN col.packey IS NOT NULL THEN
+				        col.priceentered + COALESCE((
+				            SELECT comp.priceentered * (1 + COALESCE(ct2.rate, 0) / 100)
+				            FROM c_orderline comp
+				            LEFT JOIN c_tax ct2 ON ct2.c_tax_id = comp.c_tax_id
+				            WHERE comp.c_order_id    = col.c_order_id
+				              AND comp.m_product_id IS NULL
+				              AND comp.packey       IS NOT NULL
+				              AND comp.line          > col.line
+				            ORDER BY comp.line ASC
+				            LIMIT 1
+				        ), 0)
+				    ELSE
+				        col.priceentered * (1 + COALESCE(ct.rate, 0) / 100)
+				END AS orderpris_inkl
+			FROM c_orderline col
+			JOIN c_order o       ON o.c_order_id       = col.c_order_id
+			JOIN m_product p     ON col.m_product_id   = p.m_product_id
+			JOIN m_product_po po ON p.m_product_id     = po.m_product_id
+			JOIN xc_manufacturer t ON t.xc_manufacturer_id = p.xc_manufacturer_id
+			JOIN c_bpartner bp   ON bp.c_bpartner_id   = po.c_bpartner_id
+			JOIN m_locator mloc  ON mloc.m_locator_id  = p.m_locator_id
+			LEFT JOIN c_tax ct   ON ct.c_tax_id        = col.c_tax_id
+			LEFT JOIN m_productprice pp
+				ON  pp.m_product_id          = p.m_product_id
+				AND pp.m_pricelist_version_id = 1000000
+			WHERE o.docstatus IN ('CO','IP')
+			  AND o.deliveryViaRule IN ('S','P')
+			  AND o.isSOTrx   = 'Y'
+			  AND o.isActive  = 'Y'
+			  AND o.AD_Client_ID = 1000000
+			  AND bp.value    = '5555'
+			  AND col.qtyordered = col.qtyallocated
+			  AND col.qtydelivered = 0
+			  AND col.qtyordered  > 0
+			  AND mloc.m_locator_id NOT IN (1004179)
+			  AND o.bill_bpartner_id NOT IN (1013455, 1013492)
+			ORDER BY col.created DESC
+		";
+
+		$res = @pg_query($pg, $sql);
+		if (!$res || pg_num_rows($res) === 0) {
+			echo '<p style="color:#6b7280;font-style:italic;margin:12px 0">Väntar på att första produkten skall bokas.</p>';
+			return;
+		}
+
+		$rows = array();
+		while ($r = pg_fetch_assoc($res)) $rows[] = $r;
+		pg_free_result($res);
+
+		$fmtPrice = function($v) {
+			return number_format((float)$v, 0, ',', ' ') . ' kr';
+		};
+		$h = function($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); };
+
+		// Ljudsignal om senaste raden är < 30 sek gammal
+		if (!empty($rows)) {
+			$age = time() - strtotime($rows[0]['created']);
+			if ($age < 30) {
+				echo '<audio autoplay><source src="pump_shotgun.mp3" type="audio/mpeg"></audio>';
+			}
+		}
+
+		echo '
+		<style>
+		.bns-wrap{margin:16px 0}
+		.bns-heading{font-size:15px;font-weight:700;margin-bottom:8px;color:#111}
+		.bns-count{font-size:13px;color:#6b7280;margin-top:6px}
+		.bns-table{width:100%;border-collapse:collapse;font-size:13px}
+		.bns-table thead th{background:#d1f2f0;color:#111;font-weight:700;padding:7px 10px;text-align:left;border-bottom:2px solid #a5f3f0;white-space:nowrap}
+		.bns-table thead th.num{text-align:right}
+		.bns-table tbody tr:nth-child(even){background:#fafafa}
+		.bns-table tbody tr:hover{background:#f0fdf4}
+		.bns-table tbody td{padding:7px 10px;border-bottom:1px solid #e5e7eb;vertical-align:middle}
+		.bns-table tbody td.num{text-align:right;white-space:nowrap;font-weight:700}
+		.bns-table tbody td.muted{color:#9ca3af;font-size:12px}
+		.bns-diff-low{color:#991b1b;font-weight:800}
+		.bns-diff-ok{color:#065f46}
+		.bns-vmb{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:700;background:#fef3c7;border:1px solid #fde68a;color:#92400e;white-space:nowrap}
+		.bns-link{color:#0b57d0;text-decoration:none;font-weight:600}
+		.bns-link:hover{text-decoration:underline}
+		.bns-art{font-family:monospace;font-size:12px;color:#374151}
+		</style>';
+
+		echo '<div class="bns-wrap">';
+		echo '<div class="bns-heading">Uppbokade &ndash; ej skickade</div>';
+		echo '<table class="bns-table">';
+		echo '<thead><tr>';
+		echo '<th>Datum</th>';
+		echo '<th>Order</th>';
+		echo '<th>Artnr</th>';
+		echo '<th>Produkt</th>';
+		echo '<th class="num">Utpris</th>';
+		echo '<th class="num">Orderpris</th>';
+		echo '</tr></thead>';
+		echo '<tbody>';
+
+		foreach ($rows as $r) {
+			$datum    = $h(date('Y-m-d H:i', strtotime($r['created'])));
+			$docno    = $h($r['documentno']);
+			$artnr    = $h($r['artnr']);
+			$produkt  = trim($r['tillverkare'] . ' ' . $r['beskrivning']);
+			if (strlen($produkt) > 55) $produkt = substr($produkt, 0, 55) . '…';
+			$produkt  = $h($produkt);
+
+			$utpris    = (float)$r['utpris_inkl'];
+			$orderpris = (float)$r['orderpris_inkl'];
+			$isVmb     = ($r['c_tax_id'] == 1000000);
+
+			// Orderpris lägre än utpris → markera
+			$orderClass = ($orderpris < $utpris && $utpris > 0) ? 'num bns-diff-low' : 'num bns-diff-ok';
+
+			$orderUrl   = '/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($r['documentno']);
+			$produktUrl = '/search_dispatch.php?mode=product&q=' . rawurlencode($r['artnr'])
+			            . '&open=product&id=' . (int)$r['m_product_id'];
+
+			echo '<tr>';
+			echo '<td class="muted">'.$datum.'</td>';
+			echo '<td><a href="'.$h($orderUrl).'" target="_blank" rel="noopener" class="bns-link">'.$docno.'</a></td>';
+			echo '<td class="bns-art">'.$artnr.'</td>';
+			echo '<td><a href="'.$h($produktUrl).'" target="_blank" rel="noopener" class="bns-link">'.$produkt.'</a>';
+			if ($isVmb) echo ' <span class="bns-vmb">VMB</span>';
+			echo '</td>';
+			echo '<td class="num">'.($utpris > 0 ? $fmtPrice($utpris) : '<span style="color:#9ca3af">–</span>').'</td>';
+			echo '<td class="'.$orderClass.'">'.$fmtPrice($orderpris).'</td>';
+			echo '</tr>';
+		}
+
+		echo '</tbody></table>';
+		echo '<div class="bns-count">'.count($rows).' st</div>';
+		echo '</div>';
+	}
+
 	function findMissing5555() {
 		global $dagensdatum;
 		
