@@ -603,6 +603,109 @@ if ($type === 'customer') {
         }
     }
 
+    // ===== Försäljningshistorik för begagnat/fyndvara (PostgreSQL) =====
+    $salesHistory    = array();
+    $isUsedProd      = isset($isUsedProd) ? $isUsedProd : false;
+    $showSalesHistory = ($isUsedProd || (!empty($flags['is_deal']) && $flags['is_deal']));
+
+    if ($showSalesHistory && $conn) {
+        $sqlSales = "
+            SELECT
+                o.c_order_id,
+                o.documentno,
+                o.dateordered,
+                col.line,
+                col.m_product_id   AS line_product_id,
+                col.linenetamt,
+                col.packey,
+                COALESCE(ct.rate, 0) AS tax_rate
+            FROM c_order o
+            JOIN c_orderline col ON col.c_order_id = o.c_order_id
+            LEFT JOIN c_tax ct   ON ct.c_tax_id = col.c_tax_id
+            WHERE o.issotrx = 'Y'
+              AND o.docstatus NOT IN ('VO', 'RE')
+              AND o.c_order_id IN (
+                  SELECT DISTINCT sub.c_order_id
+                  FROM c_orderline sub
+                  WHERE sub.m_product_id = \$1
+                    AND sub.qtyordered   > 0
+                    AND sub.qtydelivered >= sub.qtyordered
+              )
+              AND (
+                  col.m_product_id = \$1
+                  OR (col.m_product_id IS NULL AND col.packey IS NOT NULL)
+              )
+            ORDER BY o.dateordered DESC, o.c_order_id DESC, col.line ASC
+        ";
+
+        $rsSales = @pg_query_params($conn, $sqlSales, array($pid));
+        if ($rsSales) {
+            // Gruppera rader per order
+            $salesRaw = array();
+            while ($sr = pg_fetch_assoc($rsSales)) {
+                $oid = (int)$sr['c_order_id'];
+                if (!isset($salesRaw[$oid])) {
+                    $salesRaw[$oid] = array(
+                        'documentno'  => $sr['documentno'],
+                        'dateordered' => $sr['dateordered'],
+                        'lines'       => array(),
+                    );
+                }
+                $salesRaw[$oid]['lines'][] = $sr;
+            }
+            pg_free_result($rsSales);
+
+            // Beräkna pris per order (med packey-merge för istradein)
+            foreach ($salesRaw as $saleOrder) {
+                $productLines   = array();
+                $companionLines = array();
+                foreach ($saleOrder['lines'] as $sl) {
+                    if ($sl['line_product_id'] !== null && $sl['line_product_id'] !== '') {
+                        $productLines[] = $sl;
+                    } else {
+                        $companionLines[] = $sl;
+                    }
+                }
+
+                foreach ($productLines as $pl) {
+                    $net1    = (float)$pl['linenetamt'];
+                    $rate1   = (float)$pl['tax_rate'];
+                    $hasPack = !empty($pl['packey']);
+
+                    if ($isUsedProd && $hasPack && !empty($companionLines)) {
+                        // Hitta närmaste marginalrad med högre line-nummer
+                        $companion = null;
+                        foreach ($companionLines as $cl) {
+                            if ((int)$cl['line'] > (int)$pl['line']) {
+                                if ($companion === null || (int)$cl['line'] < (int)$companion['line']) {
+                                    $companion = $cl;
+                                }
+                            }
+                        }
+                        if ($companion !== null) {
+                            $net2  = (float)$companion['linenetamt'];
+                            $rate2 = (float)$companion['tax_rate'];
+                            // Konsumentpris = inköpspris + marginal inkl moms
+                            $salesHistory[] = array(
+                                'date'  => substr($saleOrder['dateordered'], 0, 10),
+                                'docno' => $saleOrder['documentno'],
+                                'price' => $net1 + ($net2 * (1 + $rate2 / 100)),
+                            );
+                            continue;
+                        }
+                    }
+
+                    // Normal rad (fyndvara eller begagnat från företag)
+                    $salesHistory[] = array(
+                        'date'  => substr($saleOrder['dateordered'], 0, 10),
+                        'docno' => $saleOrder['documentno'],
+                        'price' => $net1 * (1 + $rate1 / 100),
+                    );
+                }
+            }
+        }
+    }
+
     // ===== Kort: PRISER =====
     $tbClass = ($tb < 0) ? 'dw-val bad' : 'dw-val good';
     $tgClass = ($tg < 0) ? 'dw-val bad' : 'dw-val good';
@@ -660,6 +763,33 @@ if ($type === 'customer') {
 
     echo '</div>';
 
+
+	/* ===== Kort: FÖRSÄLJNINGSHISTORIK (begagnat/fyndvara) ===== */
+	if ($showSalesHistory) {
+		echo '<div class="dw-card" style="margin-top:10px">';
+		echo '<h3>Försäljningshistorik</h3>';
+
+		if (!empty($salesHistory)) {
+			echo '<table class="dw-table" style="font-size:13px">';
+			echo '<thead><tr><th>Datum</th><th>Order</th><th class="text-right">Pris</th></tr></thead>';
+			echo '<tbody>';
+			foreach ($salesHistory as $sh) {
+				$docno    = $h($sh['docno']);
+				$orderUrl = '/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($sh['docno']);
+				$priceFmt = number_format((float)$sh['price'], 2, ',', ' ') . ' kr';
+				echo '<tr>';
+				echo '<td style="white-space:nowrap">' . $h($sh['date']) . '</td>';
+				echo '<td><a href="' . $h($orderUrl) . '" target="_blank" rel="noopener">' . $docno . '</a></td>';
+				echo '<td class="text-right" style="white-space:nowrap"><strong>' . $h($priceFmt) . '</strong></td>';
+				echo '</tr>';
+			}
+			echo '</tbody></table>';
+		} else {
+			echo '<div class="dw-muted" style="font-size:13px">Inga försäljningar registrerade.</div>';
+		}
+
+		echo '</div>';
+	}
 
 	/* ===== Kort: LAGER (Kö visas alltid) ===== */
 	$availableRaw = isset($row['available_qty']) ? (int)$row['available_qty'] : 0;
