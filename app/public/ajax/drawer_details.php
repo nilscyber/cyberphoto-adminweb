@@ -765,29 +765,23 @@ if ($type === 'customer') {
 
 
 	/* ===== Kort: FÖRSÄLJNINGSHISTORIK (begagnat/fyndvara) ===== */
-	if ($showSalesHistory) {
+	if ($showSalesHistory && !empty($salesHistory)) {
 		echo '<div class="dw-card" style="margin-top:10px">';
 		echo '<h3>Försäljningshistorik</h3>';
-
-		if (!empty($salesHistory)) {
-			echo '<table class="dw-table" style="font-size:13px">';
-			echo '<thead><tr><th>Datum</th><th>Order</th><th class="text-right">Pris</th></tr></thead>';
-			echo '<tbody>';
-			foreach ($salesHistory as $sh) {
-				$docno    = $h($sh['docno']);
-				$orderUrl = '/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($sh['docno']);
-				$priceFmt = number_format((float)$sh['price'], 2, ',', ' ') . ' kr';
-				echo '<tr>';
-				echo '<td style="white-space:nowrap">' . $h($sh['date']) . '</td>';
-				echo '<td><a href="' . $h($orderUrl) . '" target="_blank" rel="noopener">' . $docno . '</a></td>';
-				echo '<td class="text-right" style="white-space:nowrap"><strong>' . $h($priceFmt) . '</strong></td>';
-				echo '</tr>';
-			}
-			echo '</tbody></table>';
-		} else {
-			echo '<div class="dw-muted" style="font-size:13px">Inga försäljningar registrerade.</div>';
+		echo '<table class="dw-table" style="font-size:13px">';
+		echo '<thead><tr><th>Datum</th><th>Order</th><th class="text-right">Pris</th></tr></thead>';
+		echo '<tbody>';
+		foreach ($salesHistory as $sh) {
+			$docno    = $h($sh['docno']);
+			$orderUrl = '/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($sh['docno']);
+			$priceFmt = number_format((float)$sh['price'], 2, ',', ' ') . ' kr';
+			echo '<tr>';
+			echo '<td style="white-space:nowrap">' . $h($sh['date']) . '</td>';
+			echo '<td><a href="' . $h($orderUrl) . '" target="_blank" rel="noopener">' . $docno . '</a></td>';
+			echo '<td class="text-right" style="white-space:nowrap"><strong>' . $h($priceFmt) . '</strong></td>';
+			echo '</tr>';
 		}
-
+		echo '</tbody></table>';
 		echo '</div>';
 	}
 
