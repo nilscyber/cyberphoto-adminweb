@@ -2,7 +2,8 @@
 	include_once("top.php");
 	include_once("header.php");
 
-	$tradein->lastSoldTradeIn(true);
+	$tradein->lastSoldTradeInV2();
+	// $tradein->lastSoldTradeIn(true); // gammal version
 
 	include_once("footer.php");
 ?>
