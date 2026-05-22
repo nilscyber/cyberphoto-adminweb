@@ -1736,6 +1736,14 @@ public static function renderOrderDetailsAD($orderNo)
         $salesrep = (string)$order['salesrep_value'];
     }
 
+    // Bestäm tidigt så att lines-queryn kan anpassas
+    $isQuote = (
+        isset($order['issotrx']) &&
+        strtoupper(trim((string)$order['issotrx'])) === 'Y' &&
+        isset($order['c_doctypetarget_id']) &&
+        in_array((int)$order['c_doctypetarget_id'], array(1000027, 1000026), true)
+    );
+
     // ----- Hämta orderrader -----
     $sqlLines = "
         SELECT 
@@ -1774,6 +1782,29 @@ public static function renderOrderDetailsAD($orderNo)
             $lines[] = $row;
         }
         pg_free_result($resLines);
+    }
+
+    // ----- Lagersaldo — bara för offert, en batchfråga för alla produkter -----
+    $stockByPid = array();
+    if ($isQuote && !empty($lines)) {
+        $pids = array();
+        foreach ($lines as $ln) {
+            $pid = (int)$ln['m_product_id'];
+            if ($pid > 0) $pids[$pid] = true;
+        }
+        if (!empty($pids)) {
+            $pidList = implode(',', array_keys($pids));
+            $sqlStock = "SELECT m_product_id, COALESCE(qtyavailable, 0) AS qtyavailable
+                           FROM m_product_stock_summary_v
+                          WHERE m_warehouse_id = 1000000
+                            AND m_product_id IN ($pidList)";
+            if ($rsStock = ($pg) ? @pg_query($pg, $sqlStock) : false) {
+                while ($rsStock && $rs = pg_fetch_assoc($rsStock)) {
+                    $stockByPid[(int)$rs['m_product_id']] = (int)$rs['qtyavailable'];
+                }
+                pg_free_result($rsStock);
+            }
+        }
     }
 
     // === Slå ihop begagnat-par: produktrad (istradein+packey) + efterföljande marginalrad (tom artikel+packey) ===
@@ -1895,7 +1926,7 @@ public static function renderOrderDetailsAD($orderNo)
     $offerBadge = '';
     $issotrx = isset($order['issotrx']) ? strtoupper(trim((string)$order['issotrx'])) : '';
     $dt      = isset($order['c_doctypetarget_id']) ? (int)$order['c_doctypetarget_id'] : 0;
-	$isQuote = ($issotrx === 'Y' && ($dt === 1000027 || $dt === 1000026));
+    // $isQuote redan satt direkt efter att $order hämtades
 
     if ($issotrx === 'Y') {
         if ($dt === 1000027) {
@@ -1978,8 +2009,9 @@ public static function renderOrderDetailsAD($orderNo)
     .discount-badge{display:inline-block;padding:0 4px;border-radius:999px;background:#f97316;color:#ffffff;font-weight:bold}
     .ord-web-link{display:inline-block;margin-right:4px}
     .ord-web-link svg{vertical-align:middle}
-    .badge--quote{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .badge--quote{background:#f97316;border:1px solid #ea580c;color:#fff;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
     .badge--quote-res{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    /* badge-stock ok/bad ärvs från admin_badges.css (laddas via header.php) */
     .dw-table-orderlines tr.ol-promised td{padding-top:6px;padding-bottom:6px;background:#ffffff}
     .promised-pill{display:inline-block;padding:3px 10px;border-radius:999px;border:1px solid #1d4ed8;background:#eff6ff;color:#1d4ed8;font-weight:700;font-size:12px}
     .dw-table-orderlines td.text-right{white-space: nowrap}
@@ -2142,14 +2174,18 @@ public static function renderOrderDetailsAD($orderNo)
     if (!$lines) {
         $html .= '<p>Inga orderrader hittades.</p>';
     } else {
-        $colCount = 7;
+        $colCount = $isQuote ? 6 : 7;
         $html .= '<table class="dw-table dw-table-compact dw-table-orderlines">';
         $html .= '<thead><tr>';
         $html .= '<th>Artnr</th>';
         $html .= '<th>Benämning</th>';
         $html .= '<th class="text-center">Best</th>';
-        $html .= '<th class="text-center">Lev</th>';
-        $html .= '<th class="text-center">Fakt</th>';
+        if ($isQuote) {
+            $html .= '<th class="text-center">I lager</th>';
+        } else {
+            $html .= '<th class="text-center">Lev</th>';
+            $html .= '<th class="text-center">Fakt</th>';
+        }
         $html .= '<th class="text-right">Exkl.</th>';
         $html .= '<th class="text-right">Inkl.</th>';
         $html .= '</tr></thead>';
@@ -2245,8 +2281,14 @@ public static function renderOrderDetailsAD($orderNo)
 			$html .= '<td><span class="copy-chip" data-copy="'.$eh($article).'">'.$eh($article).'</span></td>';
 			$html .= '<td>'.$productLabel.'</td>';
 			$html .= '<td class="text-center">'.$qtyOrdered.'</td>';
-			$html .= '<td class="text-center">'.$qtyDelivered.'</td>';
-			$html .= '<td class="text-center">'.$qtyInvoiced.'</td>';
+			if ($isQuote) {
+				$stockAvail = isset($stockByPid[$pid]) ? $stockByPid[$pid] : 0;
+				$stockCls   = $stockAvail > 0 ? 'badge-stock ok' : 'badge-stock bad';
+				$html .= '<td class="text-center"><span class="'.$stockCls.'">'.$stockAvail.'</span></td>';
+			} else {
+				$html .= '<td class="text-center">'.$qtyDelivered.'</td>';
+				$html .= '<td class="text-center">'.$qtyInvoiced.'</td>';
+			}
 			$html .= '<td class="text-right">'.$net.'</td>';
 			$html .= '<td class="text-right">'.$netIncl.'</td>';
 			$html .= '</tr>';
@@ -2285,12 +2327,17 @@ public static function renderOrderDetailsAD($orderNo)
 
 			// === Rad 2 (detaljer + länkar) ===
 			$html .= '<tr class="'.$clsSub.'"><td colspan="'.$colCount.'">';
-			$parts = array(
-				'Reserverat: '.$qtyReserved,
-				'Allokerat: '.$allocDisplay,
-				'Paket: '.$eh($isPkg),
-				'Rabatt: '.$disc
-			);
+			$parts = $isQuote
+				? array(
+					'Paket: '.$eh($isPkg),
+					'Rabatt: '.$disc
+				  )
+				: array(
+					'Reserverat: '.$qtyReserved,
+					'Allokerat: '.$allocDisplay,
+					'Paket: '.$eh($isPkg),
+					'Rabatt: '.$disc
+				  );
 			if ($note !== '') $parts[] = 'Notering: '.$eh($note);
 			$html .= implode(' &middot; ', $parts);
 
