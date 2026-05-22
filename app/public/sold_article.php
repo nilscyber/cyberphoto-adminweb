@@ -165,10 +165,34 @@ if ($showBundle && $artikelNr !== '') {
             ol.description              AS notering,
             ol.qtyordered               AS bestallt,
             ol.qtydelivered             AS skickat,
-            o.docstatus                 AS orderstatus
+            o.docstatus                 AS orderstatus,
+            ol.priceentered,
+            ol.pricelimit,
+            ol.packey,
+            ol.line,
+            ol.c_tax_id,
+            COALESCE(ct.rate, 0)        AS tax_rate,
+            -- Orderpris inkl moms: vid packey = inköpspris + marginal inkl moms
+            CASE
+                WHEN ol.packey IS NOT NULL THEN
+                    ol.priceentered + COALESCE((
+                        SELECT comp.priceentered * (1 + COALESCE(ct2.rate, 0) / 100)
+                        FROM c_orderline comp
+                        LEFT JOIN c_tax ct2 ON ct2.c_tax_id = comp.c_tax_id
+                        WHERE comp.c_order_id   = ol.c_order_id
+                          AND comp.m_product_id IS NULL
+                          AND comp.packey       IS NOT NULL
+                          AND comp.line          > ol.line
+                        ORDER BY comp.line ASC
+                        LIMIT 1
+                    ), 0)
+                ELSE
+                    ol.priceentered * (1 + COALESCE(ct.rate, 0) / 100)
+            END AS orderpris_inkl
         FROM c_orderline ol
         INNER JOIN c_order    o  ON o.c_order_id     = ol.c_order_id
         INNER JOIN c_bpartner bp ON bp.c_bpartner_id = o.c_bpartner_id
+        LEFT  JOIN c_tax      ct ON ct.c_tax_id      = ol.c_tax_id
         WHERE ol.m_product_id = $1
           AND o.issotrx = 'Y'
           AND o.docstatus NOT IN ('VO','RE')
@@ -178,6 +202,8 @@ if ($showBundle && $artikelNr !== '') {
         LIMIT " . (int)$limit . " OFFSET " . (int)$offset . "
     ";
     $rsD = ($pg) ? @pg_query_params($pg, $sqlData, array($product_id)) : false;
+
+    $fmtPrice = fn($v) => number_format((float)$v, 0, ',', ' ') . ' kr';
 
     $rowsHtml = '';
     if ($rsD) {
@@ -191,6 +217,22 @@ if ($showBundle && $artikelNr !== '') {
             $skickat  = (int)$r['skickat'];
             $status   = $statusText($r['orderstatus']);
 
+            // Priskalkyl (ex. moms)
+            $orderpris  = (float)$r['orderpris_inkl'];
+            $taxRate    = (float)$r['tax_rate'];
+            $inkopspris = !empty($r['packey'])
+                ? (float)$r['priceentered']
+                : (float)$r['pricelimit'];
+            $orderpris_ex = ($taxRate > 0) ? ($orderpris / (1 + $taxRate / 100)) : $orderpris;
+
+            $tb = $orderpris_ex - $inkopspris;
+            $tg = ($orderpris_ex > 0) ? ($tb / $orderpris_ex * 100) : 0;
+
+            $tbFmt   = ($tb >= 0 ? '' : '&minus;') . $fmtPrice(abs($tb));
+            $tbClass = ($tb < 0) ? 'sa-diff-low' : 'sa-diff-ok';
+            $tgFmt   = ($tg >= 0 ? '' : '&minus;') . number_format(abs($tg), 1, ',', ' ') . '&nbsp;%';
+            $tgClass = ($tg < 0) ? 'sa-diff-low' : 'sa-diff-ok';
+
             $ordLink  = '<a href="/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($ordNr) . '" target="_blank" rel="noopener">' . $h($ordNr) . '</a>';
             $kundLink = '<a href="/customer_orders.php?bp_id=' . $kundId . '" target="_blank" rel="noopener">' . $h($kundNamn) . '</a>';
 
@@ -202,6 +244,9 @@ if ($showBundle && $artikelNr !== '') {
                       .  '<td class="text-center">'.$bestallt.'</td>'
                       .  '<td class="text-center">'.$skickat.'</td>'
                       .  '<td>'.$status.'</td>'
+                      .  '<td class="text-right">'.$fmtPrice($orderpris).'</td>'
+                      .  '<td class="text-right '.$tbClass.'">'.$tbFmt.'</td>'
+                      .  '<td class="text-right '.$tgClass.'">'.$tgFmt.'</td>'
                       .  '</tr>';
         }
         pg_free_result($rsD);
@@ -237,6 +282,8 @@ echo '<style>
 .btn-filter:hover{ background:#f3f4f6; }
 .so-wrap { padding: 14px 16px; }
 .so-sub  { color: #6b7280; margin: 0 0 14px; font-size: 14px; }
+.sa-diff-low { color: #991b1b; font-weight: 800; white-space: nowrap; }
+.sa-diff-ok  { color: #065f46; font-weight: 700; white-space: nowrap; }
 </style>';
 
 echo '<div class="so-wrap">';
@@ -265,8 +312,8 @@ if ($rowsHtml === '') {
            . '</table>';
     } else {
         echo '<table class="table-list">'
-           . '<colgroup><col style="width:11ch"/><col style="width:12ch"/><col/><col style="width:24ch"/><col style="width:9ch"/><col style="width:9ch"/><col style="width:10ch"/></colgroup>'
-           . '<thead><tr><th>Orderdatum</th><th>Ordernummer</th><th>Kunden</th><th>Notering</th><th class="text-center">Best&auml;llda</th><th class="text-center">Skickade</th><th>Orderstatus</th></tr></thead>'
+           . '<colgroup><col style="width:11ch"/><col style="width:12ch"/><col/><col style="width:24ch"/><col style="width:9ch"/><col style="width:9ch"/><col style="width:10ch"/><col style="width:11ch"/><col style="width:10ch"/><col style="width:7ch"/></colgroup>'
+           . '<thead><tr><th>Orderdatum</th><th>Ordernummer</th><th>Kunden</th><th>Notering</th><th class="text-center">Best&auml;llda</th><th class="text-center">Skickade</th><th>Orderstatus</th><th class="text-right">Orderpris</th><th class="text-right">TB</th><th class="text-right">TG</th></tr></thead>'
            . '<tbody>' . $rowsHtml . '</tbody>'
            . '</table>';
     }
