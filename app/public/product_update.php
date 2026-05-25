@@ -604,10 +604,9 @@ if ($calc) {
         if ($price !== null)  { $calcprice  = number_format($price, 0, ',', ''); }
     }
 } else {
-    // Förvalda värden första gången sidan laddas
+    // Förvalda värden första gången sidan laddas – bara nettopriset prefylls
+    // så att användaren fritt kan ange antingen marginal eller utpris
     if ($calcnetto === "")  $calcnetto  = number_format($netto_se, 2, ',', '');
-    if ($calcmargin === "") $calcmargin = number_format($marginal_se, 2, ',', '');
-    if ($calcprice === "")  $calcprice  = number_format($utpris_moms_se, 0, ',', '');
 }
 
 ?>
