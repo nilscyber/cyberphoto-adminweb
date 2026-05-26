@@ -45,18 +45,15 @@
 	<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se' || $_COOKIE['login_mail'] == 'borje@cyberphoto.seX') { ?>
 	<?php } ?>
 	<li><a href="readyforsale.php" <?php if (preg_match("/readyforsale\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Klart att sälja</a></li>
-    <li><a href="inbyte_waiting.php" <?php if (preg_match("/inbyte_waiting\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Har hyllplats</a></li>
     <li><a href="inbyte_KOT.php" <?php if (preg_match("/inbyte_KOT\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>KOT</a></li>
     <li><a href="inbyte_lager.php" <?php if (preg_match("/inbyte_lager\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Lagerstatus</a></li>
     <li><a href="inbyte_dubbletter.php" <?php if (preg_match("/inbyte_dubbletter\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Dubbletter</a></li>
-    <li><a href="inbyte_noprice.php" <?php if (preg_match("/inbyte_noprice\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>EJ prissatta</a></li>
     <li><a href="inbyte_sold.php" <?php if (preg_match("/inbyte_sold\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Senast sålda</a></li>
-    <li><a href="inbyte_incomming.php" <?php if (preg_match("/inbyte_incomming\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Inkommande</a></li>
+    <li><a href="inbyte_incomming.php" <?php if (preg_match("/inbyte_incomming\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Inkommande gods</a></li>
     <li><a href="standard_locator.php" <?php if (preg_match("/standard_locator\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Saknad lagerplats</a></li>
     <li><a href="used_products.php" <?php if (preg_match("/used_products\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Beggat > 90d</a></li>
     <li><a href="text_templates.php" <?php if (preg_match("/text_templates\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Textmallar</a></li>
 	<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
-		<li><a href="inbyte_wishlist.php" <?php if (preg_match("/inbyte_wishlist\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Önskelista</a></li>
 		<li><a href="upload_begagnat.php" <?php if (preg_match("/upload_begagnat\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Ladda upp diagram</a></li>
 	<?php } ?>
 	</ul>
@@ -204,6 +201,9 @@
 	<li><a href="cms.php" <?php if (preg_match("/cms\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>CMS</a></li>
 	<li><a href="menu_web.php" <?php if (preg_match("/menu_web\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Meny webbshop</a></li>
     <li><a href="specialdeals.php" <?php if (preg_match("/specialdeals\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Specialdeals</a></li>
+    <li><a href="inbyte_waiting.php" <?php if (preg_match("/inbyte_waiting\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Har hyllplats</a></li>
+    <li><a href="inbyte_wishlist.php" <?php if (preg_match("/inbyte_wishlist\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Önskelista</a></li>
+    <li><a href="inbyte_noprice.php" <?php if (preg_match("/inbyte_noprice\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>EJ prissatta</a></li>
 	</ul>
 </li>
 <?php } ?>
