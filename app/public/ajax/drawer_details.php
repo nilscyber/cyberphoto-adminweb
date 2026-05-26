@@ -948,7 +948,8 @@ if ($type === 'customer') {
 			$created  = $h(substr((string)$qr['created'], 0, 10));
 			$docno    = $h($qr['documentno']);
 			$name     = $h($qr['name']);
-			$desc     = $qr['description'] !== '' ? ' <b>('.$h($qr['description']).')</b>' : '';
+			$descVal  = trim((string)$qr['description']);
+			$desc     = ($descVal !== '') ? ' <b>('.$h($descVal).')</b>' : '';
 			$best     = (int)$qr['qtyordered'];
 			$allok    = (int)$qr['qtyallocated'];
 			$prio     = (int)$qr['priorityrule'];
