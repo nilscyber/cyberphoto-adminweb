@@ -396,7 +396,7 @@ async function fetchKpi(){
   document.getElementById('lastUpdated').textContent = latest || '';
 
   if (latest){
-    const dt = new Date(latest.replace(' ', 'T'));
+    const dt = new Date(latest.replace(' ', 'T') + 'Z');
     const ageSec = Math.max(0, (Date.now() - dt.getTime())/1000);
     setPill(ageSec);
   }
