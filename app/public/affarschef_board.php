@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // affarschef_board.php
 ?>
 <!doctype html>
@@ -393,10 +393,10 @@ async function fetchKpi(){
   times.sort();
   const latest = times.length ? times[times.length-1] : null;
 
-  document.getElementById('lastUpdated').textContent = latest || '';
-
   if (latest){
     const dt = new Date(latest.replace(' ', 'T') + 'Z');
+    document.getElementById('lastUpdated').textContent =
+      dt.toLocaleString('sv-SE', {timeZone: 'Europe/Stockholm'});
     const ageSec = Math.max(0, (Date.now() - dt.getTime())/1000);
     setPill(ageSec);
   }
