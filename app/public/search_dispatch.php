@@ -255,6 +255,15 @@ echo '<style>
 .pref-btn{padding:6px 10px;border:1px solid #cfd6e0;border-radius:6px;background:#fff;cursor:pointer;}
 .pref-btn:hover{background:#f2f6ff;border-color:#b7c4da;}
 
+/* Begagnat-kommentar-ikon */
+.badge-used-comment{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:999px;
+  background:#fef3c7;border:1px solid #fcd34d;color:#92400e;
+  cursor:help;vertical-align:middle;
+}
+.badge-used-comment:hover{background:#fde68a;border-color:#f59e0b;}
+
 /* standardknapp har du redan; lägg bara en "active"-stil */
 .dw-icon-btn.active{
   border-color:#ef4444;              /* röd kant */

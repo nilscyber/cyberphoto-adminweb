@@ -453,7 +453,9 @@ SELECT
          AND xs.c_country_id = 313
        ORDER BY xs.updated DESC
        LIMIT 1
-    ), 0) AS sold_90d
+    ), 0) AS sold_90d,
+
+    NULLIF(TRIM(COALESCE(p.usedcomment, '')), '') AS used_comment
 
 FROM m_product p
 LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
@@ -596,6 +598,17 @@ public static function buildListBadges(array $r)
         // VMB-badge direkt efter Begagnad
         if ($isVatZero) {
             $badges[] = '<span class="badge badge-vmb">VMB</span>';
+        }
+
+        // Begagnat-kommentar som ikon med tooltip
+        $usedComment = isset($r['used_comment']) ? trim((string)$r['used_comment']) : '';
+        if ($usedComment !== '') {
+            $safeComment = htmlspecialchars($usedComment, ENT_QUOTES, 'UTF-8');
+            $badges[] = '<span class="badge-used-comment" title="' . $safeComment . '" aria-label="Begagnat notering">'
+                      . '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px">'
+                      . '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+                      . '</svg>'
+                      . '</span>';
         }
     } elseif ($isDealFlag) {
         $badges[] = '<span class="badge badge-deal">Fyndvara</span>';
