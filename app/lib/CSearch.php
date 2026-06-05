@@ -582,9 +582,16 @@ public static function buildListBadges(array $r)
     }
     $isVatZero = ($vatRate !== null && abs($vatRate) < 0.001);
 
+    // Extrahera skick-betyg från description_text, t.ex. "(4/5)" eller "4/5"
+    $conditionRating = '';
+    $descForRating = isset($r['description_text']) ? trim((string)$r['description_text']) : '';
+    if ($descForRating !== '' && preg_match('/\((\d+\/\d+)\)/', $descForRating, $m)) {
+        $conditionRating = ' ' . $m[1];
+    }
+
     // Begagnad trumfar Fyndvara
     if ($isUsedFlag) {
-        $badges[] = '<span class="badge badge-used">Begagnad</span>';
+        $badges[] = '<span class="badge badge-used">Begagnad' . $conditionRating . '</span>';
 
         // VMB-badge direkt efter Begagnad
         if ($isVatZero) {
