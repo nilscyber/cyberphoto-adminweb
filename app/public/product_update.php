@@ -1068,7 +1068,7 @@ if ($calc) {
 <?php } ?>
 
 <div class="card">
-    <div class="card-header">Automatiska prisjusteringar</div>
+    <div class="card-header">Schemalagda produktuppdateringar</div>
     <?php
         // Visar befintliga uppdrag för denna artikel
         $adintern->checkProductUpdate($artnr, true);

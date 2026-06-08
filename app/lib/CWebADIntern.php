@@ -664,7 +664,6 @@ JS;
 		if ($res && pg_num_rows($res) > 0) {
 
 			echo "<div class=\"top5 bottom10 floatleft\">\n";
-			echo "<div class=\"bold italic\">Automatiska prisjusteringar</div>\n";
 			echo "<table border=\"0\" cellpadding=\"0\" cellspacing=\"5\" width=\"310\">\n";
 				
 			// while ($row2 = pg_fetch_row($res)) {
