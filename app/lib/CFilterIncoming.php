@@ -126,16 +126,20 @@ Class CFilterIncoming {
 		} else {
 			$select .= "WHERE ci.checkActive = -1 ";
 		}
+		$select .= "ORDER BY ci.checkCounterTime DESC, ci.checkTime DESC ";
 
 		$res = mysqli_query(Db::getConnection(), $select);
+
+		$colspan = $deactivated ? 6 : 7;
 
 		echo "<table class=\"table-list\">\n";
 		echo "<thead><tr>";
 		echo "<th>Filter</th>";
 		echo "<th style=\"width:70px;text-align:center;\">Triggat</th>";
+		echo "<th style=\"width:130px;text-align:center;\">Senast triggat</th>";
 		echo "<th>Notering</th>";
 		echo "<th style=\"width:200px;\">Upplagd av</th>";
-		echo "<th style=\"width:100px;text-align:center;\">Datum</th>";
+		echo "<th style=\"width:100px;text-align:center;\">Skapad</th>";
 		if (!$deactivated) {
 			echo "<th style=\"width:70px;\"></th>";
 		}
@@ -146,9 +150,14 @@ Class CFilterIncoming {
 
 			while ($row = mysqli_fetch_object($res)) {
 
+				$senastTriggat = $row->checkCounterTime
+					? date("Y-m-d H:i", strtotime($row->checkCounterTime))
+					: "<span style=\"color:#9ca3af;\">–</span>";
+
 				echo "<tr>";
 				echo "<td>" . htmlspecialchars($row->checkWord) . "</td>";
 				echo "<td style=\"text-align:center;\">" . (int)$row->checkCounter . "</td>";
+				echo "<td style=\"text-align:center;\">" . $senastTriggat . "</td>";
 				echo "<td>" . htmlspecialchars($row->checkNote) . "</td>";
 				echo "<td>" . htmlspecialchars($row->checkBy) . "</td>";
 				echo "<td style=\"text-align:center;\">" . date("Y-m-d", strtotime($row->checkTime)) . "</td>";
@@ -163,13 +172,12 @@ Class CFilterIncoming {
 
 		} else {
 
-			$colspan = $deactivated ? 5 : 6;
 			echo "<tr><td colspan=\"$colspan\" style=\"color:#6b7280;font-style:italic;\">Inga träffar</td></tr>\n";
 
 		}
 
 		echo "</tbody>\n";
-		echo "<tfoot><tr><td colspan=\"" . ($deactivated ? 5 : 6) . "\" style=\"font-weight:600;\">Totalt: $startcount st</td></tr></tfoot>\n";
+		echo "<tfoot><tr><td colspan=\"$colspan\" style=\"font-weight:600;\">Totalt: $startcount st</td></tr></tfoot>\n";
 		echo "</table>\n";
 
 	}
