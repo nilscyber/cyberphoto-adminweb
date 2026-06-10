@@ -538,6 +538,42 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 </script>
 
+<script>
+(function(){
+  if (window.__copyArtInit) return;
+  window.__copyArtInit = true;
+
+  function copyText(txt){
+    txt = String(txt || '');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(txt);
+    }
+    return new Promise(function(resolve){
+      var ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch(e){}
+      document.body.removeChild(ta);
+      resolve();
+    });
+  }
+
+  document.addEventListener('click', function(e){
+    var el = e.target && e.target.closest ? e.target.closest('.copy-art') : null;
+    if (!el) return;
+    e.preventDefault();
+    var art = el.getAttribute('data-article') || (el.textContent || '').trim();
+    copyText(art).then(function(){
+      el.classList.add('copied');
+      setTimeout(function(){ el.classList.remove('copied'); }, 900);
+    });
+  }, false);
+})();
+</script>
+
 <?php
 	echo "</body>\n";
 	echo "</html>\n";

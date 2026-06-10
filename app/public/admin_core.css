@@ -233,8 +233,18 @@
 .text-negative { color: #dc2626 !important; }
 
 /* Tabell – kolumnjustering */
-.table-list th.r, .table-list td.r { text-align: right; }
-.table-list th.c, .table-list td.c { text-align: center; }
+.table-list th.r,   .table-list td.r   { text-align: right; }
+.table-list th.c,   .table-list td.c   { text-align: center; }
+.table-list th.num, .table-list td.num { text-align: right; white-space: nowrap; }
+
+/* TG-färgning */
+.bns-diff-ok  { text-align: right; white-space: nowrap; color: #065f46; }
+.bns-diff-low { text-align: right; white-space: nowrap; color: #991b1b; }
+
+/* Kopierbart artikelnummer */
+.copy-art { cursor: pointer; }
+.copy-art:hover { text-decoration: underline dotted; }
+.copy-art.copied { outline: 2px solid #a7f3d0; outline-offset: 2px; border-radius: 2px; }
 
 /* Dag/grupp-rubrikrad i tabell */
 .cat-head td {

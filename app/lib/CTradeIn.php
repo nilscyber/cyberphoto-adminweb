@@ -1987,7 +1987,7 @@ Class CTradeIn {
 		$countrow = 0;
 
 		$select = "SELECT prod.value AS artnr, pstock.qtyonhand, CONCAT (manu.name, ' ', prod.name) AS beskrivning, prod.IsSelfService, mloc.value, mloc.m_locator_id, ";
-		$select .= "prod.c_taxcategory_id, price.pricelimit, prod.created, prod.m_product_id ";
+		$select .= "prod.c_taxcategory_id, price.pricelimit, price.pricestd, prod.created, prod.m_product_id ";
 		$select .= "FROM m_product_cache pstock ";
 		$select .= "JOIN m_product prod ON prod.m_product_id = pstock.m_product_id ";
 		$select .= "JOIN m_productprice price ON prod.m_product_id = price.m_product_id ";
@@ -2014,7 +2014,7 @@ Class CTradeIn {
 		} else {
 			$select .= "AND prod.IsSelfService = 'N' ";
 		}
-		$select .= "GROUP BY prod.value, pstock.qtyonhand, prod.name, manu.name, prod.IsSelfService, mloc.value, mloc.m_locator_id, prod.c_taxcategory_id, price.pricelimit, ";
+		$select .= "GROUP BY prod.value, pstock.qtyonhand, prod.name, manu.name, prod.IsSelfService, mloc.value, mloc.m_locator_id, prod.c_taxcategory_id, price.pricelimit, price.pricestd, ";
 		$select .= "prod.created, prod.m_product_id ";
 		$select .= "ORDER BY manu.name ASC, prod.name ASC ";
 
@@ -2031,59 +2031,70 @@ Class CTradeIn {
 		
 		
 		if ($res && pg_num_rows($res) > 0) {
-		
-			if ($nostoreshelf) {
-				echo "<div class=\"count_data bold italic\">Publika produkter som saknar hyllplats, �tg�rdas snarast</div>\n";
-			} elseif ($reparationer) {
-				echo "<div class=\"count_data bold italic\">Produkter skickade f�r reparation</div>\n";
-			} else {
-				echo "<div class=\"count_data bold italic\">Tillg�ngliga begagnade produkter</div>\n";
-			}
-			if ($nostoreshelf) {
-				echo "<table id=\"begg_miss5555\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-			} else {
-				echo "<table id=\"begg_saleready\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-			}
-		
+
+			$tableId = $nostoreshelf ? 'begg_miss5555' : 'kot-begg';
+			echo "<table id=\"$tableId\" class=\"table-list\" style=\"width:95%\">\n";
+			echo "<thead><tr>\n";
+			echo "  <th>Artnr</th>\n";
+			echo "  <th>Produkt</th>\n";
+			echo "  <th class=\"num\">Dagar</th>\n";
+			echo "  <th>VMB</th>\n";
+			echo "  <th class=\"num\">Netto</th>\n";
+			echo "  <th class=\"num\">Brutto</th>\n";
+			echo "  <th class=\"num\">TG</th>\n";
+			echo "  <th class=\"num\">Webb</th>\n";
+			echo "  <th></th>\n";
+			echo "</tr></thead>\n";
+			echo "<tbody>\n";
+
 			while ($res && $row = pg_fetch_object($res)) {
 
-				// $trimmaprodukten = $row->tillverkare . " " . $row->name;
 				$trimmaprodukten = $row->beskrivning;
-				
-				if (strlen($trimmaprodukten) >= 50)
-					$trimmaprodukten = substr ($trimmaprodukten, 0, 50) . "...";
 
 				$datecreated = $this->dayFromCreated($row->created);
-				
-				echo "\t<tr>";
-				echo "\t\t<td width=\"80\" class=\"mark_black\">$row->artnr</td>\n";
-				echo "\t\t<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row->artnr\">$trimmaprodukten</a></td>\n";
-				// echo "\t\t<td class=\"mark_black\">$trimmaprodukten</td>\n";
+				$isVMB       = ($row->c_taxcategory_id == 1000000);
+				$netto       = (float)$row->pricelimit;
+				$pricestd    = (float)$row->pricestd;
+				$brutto      = $isVMB ? $pricestd : ($pricestd * 1.25);
+				$tb          = $brutto - $netto;
+				$tg          = ($brutto > 0) ? ($tb / $brutto * 100) : 0;
+				$tgFmt       = ($tg >= 0 ? '' : '−') . number_format(abs($tg), 1, ',', ' ') . ' %';
+				$tgClass     = ($tg < 0) ? 'num bns-diff-low' : 'num bns-diff-ok';
+
 				if ($datecreated > 13) {
-					echo "\t\t<td class=\"align_center span_green bold\">$datecreated</td>\n";
+					$dayCell = "<span class=\"badge-age green\">$datecreated</span>";
 				} elseif ($datecreated < 8) {
-					echo "\t\t<td class=\"align_center span_red\">$datecreated</td>\n";
+					$dayCell = "<span class=\"badge-age red\">$datecreated</span>";
 				} else {
-					echo "\t\t<td class=\"align_center\">$datecreated</td>\n";
+					$dayCell = "<span class=\"badge-age orange\">$datecreated</span>";
 				}
-				if ($row->c_taxcategory_id == 1000000) {
-					echo "\t\t<td class=\"mark_black center\" width=\"30\" class=\"align_center\">VMB</td>\n";
-				} else {
-					echo "\t\t<td class=\"mark_black\" width=\"30\" class=\"align_center\">&nbsp;</td>\n";
-				}
-				echo "\t\t<td width=\"65\" class=\"align_center\">" . round($row->pricelimit) . "</td>\n";
-				if ($row->isselfservice == 'Y') {
-					echo "\t\t<td class=\"align_center\" width=\"15\"><img border=\"\" src=\"status_green.jpg\"></td>\n";
-				} else {
-					echo "\t\t<td class=\"align_center\" width=\"15\"><img border=\"\" src=\"status_red.jpg\"></td>\n";
-				}
-				echo "\t\t<td class=\"align_center\" width=\"15\"><a href=\"javascript:winPopupCenter(900, 800, 'https://admin.cyberphoto.se/product_update.php?artnr=$row->artnr&m_product_id=$row->m_product_id');\">Uppdatera</a></td>\n";
+
+				$vmbCell  = $isVMB ? '<span class="badge badge-vmb">VMB</span>' : '';
+				$wwwDot   = ($row->isselfservice == 'Y')
+					? '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a"></span>'
+					: '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#dc2626"></span>';
+				$editLink = '<a href="javascript:winPopupCenter(900,800,\'https://admin.cyberphoto.se/product_update.php?artnr=' . $row->artnr . '&m_product_id=' . $row->m_product_id . '\');" class="edit-btn" title="Redigera">'
+					. '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+					. '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>'
+					. '</a>';
+
+				$drawerUrl = '/search_dispatch.php?mode=product&q=' . rawurlencode($row->artnr) . '&open=product&id=' . $row->m_product_id;
+				echo "\t<tr>\n";
+				echo "\t\t<td style=\"white-space:nowrap\"><span class=\"copy-art\" data-article=\"$row->artnr\" title=\"Kopiera artikelnummer\">$row->artnr</span></td>\n";
+				echo "\t\t<td><a href=\"$drawerUrl\" class=\"drawer-link btn-more\" data-type=\"product\" data-pid=\"$row->m_product_id\" data-id=\"$row->m_product_id\" data-article=\"$row->artnr\">$trimmaprodukten</a></td>\n";
+				echo "\t\t<td class=\"num\">$dayCell</td>\n";
+				echo "\t\t<td>$vmbCell</td>\n";
+				echo "\t\t<td class=\"num\">" . number_format($netto, 0, ',', ' ') . "</td>\n";
+				echo "\t\t<td class=\"num\">" . number_format($brutto, 0, ',', ' ') . "</td>\n";
+				echo "\t\t<td class=\"$tgClass\">$tgFmt</td>\n";
+				echo "\t\t<td class=\"num\">$wwwDot</td>\n";
+				echo "\t\t<td class=\"num\">$editLink</td>\n";
 				echo "\t</tr>\n";
-				
+
 				$countrow++;
-				
 			}
-			
+
+			echo "</tbody>\n";
 			echo "</table>\n";
 			if ($countrow > 0) {
 				echo "<div class=\"count_data bold\">" . $countrow . " st</div>\n";
