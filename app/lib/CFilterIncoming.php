@@ -22,39 +22,54 @@ Class CFilterIncoming {
 	}
 
 	function getOrdersThatFits($words,$checkID) {
-		
+
 		$words = trim($words);
 		$searchwords = preg_split("/[\s]+/", $words);
-		
-		$select  = "SELECT o.ordernr, o.order_url ";
-		$select .= "FROM cyberphoto.Ordertabell o ";
-		$select .= "WHERE o.inkommet > NOW() - INTERVAL 15 MINUTE ";
-		$select .= "AND (";
-		for ($i = 0; $i < count($searchwords);$i++) {
 
+		$conn_ad = Db::getConnectionAD();
+
+		$select  = "SELECT DISTINCT o.documentno, o.order_url ";
+		$select .= "FROM c_order o ";
+		$select .= "JOIN c_bpartner bp ON bp.c_bpartner_id = o.c_bpartner_id ";
+		$select .= "JOIN c_bpartner bp2 ON bp2.c_bpartner_id = o.bill_bpartner_id ";
+		$select .= "JOIN c_bpartner_location bpl ON bpl.c_bpartner_location_id = o.c_bpartner_location_id ";
+		$select .= "JOIN c_location loc ON loc.c_location_id = bpl.c_location_id ";
+		$select .= "JOIN c_bpartner_location bpl2 ON bpl2.c_bpartner_location_id = o.bill_location_id ";
+		$select .= "JOIN c_location loc2 ON loc2.c_location_id = bpl2.c_location_id ";
+		$select .= "LEFT JOIN ad_user ad2 ON ad2.c_bpartner_id = o.c_bpartner_id ";
+		$select .= "WHERE o.created > NOW() - INTERVAL '15 minutes' ";
+		$select .= "AND (";
+
+		for ($i = 0; $i < count($searchwords); $i++) {
+			$w = pg_escape_string($conn_ad, $searchwords[$i]);
+			$cond  = "bp.name ILIKE '%$w%' OR bp.name2 ILIKE '%$w%' ";
+			$cond .= "OR loc.address1 ILIKE '%$w%' OR loc.address2 ILIKE '%$w%' OR loc.city ILIKE '%$w%' ";
+			$cond .= "OR bp2.name ILIKE '%$w%' OR bp2.name2 ILIKE '%$w%' ";
+			$cond .= "OR loc2.address1 ILIKE '%$w%' OR loc2.address2 ILIKE '%$w%' OR loc2.city ILIKE '%$w%' ";
+			$cond .= "OR ad2.email ILIKE '%$w%' OR ad2.phone2 ILIKE '%$w%'";
 			if ($i == 0) {
-				$select .= "o.lnamn like '%" . $searchwords[$i] . "%' OR o.lco like '%" . $searchwords[$i] . "%' OR o.ladress like '%" . $searchwords[$i] . "%' OR o.lpostadr like '%" . $searchwords[$i] . "%' OR o.namn like '%" . $searchwords[$i] . "%' OR o.co like '%" . $searchwords[$i] . "%' OR o.adress like '%" . $searchwords[$i] . "%' OR o.postadress like '%" . $searchwords[$i] . "%' OR o.email like '%" . $searchwords[$i] . "%' OR o.telefon like '%" . $searchwords[$i] . "%') ";
+				$select .= "($cond) ";
 			} else {
-				$select .= "AND (o.lnamn like '%" . $searchwords[$i] . "%' OR o.lco like '%" . $searchwords[$i] . "%' OR o.ladress like '%" . $searchwords[$i] . "%' OR o.lpostadr like '%" . $searchwords[$i] . "%' OR o.namn like '%" . $searchwords[$i] . "%' OR o.co like '%" . $searchwords[$i] . "%' OR o.adress like '%" . $searchwords[$i] . "%' OR o.postadress like '%" . $searchwords[$i] . "%' OR o.email like '%" . $searchwords[$i] . "%' OR o.telefon like '%" . $searchwords[$i] . "%') ";
+				$select .= "AND ($cond) ";
 			}
-		
 		}
-		
+
+		$select .= ")";
+
 		// echo $select;
 
-		$res = mysqli_query(Db::getConnection(), $select);
-		// $counts = mysqli_num_rows($res);
-		
-		if (mysqli_num_rows($res) > 0) {
-			
-			while ($row = mysqli_fetch_object($res)) {
-			
-				// echo $row->ordernr . "<br>";
-				$this->sendMailForManuelCheck($row->ordernr,$words,$row->order_url);
+		$res = $conn_ad ? @pg_query($conn_ad, $select) : false;
+
+		if ($res && pg_num_rows($res) > 0) {
+
+			while ($row = pg_fetch_object($res)) {
+
+				// echo $row->documentno . "<br>";
+				$this->sendMailForManuelCheck($row->documentno, $words, $row->order_url);
 				$this->doFilterCount($checkID);
-					
+
 			}
-		
+
 		}
 
 	}
@@ -80,9 +95,8 @@ Class CFilterIncoming {
 		
 		$addcreatedby = "noreply@cyberphoto.se";
 
-		// $recipient .= " stefan";
-		$recipient .= " po@cyberphoto.se";
-		$recipient .= " urgent_ticket@cyberphoto.se";
+		$recipient  = " stefan@cyberphoto.se";
+		// $recipient .= " urgent_ticket@cyberphoto.se";
 		
 		$subj = $orderdatum . " Order som MÅSTE kontrolleras är upplagd!";
 
@@ -102,18 +116,7 @@ Class CFilterIncoming {
 	
 	function getActualFilters($deactivated = false) {
 
-		$rowcolor = true;
 		$startcount = 0;
-		
-		echo "<table cellpadding=\"2\" cellspacing=\"1\" width=\"100%\">";
-		echo "<tr>";
-		echo "<td width=\"200\" align=\"left\"><b>Filter</b></td>";
-		echo "<td width=\"50\" align=\"center\"><b>Triggat</b></td>";
-		echo "<td><b>Notering</b></td>";
-		echo "<td width=\"200\" align=\"left\"><b>Upplagd av</b></td>";
-		echo "<td width=\"90\" align=\"center\"><b>Datum</b></td>";
-		echo "<td width=\"65\" align=\"center\"><b>&nbsp;</b></td>";
-		echo "</tr>";
 
 		$select  = "SELECT ci.* ";
 		$select .= "FROM cyberadmin.checkincoming ci ";
@@ -125,52 +128,48 @@ Class CFilterIncoming {
 
 		$res = mysqli_query(Db::getConnection(), $select);
 
-			if (mysqli_num_rows($res) > 0) {
+		echo "<table class=\"table-list\">\n";
+		echo "<thead><tr>";
+		echo "<th>Filter</th>";
+		echo "<th style=\"width:70px;text-align:center;\">Triggat</th>";
+		echo "<th>Notering</th>";
+		echo "<th style=\"width:200px;\">Upplagd av</th>";
+		echo "<th style=\"width:100px;text-align:center;\">Datum</th>";
+		if (!$deactivated) {
+			echo "<th style=\"width:70px;\"></th>";
+		}
+		echo "</tr></thead>\n";
+		echo "<tbody>\n";
 
-				while ($row = mysqli_fetch_object($res)) {
-			
-					if ($rowcolor == true) {
-						$backcolor = "firstrow";
-					} else {
-						$backcolor = "secondrow";
-					}
+		if (mysqli_num_rows($res) > 0) {
 
-					echo "<tr>";
-					echo "<td class=\"$backcolor\">" . $row->checkWord . "</td>";
-					echo "<td class=\"$backcolor\" align=\"center\">" . $row->checkCounter . "</td>";
-					echo "<td class=\"$backcolor\" align=\"left\">" . $row->checkNote . "</td>";
-					echo "<td class=\"$backcolor\" align=\"left\">" . $row->checkBy . "</td>";
-					echo "<td class=\"$backcolor\" align=\"center\">" . date("Y-m-d", strtotime($row->checkTime)) . "</td>";
-					if ($deactivated) {
-						echo "<td align=\"center\">&nbsp;</td>";
-					} else {
-						echo "<td align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $row->checkID . "\">ändra</a></td>";
-					}
-					echo "</tr>";
+			while ($row = mysqli_fetch_object($res)) {
 
-					if ($rowcolor == true) {
-						$row = true;
-						$rowcolor = false;
-					} else {
-						$row = false;
-						$rowcolor = true;
-					}
-					$startcount++;
-			
-				}
-				
-			} else {
-			
 				echo "<tr>";
-				echo "<td colspan=\"4\"><font color=\"#000000\"><b>Inga träffar</b></td>";
-				echo "</tr>";
-			
+				echo "<td>" . htmlspecialchars($row->checkWord) . "</td>";
+				echo "<td style=\"text-align:center;\">" . (int)$row->checkCounter . "</td>";
+				echo "<td>" . htmlspecialchars($row->checkNote) . "</td>";
+				echo "<td>" . htmlspecialchars($row->checkBy) . "</td>";
+				echo "<td style=\"text-align:center;\">" . date("Y-m-d", strtotime($row->checkTime)) . "</td>";
+				if (!$deactivated) {
+					echo "<td><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . (int)$row->checkID . "\" style=\"color:#0d9488;text-decoration:none;font-weight:600;\">ändra</a></td>";
+				}
+				echo "</tr>\n";
+
+				$startcount++;
+
 			}
-			
-		echo "<tr>";
-		echo "<td colspan=\"4\"><b>Totalt: $startcount st</b></td>";
-		echo "</tr>";
-		echo "</table>";
+
+		} else {
+
+			$colspan = $deactivated ? 5 : 6;
+			echo "<tr><td colspan=\"$colspan\" style=\"color:#6b7280;font-style:italic;\">Inga träffar</td></tr>\n";
+
+		}
+
+		echo "</tbody>\n";
+		echo "<tfoot><tr><td colspan=\"" . ($deactivated ? 5 : 6) . "\" style=\"font-weight:600;\">Totalt: $startcount st</td></tr></tfoot>\n";
+		echo "</table>\n";
 
 	}
 
