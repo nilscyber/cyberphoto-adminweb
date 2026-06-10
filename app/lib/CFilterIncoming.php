@@ -97,7 +97,7 @@ Class CFilterIncoming {
 		$addcreatedby = "noreply@cyberphoto.se";
 
 		$recipient  = " stefan@cyberphoto.se";
-		// $recipient .= " urgent_ticket@cyberphoto.se";
+		$recipient .= " urgent_ticket@cyberphoto.se";
 		
 		$subj = $orderdatum . " Order som MÅSTE kontrolleras är upplagd!";
 

@@ -3,5 +3,6 @@ dbdata/
 Thumbs.db
 app/public/banners/
 app/public/banner_images/
+app/public/cache/
 docker/cert/
 .claude/
