@@ -37,6 +37,7 @@
 	echo "<li>Postort (leverans)</li>\n";
 	echo "<li>E-postadress</li>\n";
 	echo "<li>Telefon</li>\n";
+	echo "<li>Personnummer / organisationsnummer</li>\n";
 	echo "</ul>\n";
 	echo "<p style=\"margin:0 0 4px;\">Tänk på att inte göra för detaljerade sökningar. Ange istället delar av namnen du vill söka på.</p>\n";
 	echo "<p style=\"margin:0 0 4px;\">Exempel: Om du vill bevaka en buse som brukar lägga ordrar som Benjamin Karlsson i Växjö. Lägg ett filter på: <em>benj karl väx</em></p>\n";

@@ -46,7 +46,8 @@ Class CFilterIncoming {
 			$cond .= "OR loc.address1 ILIKE '%$w%' OR loc.address2 ILIKE '%$w%' OR loc.city ILIKE '%$w%' ";
 			$cond .= "OR bp2.name ILIKE '%$w%' OR bp2.name2 ILIKE '%$w%' ";
 			$cond .= "OR loc2.address1 ILIKE '%$w%' OR loc2.address2 ILIKE '%$w%' OR loc2.city ILIKE '%$w%' ";
-			$cond .= "OR ad2.email ILIKE '%$w%' OR ad2.phone2 ILIKE '%$w%'";
+			$cond .= "OR ad2.email ILIKE '%$w%' OR ad2.phone2 ILIKE '%$w%' ";
+			$cond .= "OR bp.taxid ILIKE '%$w%' OR bp2.taxid ILIKE '%$w%'";
 			if ($i == 0) {
 				$select .= "($cond) ";
 			} else {
@@ -102,11 +103,11 @@ Class CFilterIncoming {
 
 		$extra = "From: " . $addcreatedby;
 		
-		$text1  = "Denna order har fastnat i vårt inkommenade filterkontroll och måste kontrolleras manuellt.\n";
+		$text1  = "Denna order har fastnat i vår inkommande filterkontroll och måste kontrolleras manuellt.\n";
 		$text1 .= "KAN vara så att en bedragare bakom denna order. Skall dock hanteras med stor respekt.\n\n";
 		$text1 .= "Order nr: " . $ordernr . "\n\n";
 		$text1 .= "Filter som utlöste aviseringen: " . $words . "\n\n";
-		$text1 .= "https://www2.cyberphoto.se/kundvagn/min-orderstatus?orderref=" . $url . "&order_check=" . $ordernr . "\n\n";
+		$text1 .= "https://admin.cyberphoto.se/search_dispatch.php?mode=order&page=1&q=" . $ordernr . "\n\n";
 		$text1 .= "Mer information kan du hitta på sidan för filterhanteringen\n";
 		$text1 .= "http://admin.cyberphoto.se/check_incoming.php\n\n";
 		
