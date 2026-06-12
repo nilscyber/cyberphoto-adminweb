@@ -131,6 +131,7 @@
     <li><a href="dropshipment.php" <?php if (preg_match("/dropshipment\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Dropshipment</a></li>
     <li><a href="rma_summary.php" <?php if (preg_match("/rma_summary\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>RMA ärenden</a></li>
     <li><a href="tickets.php" <?php if (preg_match("/tickets\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>OTRS</a></li>
+    <li><a href="bundle_overview.php" <?php if (preg_match("/bundle_overview\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Egna paket</a></li>
 	<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
 	<?php } ?>
 	</ul>
