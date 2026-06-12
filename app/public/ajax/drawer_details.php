@@ -1174,7 +1174,7 @@ if ($type === 'customer') {
     $art     = $h($row['article']);
     $pidOut  = (int)$row['m_product_id'];
     $suppUrl = 'https://admin.cyberphoto.se/suplier.php?artnr='.$art;
-    $soldUrl = 'https://admin.cyberphoto.se/sold_article.php?product_id='.$pidOut;
+    $soldUrl = '/sold_article.php?product_id='.$pidOut;
     $moniUrl = 'https://admin.cyberphoto.se/monitor_articles.php?add=yes&addArtnr='.$art;
     $feedUrl = 'https://admin.cyberphoto.se/product_feedback.php?popup=1&artnr='.$art.'&ordernr=';
     $editUrl = 'https://admin.cyberphoto.se/product_update.php?artnr='.$art.'&m_product_id='.$pidOut;

@@ -1102,8 +1102,10 @@ foreach ($res['rows'] as $r) {
 
       // Sålda (30d) + tooltip 7/30/90
       // echo '<td class="text-center"><span title="'.$soldHover.'">'.$sold30.'</span></td>';
+	  $isBundle = (isset($r['issalesbundle']) && strtoupper((string)$r['issalesbundle']) === 'Y');
+	  $soldUrl  = '/sold_article.php?product_id='.$pid.($isBundle ? '&show_salesbundle=yes' : '');
 	  echo '<td class="text-center">'
-		 . '<a href="https://admin.cyberphoto.se/sold_article.php?product_id='.$pid.'"'
+		 . '<a href="'.$soldUrl.'"'
 		 . ' target="_blank" rel="noopener"'
 		 . ' title="'.$soldHover.'"'
 		 . ' class="sold-count-link">'
