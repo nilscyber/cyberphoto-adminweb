@@ -469,6 +469,11 @@
 					$addRecipient = $_COOKIE['login_mail'];
 				}
 			}
+			$queueAddresses = array('ekonomi@cyberphoto.se','inbyte@cyberphoto.se','kundtjanst@cyberphoto.se','produkt@cyberphoto.se','salj@cyberphoto.se','service@cyberphoto.se');
+			if (in_array($addRecipient, $queueAddresses) && strlen(trim($addComment)) < 5) {
+				$olright = false;
+				$wrongmess .= "<p class=\"boldit_red\">- Du måste ange en egen notis (minst 5 tecken) när bevakningen skickas till en kö!</p>";
+			}
 			if ($olright) {
 				if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") {
 					$monitor->doMonitorAdd_v3($addArtnr,$addRecipient,$addMoreLess,$addStoreValue,$addComment,$addType);
@@ -524,6 +529,11 @@
 				} else {
 					$addRecipient = $_COOKIE['login_mail'];
 				}
+			}
+			$queueAddresses = array('ekonomi@cyberphoto.se','inbyte@cyberphoto.se','kundtjanst@cyberphoto.se','produkt@cyberphoto.se','salj@cyberphoto.se','service@cyberphoto.se');
+			if (in_array($addRecipient, $queueAddresses) && strlen(trim($addComment)) < 5) {
+				$olright = false;
+				$wrongmess .= "<p class=\"boldit_red\">- Du måste ange en egen notis (minst 5 tecken) när bevakningen skickas till en kö!</p>";
 			}
 			if ($olright) {
 				if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") {
