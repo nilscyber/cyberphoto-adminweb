@@ -166,11 +166,11 @@ if ($addStoreValue == "" && $addArtnr != "") {
             <div class="field">
                 <select name="addRecipient" style="width:240px">
                     <option value=""></option>
-                    <option value="ekonomi"<?php if ($addRecipient == "ekonomi") echo " selected"; ?>>OTRS ekonomikö</option>
-                    <option value="inbyte"<?php if ($addRecipient == "inbyte") echo " selected"; ?>>OTRS inbyteskö</option>
-                    <option value="kundtjanst"<?php if ($addRecipient == "kundtjanst") echo " selected"; ?>>OTRS kundtjänstkö</option>
-                    <option value="produkt"<?php if ($addRecipient == "produkt") echo " selected"; ?>>OTRS säljkö</option>
-                    <option value="service"<?php if ($addRecipient == "service") echo " selected"; ?>>OTRS servicekö</option>
+                    <option value="ekonomi@cyberphoto.se"<?php if ($addRecipient == "ekonomi@cyberphoto.se") echo " selected"; ?>>OTRS ekonomikö</option>
+                    <option value="inbyte@cyberphoto.se"<?php if ($addRecipient == "inbyte@cyberphoto.se") echo " selected"; ?>>OTRS inbyteskö</option>
+                    <option value="kundtjanst@cyberphoto.se"<?php if ($addRecipient == "kundtjanst@cyberphoto.se") echo " selected"; ?>>OTRS kundtjänstkö</option>
+                    <option value="produkt@cyberphoto.se"<?php if ($addRecipient == "produkt@cyberphoto.se") echo " selected"; ?>>OTRS säljkö</option>
+                    <option value="service@cyberphoto.se"<?php if ($addRecipient == "service@cyberphoto.se") echo " selected"; ?>>OTRS servicekö</option>
                 </select>
                 <span class="hint">Lämna tomt för att skicka till din e-post</span>
             </div>
