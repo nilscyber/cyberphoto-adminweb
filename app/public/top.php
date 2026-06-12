@@ -678,7 +678,7 @@
 			$addid = $rows->frontID;
 			$addfrom = substr ($rows->frontDateFrom, 0, 19);
 			if ($now == "yes") {
-				$addto = date("Y-m-d H:i:s", time());
+				$addto = date("Y-m-d H:i:s");
 			} else {
 				$addto = substr ($rows->frontDateTo, 0, 19);
 			}
@@ -702,22 +702,16 @@
 			$rows = $banners->getSpecFrontBanner($copypost);
 
 			$addidc = $rows->frontID;
-			// $addfrom = substr ($rows->frontDateFrom, 0, 19);
-			
-			$timefrom = preg_replace('/:[0-9][0-9][0-9]/','', $rows->frontDateFrom);
-			$timefrom = strtotime($timefrom);
-			if ($timefrom > time()) {
-				$addfrom = date("Y-m-d H:i:s", $timefrom);
-			} else {
-				$addfrom = date("Y-m-d H:i:s", time());
-			}
-				
-			$timeto = preg_replace('/:[0-9][0-9][0-9]/','', $rows->frontDateTo);
-			$timeto = strtotime($timeto);
-			if ($timeto < time()) {
+
+			$now      = date("Y-m-d H:i:s");
+			$timefrom = substr($rows->frontDateFrom, 0, 19);
+			$addfrom  = ($timefrom > $now) ? $timefrom : $now;
+
+			$timeto = substr($rows->frontDateTo, 0, 19);
+			if ($timeto < $now) {
 				unset($timeto);
 			} else {
-				$addto = date("Y-m-d H:i:s", $timeto);
+				$addto = $timeto;
 			}
 				
 			// $addfrom = date("Y-m-d H:i:s", time());

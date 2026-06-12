@@ -25,6 +25,7 @@ class Db {
                     getenv('DB_NAME') ?: 'cyberphoto'
                 );
                 self::$conn_master->set_charset('utf8mb4');
+                self::$conn_master->query("SET time_zone = 'Europe/Stockholm'");
             }
             return self::$conn_master;
         } else {
@@ -36,6 +37,7 @@ class Db {
                     getenv('DB_NAME') ?: 'cyberphoto'
                 );
                 self::$conn_standard->set_charset('utf8mb4');
+                self::$conn_standard->query("SET time_zone = 'Europe/Stockholm'");
             }
             return self::$conn_standard;
         }
@@ -57,6 +59,7 @@ class Db {
                 $dbname
             );
             self::$conn_db[$key]->set_charset('utf8mb4');
+            self::$conn_db[$key]->query("SET time_zone = 'Europe/Stockholm'");
         }
         return self::$conn_db[$key];
     }
