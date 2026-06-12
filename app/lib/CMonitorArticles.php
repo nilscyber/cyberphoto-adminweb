@@ -176,7 +176,7 @@ class CMonitorArticles {
         echo "<tbody>\n";
 
         $sql = "
-            SELECT monID, monUser, monArtnr, monMoreLess, monStoreValue, monTime, monComment, monType, monCount
+            SELECT monID, monUser, monArtnr, monMoreLess, monStoreValue, monTime, monComment, monType, monCount, monAddBy
             FROM cyberphoto.MonitorArticles
             WHERE monActive = 1
             ORDER BY monUser ASC, monArtnr ASC
@@ -206,6 +206,7 @@ class CMonitorArticles {
                 $monComment = $row['monComment'];
                 $monType = (int)$row['monType'];
                 $monCount = (int)$row['monCount'];
+                $monAddBy = $row['monAddBy'];
 
                 $nameData = !empty($names[$monArtnr]) ? $names[$monArtnr] : null;
                 $name = $nameData ? $nameData['name'] : '(saknas i AD)';
@@ -247,7 +248,12 @@ class CMonitorArticles {
                     echo "<td style=\"text-align:center\">$qtyNow</td>\n";
                 }
 
-                echo "<td>" . htmlspecialchars($monUser) . "</td>\n";
+                $queueAddresses = array('ekonomi@cyberphoto.se','inbyte@cyberphoto.se','kundtjanst@cyberphoto.se','produkt@cyberphoto.se','salj@cyberphoto.se','service@cyberphoto.se');
+                if (in_array($monUser, $queueAddresses) && !empty($monAddBy)) {
+                    echo "<td>" . htmlspecialchars($monUser) . "<br><span style=\"font-size:11px;color:#6b7280\">tillagd av " . htmlspecialchars($monAddBy) . "</span></td>\n";
+                } else {
+                    echo "<td>" . htmlspecialchars($monUser) . "</td>\n";
+                }
 
                 if ($isStefan) {
                     if ($monDays == 0) {
@@ -456,7 +462,7 @@ class CMonitorArticles {
 
     function doMonitorAdd_v3($addArtnr, $addRecipient, $addMoreLess, $addStoreValue, $addComment, $addType) {
         $monIP = $_SERVER['REMOTE_ADDR'];
-        $addBy = !empty($_SESSION['admin_info']['email']) ? $_SESSION['admin_info']['email'] : 'noreply';
+        $addBy = !empty($_COOKIE['login_mail']) ? $_COOKIE['login_mail'] : 'noreply';
 
         $artnr = $this->esc($addArtnr);
         $recipient = $this->esc($addRecipient);
