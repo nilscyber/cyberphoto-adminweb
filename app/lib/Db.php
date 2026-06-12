@@ -25,7 +25,7 @@ class Db {
                     getenv('DB_NAME') ?: 'cyberphoto'
                 );
                 self::$conn_master->set_charset('utf8mb4');
-                self::$conn_master->query("SET time_zone = 'Europe/Stockholm'");
+                self::$conn_master->query("SET time_zone = '" . self::stockholmOffset() . "'");
             }
             return self::$conn_master;
         } else {
@@ -37,7 +37,7 @@ class Db {
                     getenv('DB_NAME') ?: 'cyberphoto'
                 );
                 self::$conn_standard->set_charset('utf8mb4');
-                self::$conn_standard->query("SET time_zone = 'Europe/Stockholm'");
+                self::$conn_standard->query("SET time_zone = '" . self::stockholmOffset() . "'");
             }
             return self::$conn_standard;
         }
@@ -59,7 +59,7 @@ class Db {
                 $dbname
             );
             self::$conn_db[$key]->set_charset('utf8mb4');
-            self::$conn_db[$key]->query("SET time_zone = 'Europe/Stockholm'");
+            self::$conn_db[$key]->query("SET time_zone = '" . self::stockholmOffset() . "'");
         }
         return self::$conn_db[$key];
     }
@@ -79,6 +79,12 @@ class Db {
             self::$conn_otrs->set_charset('utf8mb4');
         }
         return self::$conn_otrs;
+    }
+
+    private static function stockholmOffset(): string {
+        $offset = (new DateTimeZone('Europe/Stockholm'))->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+        $h = intdiv(abs($offset), 3600);
+        return sprintf('%s%02d:00', $offset >= 0 ? '+' : '-', $h);
     }
 
     /**
