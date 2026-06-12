@@ -559,7 +559,7 @@ class CMonitorArticles {
         }
 
         $sql = "
-            SELECT monID, monUser, monArtnr, monStoreValue, monComment, monMoreLess, monType
+            SELECT monID, monUser, monArtnr, monStoreValue, monComment, monMoreLess, monType, monAddBy
             FROM cyberphoto.MonitorArticles
             WHERE monActive = 1 AND monType = $monitorType
         ";
@@ -588,6 +588,7 @@ class CMonitorArticles {
             $monStoreValue = (int)$row['monStoreValue'];
             $monComment = $row['monComment'];
             $monMoreLess = (int)$row['monMoreLess'];
+            $monAddBy = $row['monAddBy'];
 
             $trigger = false;
             $valueNow = 0;
@@ -612,7 +613,7 @@ class CMonitorArticles {
             }
 
             if ($trigger) {
-                $this->sendMonitorMess_v1($monUser, $monArtnr, $valueNow, $monComment, $monitorType);
+                $this->sendMonitorMess_v1($monUser, $monArtnr, $valueNow, $monComment, $monitorType, $monAddBy);
 
                 if ($monMoreLess == 2 && $monitorType == 0) {
                     $this->doCorrectMonitor($valueNow, $monID);
@@ -623,7 +624,7 @@ class CMonitorArticles {
         }
     }
 
-    function sendMonitorMess_v1($monUser, $monArtnr, $monStoreValue, $monComment, $monType) {
+    function sendMonitorMess_v1($monUser, $monArtnr, $monStoreValue, $monComment, $monType, $monAddBy = '') {
         $bevdatum = date("Y-m-d H:i:s", time());
 
         $addcreatedby = "no-reply@cyberphoto.se";
@@ -642,6 +643,11 @@ class CMonitorArticles {
 
         if ($monComment != "") {
             $text1 .= "Din egen notis: " . $monComment . "\n\n";
+        }
+
+        $queueAddresses = array('ekonomi@cyberphoto.se','inbyte@cyberphoto.se','kundtjanst@cyberphoto.se','produkt@cyberphoto.se','salj@cyberphoto.se','service@cyberphoto.se');
+        if (in_array($monUser, $queueAddresses) && !empty($monAddBy)) {
+            $text1 .= "Bevakning skapad av: " . $monAddBy . "\n\n";
         }
 
         $text1 .= "Vänligen vidta lämplig åtgärd!\n\n";
