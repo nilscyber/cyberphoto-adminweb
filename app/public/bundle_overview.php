@@ -72,10 +72,18 @@ $sql = "
     FROM m_product p
     LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
     LEFT JOIN m_product_category pc ON pc.m_product_category_id = p.m_product_category_id
-    WHERE p.isactive       = 'Y'
-      AND p.issalesbundle  = 'Y'
-      AND p.isselfservice  = 'Y'
+    LEFT JOIN (
+        SELECT m_product_id, SUM(qtyavailable) AS qtyavailable
+        FROM m_product_cache
+        WHERE m_warehouse_id = 1000000
+        GROUP BY m_product_id
+    ) ps ON ps.m_product_id = p.m_product_id
+    WHERE p.isactive      = 'Y'
+      AND p.issalesbundle = 'Y'
+      AND p.isselfservice = 'Y'
       AND (p.launchdate IS NULL OR p.launchdate <= NOW())
+      AND (p.discontinued  = 'N' OR COALESCE(ps.qtyavailable, 0) > 0)
+      AND (p.demo_product  = 'N' OR COALESCE(ps.qtyavailable, 0) > 0)
     ORDER BY
         COALESCE(pc.sort_priority, 999999) DESC,
         pc.name NULLS LAST,
