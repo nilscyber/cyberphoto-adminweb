@@ -169,7 +169,7 @@ if ($addStoreValue == "" && $addArtnr != "") {
                     <option value="ekonomi@cyberphoto.se"<?php if ($addRecipient == "ekonomi@cyberphoto.se") echo " selected"; ?>>OTRS ekonomikö</option>
                     <option value="inbyte@cyberphoto.se"<?php if ($addRecipient == "inbyte@cyberphoto.se") echo " selected"; ?>>OTRS inbyteskö</option>
                     <option value="kundtjanst@cyberphoto.se"<?php if ($addRecipient == "kundtjanst@cyberphoto.se") echo " selected"; ?>>OTRS kundtjänstkö</option>
-                    <option value="produkt@cyberphoto.se"<?php if ($addRecipient == "produkt@cyberphoto.se") echo " selected"; ?>>OTRS säljkö</option>
+                    <option value="produkt@cyberphoto.se"<?php if ($addRecipient == "salj@cyberphoto.se") echo " selected"; ?>>OTRS säljkö</option>
                     <option value="service@cyberphoto.se"<?php if ($addRecipient == "service@cyberphoto.se") echo " selected"; ?>>OTRS servicekö</option>
                 </select>
                 <span class="hint">Lämna tomt för att skicka till din e-post</span>
