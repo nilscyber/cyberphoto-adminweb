@@ -14,8 +14,10 @@
 		} else {
 			include("monitor_articles_add.php");
 		}
+	} else {
+		echo "<div><img border=\"0\" src=\"/pic/help.gif\">&nbsp;<b><a href=\"" . $_SERVER['PHP_SELF'] . "?add=yes\">Lägg till bevakning</b></a></div>\n";
 	}
-	echo "<div><img border=\"0\" src=\"/pic/help.gif\">&nbsp;<b><a href=\"" . $_SERVER['PHP_SELF'] . "?add=yes\">Lägg till bevakning</b></a></div>\n";
+	
 	if ($add != "yes") {
 		echo "<h2>Aktuella bevakningar</h2>\n";
 		$monitor->getActualMonitors();
