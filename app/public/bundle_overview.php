@@ -204,12 +204,9 @@ foreach ($rows as $r) {
     $badge90Class  = ($sold90  > 0) ? 'ok'  : (($soldTot > 0) ? 'low' : 'none');
     $badgeTotClass = ($soldTot > 0) ? 'plain' : 'none';
 
-    // Drawer-länk på produktnamnen
     $qs = array('mode'=>'product','q'=>$r['article'],'open'=>'product','id'=>$pid);
     $shareUrl = '/search_dispatch.php?' . http_build_query($qs);
-    $prodLink = '<a href="'.$shareUrl.'" class="drawer-link btn-more"'
-              . ' data-type="product" data-pid="'.$pid.'" data-id="'.$pid.'" data-article="'.$article.'">'
-              . $prodFull . '</a>';
+    $prodLink = '<a href="'.$shareUrl.'" target="_blank" rel="noopener">'.$prodFull.'</a>';
 
     $createdDate = $h($r['created_date'] ?? '');
 
