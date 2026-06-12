@@ -30,6 +30,7 @@ $sql = "
         COALESCE(pc.name,'')                                            AS category_name,
         COALESCE(pc.value,'')                                           AS category_value,
         COALESCE(pc.sort_priority, 999999)                              AS category_priority,
+        p.created::date                                                 AS created_date,
 
         -- Sålda via packey (bundle-räkning): 30 dagar
         COALESCE((
@@ -156,6 +157,7 @@ $total = count($rows);
 <colgroup>
   <col class="col-art" />
   <col class="col-prod" />
+  <col style="width:11ch" />
   <col class="col-sold" />
   <col class="col-sold" />
   <col class="col-sold" />
@@ -164,6 +166,7 @@ $total = count($rows);
   <tr>
     <th>Artikel</th>
     <th>Produkt</th>
+    <th class="text-center">Skapad</th>
     <th class="text-center" title="Sålda ordrar senaste 30 dagarna">30d</th>
     <th class="text-center" title="Sålda ordrar senaste 90 dagarna">90d</th>
     <th class="text-center" title="Totalt antal sålda ordrar">Totalt</th>
@@ -208,9 +211,12 @@ foreach ($rows as $r) {
               . ' data-type="product" data-pid="'.$pid.'" data-id="'.$pid.'" data-article="'.$article.'">'
               . $prodFull . '</a>';
 
+    $createdDate = $h($r['created_date'] ?? '');
+
     echo '<tr>'
        . '<td><span class="copy-art" data-article="'.$article.'" title="Kopiera artikelnummer">'.$article.'</span></td>'
        . '<td>'.$prodLink.'</td>'
+       . '<td class="text-center" style="white-space:nowrap;color:#6b7280">'.$createdDate.'</td>'
        . '<td class="text-center"><a href="'.$soldUrl.'" class="sold-badge '.$badge30Class.'" target="_blank" rel="noopener" title="30 dagars försäljning">'.$sold30.'</a></td>'
        . '<td class="text-center"><a href="'.$soldUrl.'" class="sold-badge '.$badge90Class.'" target="_blank" rel="noopener" title="90 dagars försäljning">'.$sold90.'</a></td>'
        . '<td class="text-center"><a href="'.$soldUrl.'" class="sold-badge '.$badgeTotClass.'" target="_blank" rel="noopener" title="Totalt sålda ordrar">'.$soldTot.'</a></td>'
