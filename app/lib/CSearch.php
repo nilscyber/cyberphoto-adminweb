@@ -2410,12 +2410,14 @@ public static function renderOrderDetailsAD($orderNo)
 
     $html .= '</div>';
 
-    // Total – beräkna moms från orderrader
-    $totalExVat = (float)$order['totallines'];
+    // Total – summera direkt från orderrader (inkl. öresavrundningsrad) i stället
+    // för order-headerns totallines som exkluderar rader utan produkt (t.ex. 0%-momsrader)
+    $totalExVat = 0.0;
     $totalTaxCalc = 0.0;
     foreach ($lines as $ln) {
         $lnNet  = (float)$ln['linenetamt'];
         $lnRate = isset($ln['tax_rate']) ? (float)$ln['tax_rate'] : 0;
+        $totalExVat   += $lnNet;
         $totalTaxCalc += $lnNet * ($lnRate / 100);
     }
     $totalInclVat = $totalExVat + $totalTaxCalc;
