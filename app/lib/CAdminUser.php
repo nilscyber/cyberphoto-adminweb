@@ -221,7 +221,8 @@ private static function getUserActiveOrders($adUserId, $limit = 50)
             bp.name AS bp_name,
             o.totallines,
             o.docstatus,
-            o.ispartdelivered
+            o.ispartdelivered,
+            o.socreditstatus
         FROM c_order o
         JOIN c_bpartner bp ON bp.c_bpartner_id = o.c_bpartner_id
         WHERE 
@@ -282,6 +283,7 @@ public static function renderUserActiveOrders($adUserId, $limit = 50)
                 <th>Kund</th>
                 <th style="width:120px;">Ordernr</th>
                 <th style="width:120px;">Status</th>
+                <th style="width:140px;">Kreditstatus</th>
                 <th style="width:120px;" class="text-right">Belopp</th>
             </tr>
         </thead>
@@ -309,6 +311,28 @@ public static function renderUserActiveOrders($adUserId, $limit = 50)
                 // Belopp
                 $totalRaw  = isset($o['totallines']) ? (float)$o['totallines'] : 0.0;
                 $totalDisp = number_format($totalRaw, 0, ',', ' ') . ' kr';
+
+                // Kreditstatus
+                $creditStatusMap = array(
+                    'A' => 'Inget har hänt',
+                    'B' => 'Prövning',
+                    'C' => 'Preliminärt godkänd',
+                    'E' => 'Leveransklar',
+                    'F' => 'Avslag',
+                    'G' => 'Annullerad',
+                    'H' => 'Slutlevererad',
+                    'I' => 'Förfrågan skickad',
+                    'J' => 'Ändrad, skall omprövas',
+                    'K' => 'Borttagen',
+                    'N' => 'Slutbetald av kund',
+                    'O' => 'Felaktig adress',
+                    'Z' => 'Fel vid kommunikation',
+                );
+                $csRaw   = isset($o['socreditstatus']) ? trim((string)$o['socreditstatus']) : '';
+                $csLabel = (isset($creditStatusMap[$csRaw])) ? $creditStatusMap[$csRaw] : '';
+                $csStyle = ($csRaw === 'E')
+                    ? 'font-weight:bold;color:#166534'
+                    : 'font-weight:bold;color:#c05621';
             ?>
             <tr>
                 <td><?php echo htmlspecialchars($o['dateordered']); ?></td>
@@ -320,6 +344,11 @@ public static function renderUserActiveOrders($adUserId, $limit = 50)
                 </td>
                 <td class="<?php echo $statusClass; ?>">
                     <?php echo htmlspecialchars($statusLabel); ?>
+                </td>
+                <td>
+                    <?php if ($csLabel !== ''): ?>
+                        <span style="<?php echo $csStyle; ?>"><?php echo htmlspecialchars($csLabel); ?></span>
+                    <?php endif; ?>
                 </td>
                 <td class="text-right">
                     <?php echo htmlspecialchars($totalDisp); ?>

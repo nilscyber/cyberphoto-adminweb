@@ -1709,6 +1709,8 @@ public static function renderOrderDetailsAD($orderNo)
             pay.name AS paymentterm,
             sh.name  AS shipper,
 
+            o.socreditstatus,
+
             xc.name  AS pclass,
             xc.name2 AS pclass2
 
@@ -2088,6 +2090,27 @@ public static function renderOrderDetailsAD($orderNo)
     // Betalning / frakt / kredit
     $html .= '<div class="dw-section dw-section-compact">';
     $html .= '  <div class="dw-row"><span class="dw-label">Betalningsvillkor:</span> <span class="dw-value"><strong>' . $eh($order['paymentterm']) . '</strong></span></div>';
+    $creditStatusMap = array(
+        'A' => 'Inget har hänt',
+        'B' => 'Prövning',
+        'C' => 'Preliminärt godkänd',
+        'E' => 'Leveransklar',
+        'F' => 'Avslag',
+        'G' => 'Annullerad',
+        'H' => 'Slutlevererad',
+        'I' => 'Förfrågan skickad',
+        'J' => 'Ändrad, skall omprövas',
+        'K' => 'Borttagen',
+        'N' => 'Slutbetald av kund',
+        'O' => 'Felaktig adress',
+        'Z' => 'Fel vid kommunikation',
+    );
+    $csRaw = isset($order['socreditstatus']) ? trim((string)$order['socreditstatus']) : '';
+    if ($csRaw !== '' && isset($creditStatusMap[$csRaw])) {
+        $csLabel = $creditStatusMap[$csRaw];
+        $csColor = ($csRaw === 'E') ? '#166534' : '#c05621';
+        $html .= '  <div class="dw-row"><span class="dw-label">Kreditstatus:</span> <span class="dw-value"><strong style="color:' . $csColor . '">' . $eh($csLabel) . '</strong></span></div>';
+    }
     if (!empty($order['shipper'])) {
         $html .= '  <div class="dw-row"><span class="dw-label">Leveranssätt:</span> <span class="dw-value"><strong>' . $eh($order['shipper']) . '</strong></span></div>';
     }
