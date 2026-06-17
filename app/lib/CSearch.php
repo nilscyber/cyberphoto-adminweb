@@ -2109,8 +2109,11 @@ public static function renderOrderDetailsAD($orderNo)
     if ($csRaw !== '' && isset($creditStatusMap[$csRaw])) {
         $csLabel = $creditStatusMap[$csRaw];
         $csColor = ($csRaw === 'E') ? '#166534' : '#c05621';
-        $html .= '  <div class="dw-row"><span class="dw-label">Kreditstatus:</span> <span class="dw-value"><strong style="color:' . $csColor . '">' . $eh($csLabel) . '</strong></span></div>';
+        $csHtml  = '<strong style="color:' . $csColor . '">' . $eh($csLabel) . '</strong>';
+    } else {
+        $csHtml  = '<em>ej angivet</em>';
     }
+    $html .= '  <div class="dw-row"><span class="dw-label">Kreditstatus:</span> <span class="dw-value">' . $csHtml . '</span></div>';
     if (!empty($order['shipper'])) {
         $html .= '  <div class="dw-row"><span class="dw-label">Leveranssätt:</span> <span class="dw-value"><strong>' . $eh($order['shipper']) . '</strong></span></div>';
     }

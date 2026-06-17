@@ -329,10 +329,13 @@ public static function renderUserActiveOrders($adUserId, $limit = 50)
                     'Z' => 'Fel vid kommunikation',
                 );
                 $csRaw   = isset($o['socreditstatus']) ? trim((string)$o['socreditstatus']) : '';
-                $csLabel = (isset($creditStatusMap[$csRaw])) ? $creditStatusMap[$csRaw] : '';
-                $csStyle = ($csRaw === 'E')
-                    ? 'font-weight:bold;color:#166534'
-                    : 'font-weight:bold;color:#c05621';
+                if ($csRaw !== '' && isset($creditStatusMap[$csRaw])) {
+                    $csLabel = $creditStatusMap[$csRaw];
+                    $csStyle = ($csRaw === 'E') ? 'font-weight:bold;color:#166534' : 'font-weight:bold;color:#c05621';
+                } else {
+                    $csLabel = 'ej angivet';
+                    $csStyle = 'font-style:italic;color:#6b7280';
+                }
             ?>
             <tr>
                 <td><?php echo htmlspecialchars($o['dateordered']); ?></td>
@@ -346,9 +349,7 @@ public static function renderUserActiveOrders($adUserId, $limit = 50)
                     <?php echo htmlspecialchars($statusLabel); ?>
                 </td>
                 <td>
-                    <?php if ($csLabel !== ''): ?>
-                        <span style="<?php echo $csStyle; ?>"><?php echo htmlspecialchars($csLabel); ?></span>
-                    <?php endif; ?>
+                    <span style="<?php echo $csStyle; ?>"><?php echo htmlspecialchars($csLabel); ?></span>
                 </td>
                 <td class="text-right">
                     <?php echo htmlspecialchars($totalDisp); ?>
