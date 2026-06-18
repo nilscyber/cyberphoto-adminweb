@@ -222,10 +222,15 @@ private static function getUserActiveOrders($adUserId, $limit = 50)
             o.totallines,
             o.docstatus,
             o.ispartdelivered,
-            o.socreditstatus
+            o.socreditstatus,
+            o.locked_to_id,
+            us.name AS locked_user_name,
+            xc.name AS xc_status_name
         FROM c_order o
         JOIN c_bpartner bp ON bp.c_bpartner_id = o.c_bpartner_id
-        WHERE 
+        LEFT JOIN ad_user us ON us.ad_user_id = o.locked_to_id
+        LEFT JOIN xc_sales_order_status xc ON xc.xc_sales_order_status_id = o.xc_sales_order_status_id
+        WHERE
             o.salesrep_id = $1
             AND o.c_doctypetarget_id = 1000030
             AND o.isactive = 'Y'
@@ -272,8 +277,11 @@ public static function renderUserActiveOrders($adUserId, $limit = 50)
     ob_start();
     ?>
     <style>
-        .order-status-partial  { font-weight:bold; color:#c05621; }
-        .order-status-active   { font-weight:bold; color:#15803d; }
+        .order-status-draft     { font-weight:bold; color:#6b7280; }
+        .order-status-active    { font-weight:bold; color:#15803d; }
+        .order-status-done      { font-weight:bold; color:#1d4ed8; }
+        .order-status-partial   { font-weight:bold; color:#c05621; }
+        .order-status-cancelled { font-weight:bold; color:#991b1b; }
     </style>
 
     <table class="table-list with-drawer-gutter">
@@ -290,15 +298,41 @@ public static function renderUserActiveOrders($adUserId, $limit = 50)
         <tbody>
         <?php foreach ($orders as $o): ?>
             <?php
-                // --- Status baserat på ispartdelivered ---
+                // --- Status baserat på docstatus + ispartdelivered ---
+                $docStatus       = strtoupper(trim((string)($o['docstatus'] ?? '')));
                 $isPartDelivered = isset($o['ispartdelivered']) ? $o['ispartdelivered'] : 'N';
-                
+
+                $docStatusMap = array(
+                    'DR' => array('label' => 'Utkast (ej registrerad)',        'class' => 'order-status-draft'),
+                    'IP' => array('label' => 'Under bearbetning (registrerad)','class' => 'order-status-active'),
+                    'CO' => array('label' => 'Slutförd',                       'class' => 'order-status-done'),
+                    'WC' => array('label' => 'Väntar på bekräftelse',          'class' => 'order-status-draft'),
+                    'VO' => array('label' => 'Annullerad',                     'class' => 'order-status-cancelled'),
+                    'RE' => array('label' => 'Återförd',                       'class' => 'order-status-cancelled'),
+                    'CL' => array('label' => 'Stängd',                         'class' => 'order-status-done'),
+                );
+
                 if ($isPartDelivered === 'Y') {
                     $statusLabel = 'Dellevererad';
                     $statusClass = 'order-status-partial';
+                } elseif (isset($docStatusMap[$docStatus])) {
+                    $statusLabel = $docStatusMap[$docStatus]['label'];
+                    $statusClass = $docStatusMap[$docStatus]['class'];
                 } else {
-                    $statusLabel = 'Behandlas';
-                    $statusClass = 'order-status-active';
+                    $statusLabel = $docStatus;
+                    $statusClass = 'order-status-draft';
+                }
+
+                // Hänglåsikoner
+                $lockHtml = '';
+                $lockedUser = trim((string)($o['locked_user_name'] ?? ''));
+                $xcStatus   = trim((string)($o['xc_status_name']   ?? ''));
+                $lockSvg = '<svg style="vertical-align:middle;margin-left:4px" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+                if ($lockedUser !== '') {
+                    $lockHtml .= '<span title="Låst till: ' . htmlspecialchars($lockedUser) . '" style="color:#b45309;cursor:default">' . $lockSvg . '</span>';
+                }
+                if ($xcStatus !== '') {
+                    $lockHtml .= '<span title="Orderstatus: ' . htmlspecialchars($xcStatus) . '" style="color:#1d4ed8;cursor:default">' . $lockSvg . '</span>';
                 }
 
                 // Teckenkodning kundnamn
@@ -340,10 +374,10 @@ public static function renderUserActiveOrders($adUserId, $limit = 50)
             <tr>
                 <td><?php echo htmlspecialchars($o['dateordered']); ?></td>
                 <td><?php echo htmlspecialchars($bpName); ?></td>
-                <td>
+                <td style="white-space:nowrap">
                     <a href="<?php echo htmlspecialchars($orderUrl); ?>" target="_blank">
                         <?php echo htmlspecialchars($docNo); ?>
-                    </a>
+                    </a><?php echo $lockHtml; ?>
                 </td>
                 <td class="<?php echo $statusClass; ?>">
                     <?php echo htmlspecialchars($statusLabel); ?>
