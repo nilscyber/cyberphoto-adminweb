@@ -1711,12 +1711,18 @@ public static function renderOrderDetailsAD($orderNo)
 
             o.socreditstatus,
 
+            o.locked_to_id,
+            us_lock.name AS locked_user_name,
+            xc_sos.name  AS xc_status_name,
+
             xc.name  AS pclass,
             xc.name2 AS pclass2
 
         FROM c_order o
             JOIN c_paymentterm pay ON pay.c_paymentterm_id = o.c_paymentterm_id
             LEFT JOIN m_shipper sh ON sh.m_shipper_id = o.m_shipper_id
+            LEFT JOIN ad_user us_lock ON us_lock.ad_user_id = o.locked_to_id
+            LEFT JOIN xc_sales_order_status xc_sos ON xc_sos.xc_sales_order_status_id = o.xc_sales_order_status_id
 
             JOIN ad_user ad ON ad.ad_user_id = o.salesrep_id
 
@@ -1903,8 +1909,17 @@ public static function renderOrderDetailsAD($orderNo)
 
     // ----- Orderstatus -----
     $docStatus = strtoupper(trim((string)$order['docstatus']));
-    $statusLabel = 'Bearbetas';
-    $statusClass = 'badge-status badge-status-process';
+    $docStatusMap = array(
+        'DR' => array('label' => 'Utkast (ej registrerad)',         'class' => 'badge-status badge-status-draft'),
+        'IP' => array('label' => 'Under bearbetning (registrerad)', 'class' => 'badge-status badge-status-process'),
+        'CO' => array('label' => 'Slutförd',                        'class' => 'badge-status badge-status-sent'),
+        'WC' => array('label' => 'Väntar på bekräftelse',           'class' => 'badge-status badge-status-draft'),
+        'VO' => array('label' => 'Annullerad',                      'class' => 'badge-status badge-status-cancel'),
+        'RE' => array('label' => 'Återförd',                        'class' => 'badge-status badge-status-cancel'),
+        'CL' => array('label' => 'Stängd',                          'class' => 'badge-status badge-status-sent'),
+    );
+    $statusLabel = isset($docStatusMap[$docStatus]) ? $docStatusMap[$docStatus]['label'] : 'Bearbetas';
+    $statusClass = isset($docStatusMap[$docStatus]) ? $docStatusMap[$docStatus]['class'] : 'badge-status badge-status-process';
     $isCancelled = in_array($docStatus, array('VO', 'CL'));
 
     $allDelivered      = false;
@@ -2021,10 +2036,12 @@ public static function renderOrderDetailsAD($orderNo)
     .dw-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
     .dw-title{margin:0}
     .badge-status{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d1d5db;font-size:12px;font-weight:700}
+    .badge-status-draft{background:#f3f4f6;border-color:#d1d5db;color:#6b7280}
     .badge-status-process{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
     .badge-status-sent{background:#ecfdf5;border-color:#6ee7b7;color:#065f46}
     .badge-status-partial{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
     .badge-status-cancel{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+    .dw-lock{display:inline-flex;align-items:center;margin-left:6px;cursor:default}
     .copy-chip{cursor:pointer}
     .copy-chip:hover{background:#f3f4f6;border-radius:3px}
     .copy-chip.copied{background:#ecfdf5;box-shadow:inset 0 0 0 1px #34d399;border-radius:3px}
@@ -2074,8 +2091,19 @@ public static function renderOrderDetailsAD($orderNo)
                . '</a>'
                : '')
            . '</h2>';
+    $lockSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+    $lockHtml = '';
+    $lockedUser = trim((string)($order['locked_user_name'] ?? ''));
+    $xcStatus   = trim((string)($order['xc_status_name']   ?? ''));
+    if ($lockedUser !== '') {
+        $lockHtml .= '<span class="dw-lock" title="Låst till: '.$eh($lockedUser).'" style="color:#b45309">'.$lockSvg.'</span>';
+    }
+    if ($xcStatus !== '') {
+        $lockHtml .= '<span class="dw-lock" title="Orderstatus: '.$eh($xcStatus).'" style="color:#1d4ed8">'.$lockSvg.'</span>';
+    }
     $html .= '<div class="order-status-wrap">'
           .  '<span class="'.$eh($statusClass).'">'.$eh($statusLabel).'</span>'
+          .  $lockHtml
           .  $offerBadge
           .  '</div>';
     $html .= '</div>';
