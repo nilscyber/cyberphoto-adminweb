@@ -457,57 +457,36 @@ Class CWebADInternSuplier {
 				exit;
 			}
 
-			echo "<table>";
-			echo "<tr>";
-			echo "<td width=\"650\"><b>Leverantör</b></td>";
-			// echo "<td width=\"75\" align=\"center\"><b>Antal</b></td>";
-			echo "<td width=\"120\" align=\"center\"><b>Lagervärde</b></td>";
-			echo "</tr>";
+			echo "<table class=\"table-list\">";
+			echo "<thead><tr>";
+			echo "<th>Leverantör</th>";
+			echo "<th style=\"text-align:right\">Lagervärde</th>";
+			echo "</tr></thead>";
+			echo "<tbody>";
 
 			$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-			// $row = pg_fetch_object($res);
 
 				if ($res && pg_num_rows($res) > 0) {
-				
+
 					while ($res && $row = pg_fetch_row($res)) {
-					
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-						
+
 						$totalvarde += $row[2];
 						$SummaLager = number_format($row[2], 0, ',', ' ');
 
 						echo "<tr>";
-						if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") {
-							echo "<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?supID=$row[3]&demo=" . $demo . "&begagnat=" . $begagnat . "\">$row[1] ($row[3])</a></td>";
-						} else {
-							echo "<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?supID=$row[3]&demo=" . $demo . "&begagnat=" . $begagnat . "\">$row[1] ($row[3])</a></td>";
-						}
-						// echo "<td class=\"$backcolor\" align=\"center\">$row[3]</td>";
-						echo "<td class=\"$backcolor\" align=\"right\">$SummaLager SEK&nbsp;</td>";
+						echo "<td><a href=\"" . $_SERVER['PHP_SELF'] . "?supID=$row[3]&demo=" . $demo . "&begagnat=" . $begagnat . "\">$row[1] ($row[3])</a></td>";
+						echo "<td style=\"text-align:right\">$SummaLager SEK</td>";
 						echo "</tr>";
-
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
-						
 					}
 
 				}
 
+			echo "</tbody>";
 			$totalvarde = number_format($totalvarde, 0, ',', ' ');
-			echo "<tr>";
-			echo "<td align=\"left\"><b>Totalt:</b></td>";
-			// echo "<td align=\"right\"><b></b></td>";
-			echo "<td align=\"right\"><b>$totalvarde SEK&nbsp;</b></td>";
-			echo "</tr>";
+			echo "<tfoot><tr>";
+			echo "<td><b>Totalt:</b></td>";
+			echo "<td style=\"text-align:right\"><b>$totalvarde SEK</b></td>";
+			echo "</tr></tfoot>";
 			echo "</table>";
 
 	}
@@ -601,19 +580,19 @@ Class CWebADInternSuplier {
 			
 			} else {
 
-				echo "<table>";
-				echo "<tr>";
-				echo "<td width=\"550\"><b>Artikel</b></td>";
-				// echo "<td width=\"100\"><b>Tillverkare</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Antal</b></td>";
-				echo "<td width=\"100\" align=\"center\"><b>Lagervärde</b></td>";
-				echo "<td width=\"100\" align=\"center\"><b>Allokerat</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Räcker</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Sålda 30</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Sålda 60</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Trend</b></td>";
-				echo "</tr>";
-			
+				echo "<table class=\"table-list\">";
+				echo "<thead><tr>";
+				echo "<th>Artikel</th>";
+				echo "<th>Antal</th>";
+				echo "<th style=\"text-align:right\">Lagervärde</th>";
+				echo "<th style=\"text-align:right\">Allokerat</th>";
+				echo "<th>Räcker</th>";
+				echo "<th>Sålda 30</th>";
+				echo "<th>Sålda 60</th>";
+				echo "<th>Trend</th>";
+				echo "</tr></thead>";
+				echo "<tbody>";
+
 			}
 
 			$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
@@ -737,66 +716,54 @@ Class CWebADInternSuplier {
 							// $antal_produkter++;
 							$antal_produkter += $row[1];
 
+							$productUrl = '/search_dispatch.php?mode=product&q=' . rawurlencode($row[0]);
 							echo "<tr>";
 							if ($supID == 5555) {
-								echo "<td class=\"$backcolor\">(" . $row[0] . ") <a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[0]\">$beskrivning</a></td>";
+								echo "<td>(" . $row[0] . ") <a target=\"_blank\" href=\"$productUrl\">$beskrivning</a></td>";
 							} else {
-								echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[0]\">$beskrivning...</a></td>";
+								echo "<td><a target=\"_blank\" href=\"$productUrl\">$beskrivning</a></td>";
 							}
-							// echo "<td class=\"$backcolor\" align=\"center\">$row[4]</td>";
-							echo "<td class=\"$backcolor\" align=\"center\">$row[1]</td>";
-							echo "<td class=\"$backcolor\" align=\"right\">$SummaLager SEK&nbsp;</td>";
-							echo "<td class=\"$backcolor\" align=\"right\">$allokerat SEK&nbsp;</td>";
+							echo "<td style=\"text-align:center\">$row[1]</td>";
+							echo "<td style=\"text-align:right\">$SummaLager SEK</td>";
+							echo "<td style=\"text-align:right\">$allokerat SEK</td>";
 							if ($antalManad1 == 0) {
-								echo "<td class=\"$backcolor\" align=\"center\"><span class=\"lagerred\">&#8734;</span></td>";
+								echo "<td style=\"text-align:center\"><span class=\"lagerred\">&#8734;</span></td>";
 							} else {
 								if ($Takt < 15) {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagergreen\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagergreen\">$Takt dagar</span></td>";
 								} elseif ($Takt > 14 && $Takt < 31)  {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerblack\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerblack\">$Takt dagar</span></td>";
 								} elseif ($Takt > 30 && $Takt < 100)  {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerred\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerred\">$Takt dagar</span></td>";
 								} else {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerredbold\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerredbold\">$Takt dagar</span></td>";
 								}
 							}
-							echo "<td class=\"$backcolor\" align=\"center\">$antalManad1</td>";
-							echo "<td class=\"$backcolor\" align=\"center\">$antalManad2</td>";
+							echo "<td style=\"text-align:center\">$antalManad1</td>";
+							echo "<td style=\"text-align:center\">$antalManad2</td>";
 							echo $this->displayTrend($avvikelse);
 							echo "</tr>";
-
-							if ($rowcolor == true) {
-								$row = true;
-								$rowcolor = false;
-							} else {
-								$row = false;
-								$rowcolor = true;
-							}
-							
 						}
-						
+
 					}
 
 				}
 
 			if (!$export) {
-				
+
 				$totalvarde = number_format($totalvarde, 0, ',', ' ');
 				$totalallokerat = number_format($totalallokerat, 0, ',', ' ');
-				echo "<tr>";
-				echo "<td align=\"left\"><b>Totalt:</b></td>";
-				if ($supID == 5555) {
-					echo "<td align=\"center\"><b>$antal_produkter st</b></td>";
-				} else {
-					echo "<td align=\"center\"><b>$antal_produkter st</b></td>";
-				}
-				echo "<td align=\"right\"><b>$totalvarde SEK&nbsp;</b></td>";
-				echo "<td align=\"right\"><b>$totalallokerat SEK&nbsp;</b></td>";
-				echo "</tr>";
+				echo "</tbody>";
+				echo "<tfoot><tr>";
+				echo "<td><b>Totalt:</b></td>";
+				echo "<td style=\"text-align:center\"><b>$antal_produkter st</b></td>";
+				echo "<td style=\"text-align:right\"><b>$totalvarde SEK</b></td>";
+				echo "<td style=\"text-align:right\"><b>$totalallokerat SEK</b></td>";
+				echo "</tr></tfoot>";
 				echo "</table>";
-				
+
 			}
-				
+
 	}
 
 	function displayManufacturerValue() {
@@ -832,58 +799,36 @@ Class CWebADInternSuplier {
 			echo "begagnat: ". $begagnat . "<br>";
 			*/
 
-			echo "<table>";
-			echo "<tr>";
-			echo "<td width=\"650\"><b>Tillverkare</b></td>";
-			// echo "<td width=\"75\" align=\"center\"><b>Antal</b></td>";
-			echo "<td width=\"120\" align=\"center\"><b>Lagervärde</b></td>";
-			echo "</tr>";
+			echo "<table class=\"table-list\">";
+			echo "<thead><tr>";
+			echo "<th>Tillverkare</th>";
+			echo "<th style=\"text-align:right\">Lagervärde</th>";
+			echo "</tr></thead>";
+			echo "<tbody>";
 
 			$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-			// $row = pg_fetch_object($res);
 
 				if ($res && pg_num_rows($res) > 0) {
-				
+
 					while ($res && $row = pg_fetch_row($res)) {
-					
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-						
+
 						$totalvarde += $row[2];
 						$SummaLager = number_format($row[2], 0, ',', ' ');
 
 						echo "<tr>";
-						if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") {
-							// echo "<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?manID=$row[0]\">$row[1]</a></td>";
-							echo "<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?manID=$row[0]&demo=" . $demo . "&begagnat=" . $begagnat . "\">" . $row[1] . "</a></td>";
-						} else {
-							echo "<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?manID=$row[0]&demo=" . $demo . "&begagnat=" . $begagnat . "\">" . $row[1] . "</a></td>";
-						}
-						// echo "<td class=\"$backcolor\" align=\"center\">$row[3]</td>";
-						echo "<td class=\"$backcolor\" align=\"right\">$SummaLager SEK&nbsp;</td>";
+						echo "<td><a href=\"" . $_SERVER['PHP_SELF'] . "?manID=$row[0]&demo=" . $demo . "&begagnat=" . $begagnat . "\">" . $row[1] . "</a></td>";
+						echo "<td style=\"text-align:right\">$SummaLager SEK</td>";
 						echo "</tr>";
-
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
-						
 					}
 
 				}
 
+			echo "</tbody>";
 			$totalvarde = number_format($totalvarde, 0, ',', ' ');
-			echo "<tr>";
-			echo "<td align=\"left\"><b>Totalt:</b></td>";
-			// echo "<td align=\"right\"><b></b></td>";
-			echo "<td align=\"right\"><b>$totalvarde SEK&nbsp;</b></td>";
-			echo "</tr>";
+			echo "<tfoot><tr>";
+			echo "<td><b>Totalt:</b></td>";
+			echo "<td style=\"text-align:right\"><b>$totalvarde SEK</b></td>";
+			echo "</tr></tfoot>";
 			echo "</table>";
 
 	}
@@ -977,20 +922,20 @@ Class CWebADInternSuplier {
 			
 			} else {
 
-				echo "<table>";
-				echo "<tr>";
-				echo "<td><b>Artnr</b></td>";
-				echo "<td width=\"550\"><b>Artikel</b></td>";
-				// echo "<td width=\"100\"><b>Tillverkare</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Antal</b></td>";
-				echo "<td width=\"100\" align=\"center\"><b>Lagervärde</b></td>";
-				echo "<td width=\"100\" align=\"center\"><b>Allokerat</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Räcker</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Sålda 30</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Sålda 60</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Trend</b></td>";
-				echo "</tr>";
-			
+				echo "<table class=\"table-list\">";
+				echo "<thead><tr>";
+				echo "<th>Artnr</th>";
+				echo "<th>Artikel</th>";
+				echo "<th>Antal</th>";
+				echo "<th style=\"text-align:right\">Lagervärde</th>";
+				echo "<th style=\"text-align:right\">Allokerat</th>";
+				echo "<th>Räcker</th>";
+				echo "<th>Sålda 30</th>";
+				echo "<th>Sålda 60</th>";
+				echo "<th>Trend</th>";
+				echo "</tr></thead>";
+				echo "<tbody>";
+
 			}
 
 			$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
@@ -1114,67 +1059,55 @@ Class CWebADInternSuplier {
 							// $antal_produkter++;
 							$antal_produkter += $row[1];
 
+							$productUrl = '/search_dispatch.php?mode=product&q=' . rawurlencode($row[0]);
 							echo "<tr>";
-							echo "<td class=\"$backcolor\" align=\"center\">$row[0]</td>";
+							echo "<td style=\"text-align:center\">$row[0]</td>";
 							if ($supID == 5555) {
-								echo "<td class=\"$backcolor\">(" . $row[0] . ") <a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[0]\">$beskrivning</a></td>";
+								echo "<td>(" . $row[0] . ") <a target=\"_blank\" href=\"$productUrl\">$beskrivning</a></td>";
 							} else {
-								echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[0]\">$beskrivning</a></td>";
+								echo "<td><a target=\"_blank\" href=\"$productUrl\">$beskrivning</a></td>";
 							}
-							// echo "<td class=\"$backcolor\" align=\"center\">$row[4]</td>";
-							echo "<td class=\"$backcolor\" align=\"center\">$row[1]</td>";
-							echo "<td class=\"$backcolor\" align=\"right\">$SummaLager SEK&nbsp;</td>";
-							echo "<td class=\"$backcolor\" align=\"right\">$allokerat SEK&nbsp;</td>";
+							echo "<td style=\"text-align:center\">$row[1]</td>";
+							echo "<td style=\"text-align:right\">$SummaLager SEK</td>";
+							echo "<td style=\"text-align:right\">$allokerat SEK</td>";
 							if ($antalManad1 == 0) {
-								echo "<td class=\"$backcolor\" align=\"center\"><span class=\"lagerred\">&#8734;</span></td>";
+								echo "<td style=\"text-align:center\"><span class=\"lagerred\">&#8734;</span></td>";
 							} else {
 								if ($Takt < 15) {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagergreen\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagergreen\">$Takt dagar</span></td>";
 								} elseif ($Takt > 14 && $Takt < 31)  {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerblack\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerblack\">$Takt dagar</span></td>";
 								} elseif ($Takt > 30 && $Takt < 100)  {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerred\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerred\">$Takt dagar</span></td>";
 								} else {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerredbold\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerredbold\">$Takt dagar</span></td>";
 								}
 							}
-							echo "<td class=\"$backcolor\" align=\"center\">$antalManad1</td>";
-							echo "<td class=\"$backcolor\" align=\"center\">$antalManad2</td>";
+							echo "<td style=\"text-align:center\">$antalManad1</td>";
+							echo "<td style=\"text-align:center\">$antalManad2</td>";
 							echo $this->displayTrend($avvikelse);
 							echo "</tr>";
-
-							if ($rowcolor == true) {
-								$row = true;
-								$rowcolor = false;
-							} else {
-								$row = false;
-								$rowcolor = true;
-							}
-							
 						}
-						
+
 					}
 
 				}
 
 			if (!$export) {
-				
+
 				$totalvarde = number_format($totalvarde, 0, ',', ' ');
 				$totalallokerat = number_format($totalallokerat, 0, ',', ' ');
-				echo "<tr>";
-				echo "<td align=\"left\"><b>Totalt:</b></td>";
-				if ($supID == 5555) {
-					echo "<td align=\"center\"><b>$antal_produkter st</b></td>";
-				} else {
-					echo "<td align=\"center\"><b>$antal_produkter st</b></td>";
-				}
-				echo "<td align=\"right\"><b>$totalvarde SEK&nbsp;</b></td>";
-				echo "<td align=\"right\"><b>$totalallokerat SEK&nbsp;</b></td>";
-				echo "</tr>";
+				echo "</tbody>";
+				echo "<tfoot><tr>";
+				echo "<td><b>Totalt:</b></td>";
+				echo "<td style=\"text-align:center\"><b>$antal_produkter st</b></td>";
+				echo "<td style=\"text-align:right\"><b>$totalvarde SEK</b></td>";
+				echo "<td style=\"text-align:right\"><b>$totalallokerat SEK</b></td>";
+				echo "</tr></tfoot>";
 				echo "</table>";
-				
+
 			}
-				
+
 	}
 
 	function displayProductsValue() {
@@ -1197,63 +1130,39 @@ Class CWebADInternSuplier {
 				exit;
 			}
 	
-			echo "<table>";
-			echo "<tr>";
-			// echo "<td width=\"10\">&nbsp;</td>";
-			echo "<td width=\"550\"><b>Kategori</b></td>";
-			echo "<td width=\"75\" align=\"center\"><b>Antal</b></td>";
-			echo "<td width=\"120\" align=\"center\"><b>Lagervärde</b></td>";
-			echo "<td width=\"70\" align=\"center\"><b>Ansvarig</b></td>";
-			echo "</tr>";
+			echo "<table class=\"table-list\">";
+			echo "<thead><tr>";
+			echo "<th>Kategori</th>";
+			echo "<th style=\"text-align:center\">Antal</th>";
+			echo "<th style=\"text-align:right\">Lagervärde</th>";
+			echo "</tr></thead>";
+			echo "<tbody>";
 
 			$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-			// $row = pg_fetch_object($res);
 
 				if ($res && pg_num_rows($res) > 0) {
-				
+
 					while ($res && $row = pg_fetch_row($res)) {
-					
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-						
+
 						$totalvarde += $row[2];
 						$SummaLager = number_format($row[2], 0, ',', ' ');
 
 						echo "<tr>";
-						// echo "<td class=\"$backcolor\" align=\"center\">$countrow</td>";
-						if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") {
-							echo "<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?katID=$row[3]\">$row[0]</a></td>";
-						} else {
-							echo "<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?katID=$row[3]\">$row[0]</a></td>";
-						}
-						echo "<td class=\"$backcolor\" align=\"center\">$row[1]</td>";
-						echo "<td class=\"$backcolor\" align=\"right\">$SummaLager SEK&nbsp;</td>";
-						echo "<td class=\"$backcolor\" align=\"center\">" . strtoupper($row[4]) . "</td>";
+						echo "<td><a href=\"" . $_SERVER['PHP_SELF'] . "?katID=$row[3]\">$row[0]</a></td>";
+						echo "<td style=\"text-align:center\">$row[1]</td>";
+						echo "<td style=\"text-align:right\">$SummaLager SEK</td>";
 						echo "</tr>";
-
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
-						
-						$countrow++;
-						
 					}
 
 				}
 
+			echo "</tbody>";
 			$totalvarde = number_format($totalvarde, 0, ',', ' ');
-			echo "<tr>";
-			echo "<td align=\"left\"><b>Totalt:</b></td>";
-			echo "<td align=\"right\"><b></b></td>";
-			echo "<td align=\"right\"><b>$totalvarde SEK&nbsp;</b></td>";
-			echo "</tr>";
+			echo "<tfoot><tr>";
+			echo "<td><b>Totalt:</b></td>";
+			echo "<td style=\"text-align:center\"></td>";
+			echo "<td style=\"text-align:right\"><b>$totalvarde SEK</b></td>";
+			echo "</tr></tfoot>";
 			echo "</table>";
 
 	}
@@ -1285,29 +1194,29 @@ Class CWebADInternSuplier {
 				exit;
 			}
 
-			echo "<table width=\"1250\">";
-			echo "<tr>";
-			echo "<td><b>Artikel</b></td>";
-			echo "<td width=\"75\" align=\"center\"><b>Antal</b></td>";
-			echo "<td width=\"100\" align=\"center\"><b>Lagervärde</b></td>";
-			echo "<td width=\"100\" align=\"center\"><b>Allokerat</b></td>";
-			echo "<td width=\"55\" align=\"center\"><b>Antal</b></td>";
-			echo "<td width=\"75\" align=\"center\"><b>Räcker</b></td>";
-			echo "<td width=\"75\" align=\"center\"><b>Sålda 30</b></td>";
-			echo "<td width=\"75\" align=\"center\"><b>Sålda 60</b></td>";
-			echo "<td width=\"75\" align=\"center\"><b>Trend</b></td>";
-			echo "</tr>";
+			echo "<table class=\"table-list\">";
+			echo "<thead><tr>";
+			echo "<th>Artikel</th>";
+			echo "<th>Antal</th>";
+			echo "<th style=\"text-align:right\">Lagervärde</th>";
+			echo "<th style=\"text-align:right\">Allokerat</th>";
+			echo "<th>Allok. antal</th>";
+			echo "<th>Räcker</th>";
+			echo "<th>Sålda 30</th>";
+			echo "<th>Sålda 60</th>";
+			echo "<th>Trend</th>";
+			echo "</tr></thead>";
+			echo "<tbody>";
 
 			$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-			// $row = pg_fetch_object($res);
 
 				if ($res && pg_num_rows($res) > 0) {
-				
+
 					while ($res && $row = pg_fetch_row($res)) {
-					
+
 						$antalManad1 = $row[6];
 						$antalManad2 = $row[7];
-					
+
 						if ($antalManad1 == null) {
 							$antalManad1 = 0;
 						}
@@ -1324,12 +1233,6 @@ Class CWebADInternSuplier {
 							$avvikelse = round($antalManad1 / $antalManad2, 2);
 						}
 
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-						
 						$beskrivning = $row[4] . " " . $row[3];
 						if (strlen($beskrivning) > 75) {
 							$beskrivning = substr ($beskrivning, 0, 75) . "....";
@@ -1347,51 +1250,43 @@ Class CWebADInternSuplier {
 						$allokerat = number_format(($row[5]*$allokerat_antal), 0, ',', ' ');
 						$totalallokerat+= $row[5]*$allokerat_antal;
 
+						$productUrl = '/search_dispatch.php?mode=product&q=' . rawurlencode($row[0]);
 						echo "<tr>";
-						echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[0]\">$beskrivning</a></td>";
-						echo "<td class=\"$backcolor\" align=\"center\">$row[1]</td>";
-						echo "<td class=\"$backcolor\" align=\"right\">$SummaLager SEK&nbsp;</td>";
-						echo "<td class=\"$backcolor\" align=\"right\">$allokerat SEK&nbsp;</td>";
-						echo "<td class=\"$backcolor\" align=\"center\">$allokerat_antal</td>";
+						echo "<td><a target=\"_blank\" href=\"$productUrl\">$beskrivning</a></td>";
+						echo "<td style=\"text-align:center\">$row[1]</td>";
+						echo "<td style=\"text-align:right\">$SummaLager SEK</td>";
+						echo "<td style=\"text-align:right\">$allokerat SEK</td>";
+						echo "<td style=\"text-align:center\">$allokerat_antal</td>";
 						if ($antalManad1 == 0) {
-							echo "<td class=\"$backcolor\" align=\"center\"><span class=\"lagerred\">&#8734;</span></td>";
+							echo "<td style=\"text-align:center\"><span class=\"lagerred\">&#8734;</span></td>";
 						} else {
 							if ($Takt < 15) {
-								echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagergreen\">$Takt dagar&nbsp;</span></td>";
+								echo "<td style=\"text-align:right\"><span class=\"lagergreen\">$Takt dagar</span></td>";
 							} elseif ($Takt > 14 && $Takt < 31)  {
-								echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerblack\">$Takt dagar&nbsp;</span></td>";
+								echo "<td style=\"text-align:right\"><span class=\"lagerblack\">$Takt dagar</span></td>";
 							} elseif ($Takt > 30 && $Takt < 100)  {
-								echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerred\">$Takt dagar&nbsp;</span></td>";
+								echo "<td style=\"text-align:right\"><span class=\"lagerred\">$Takt dagar</span></td>";
 							} else {
-								echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerredbold\">$Takt dagar&nbsp;</span></td>";
+								echo "<td style=\"text-align:right\"><span class=\"lagerredbold\">$Takt dagar</span></td>";
 							}
 						}
-						echo "<td class=\"$backcolor\" align=\"center\">$antalManad1</td>";
-						echo "<td class=\"$backcolor\" align=\"center\">$antalManad2</td>";
+						echo "<td style=\"text-align:center\">$antalManad1</td>";
+						echo "<td style=\"text-align:center\">$antalManad2</td>";
 						echo $this->displayTrend($avvikelse);
 						echo "</tr>";
-
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
-						
 					}
 
 				}
 
 			$totalvarde = number_format($totalvarde, 0, ',', ' ');
 			$totalallokerat = number_format($totalallokerat, 0, ',', ' ');
-			echo "<tr>";
-			echo "<td align=\"left\"><b>Totalt:</b></td>";
-			echo "<td align=\"right\"><b></b></td>";
-			echo "<td align=\"right\"><b>$totalvarde SEK&nbsp;</b></td>";
-			echo "<td align=\"right\"><b>$totalallokerat SEK&nbsp;</b></td>";
-			echo "<td align=\"right\"><b>&nbsp;</b></td>";
-			echo "</tr>";
+			echo "</tbody>";
+			echo "<tfoot><tr>";
+			echo "<td><b>Totalt:</b></td>";
+			echo "<td></td>";
+			echo "<td style=\"text-align:right\"><b>$totalvarde SEK</b></td>";
+			echo "<td style=\"text-align:right\"><b>$totalallokerat SEK</b></td>";
+			echo "</tr></tfoot>";
 			echo "</table>";
 
 	}
@@ -1466,20 +1361,21 @@ Class CWebADInternSuplier {
 				echo "\n";		
 				*/
 			} else {
-				echo "<table>";
-				echo "<tr>";
-				echo "<td width=\"150\"><b>Leverantör</b></td>";
-				echo "<td width=\"550\"><b>Artikel</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Antal</b></td>";
-				echo "<td width=\"100\" align=\"center\"><b>Lagervärde</b></td>";
-				echo "<td width=\"100\" align=\"center\"><b>Allokerat</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Räcker</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Sålda 30</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Sålda 60</b></td>";
+				echo "<table class=\"table-list\">";
+				echo "<thead><tr>";
+				echo "<th>Leverantör</th>";
+				echo "<th>Artikel</th>";
+				echo "<th>Antal</th>";
+				echo "<th style=\"text-align:right\">Lagervärde</th>";
+				echo "<th style=\"text-align:right\">Allokerat</th>";
+				echo "<th>Räcker</th>";
+				echo "<th>Sålda 30</th>";
+				echo "<th>Sålda 60</th>";
 				if ($showLastInvoiced)
-					echo "<td width=\"75\" align=\"center\"><b>Senast såld</b></td>";
-				echo "<td width=\"75\" align=\"center\"><b>Trend</b></td>";
-				echo "</tr>";			
+					echo "<th>Senast såld</th>";
+				echo "<th>Trend</th>";
+				echo "</tr></thead>";
+				echo "<tbody>";			
 			}
 			
 
@@ -1566,12 +1462,6 @@ Class CWebADInternSuplier {
 								$avvikelse = round($antalManad1 / $antalManad2, 2);
 							}
 		
-							if ($rowcolor == true) {
-								$backcolor = "firstrow";
-							} else {
-								$backcolor = "secondrow";
-							}
-							
 							$beskrivning = $row[4] . " " . $row[3];
 							if (strlen($beskrivning) > 75) {
 								$beskrivning = substr ($beskrivning, 0, 75) . "....";
@@ -1583,40 +1473,33 @@ Class CWebADInternSuplier {
 							$totalallokerat+= $row[5];
 							$SummaLager = number_format($row[2], 0, ',', ' ');
 							$allokerat = number_format($row[5], 0, ',', ' ');
-		
+
+							$productUrl = '/search_dispatch.php?mode=product&q=' . rawurlencode($row[0]);
 							echo "<tr>";
-							echo "<td class=\"$backcolor\" align=\"left\">$row[11]</td>";
-							echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[0]\">$beskrivning</a></td>";
-							echo "<td class=\"$backcolor\" align=\"center\">$row[1]</td>";
-							echo "<td class=\"$backcolor\" align=\"right\">$SummaLager SEK&nbsp;</td>";
-							echo "<td class=\"$backcolor\" align=\"right\">$allokerat &nbsp;</td>";
+							echo "<td>$row[11]</td>";
+							echo "<td><a target=\"_blank\" href=\"$productUrl\">$beskrivning</a></td>";
+							echo "<td style=\"text-align:center\">$row[1]</td>";
+							echo "<td style=\"text-align:right\">$SummaLager SEK</td>";
+							echo "<td style=\"text-align:right\">$allokerat</td>";
 							if ($antalManad1 == 0) {
-								echo "<td class=\"$backcolor\" align=\"center\"><span class=\"lagerred\">&#8734;</span></td>";
+								echo "<td style=\"text-align:center\"><span class=\"lagerred\">&#8734;</span></td>";
 							} else {
 								if ($Takt < 15) {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagergreen\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagergreen\">$Takt dagar</span></td>";
 								} elseif ($Takt > 14 && $Takt < 31)  {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerblack\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerblack\">$Takt dagar</span></td>";
 								} elseif ($Takt > 30 && $Takt < 100)  {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerred\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerred\">$Takt dagar</span></td>";
 								} else {
-									echo "<td class=\"$backcolor\" align=\"right\"><span class=\"lagerredbold\">$Takt dagar&nbsp;</span></td>";
+									echo "<td style=\"text-align:right\"><span class=\"lagerredbold\">$Takt dagar</span></td>";
 								}
 							}
-							echo "<td class=\"$backcolor\" align=\"center\">$antalManad1</td>";
-							echo "<td class=\"$backcolor\" align=\"center\">$antalManad2</td>";
-							if ($showLastInvoiced) 
-								echo "<td class=\"$backcolor\" align=\"center\">$lastInvoiced</td>";
+							echo "<td style=\"text-align:center\">$antalManad1</td>";
+							echo "<td style=\"text-align:center\">$antalManad2</td>";
+							if ($showLastInvoiced)
+								echo "<td style=\"text-align:center\">$lastInvoiced</td>";
 							echo $this->displayTrend($avvikelse);
 							echo "</tr>";
-		
-							if ($rowcolor == true) {
-								$row = true;
-								$rowcolor = false;
-							} else {
-								$row = false;
-								$rowcolor = true;
-							}						
 						}
 					}
 
@@ -1624,12 +1507,13 @@ Class CWebADInternSuplier {
 			if (!$export) {
 				$totalvarde = number_format($totalvarde, 0, ',', ' ');
 				$totalallokerat = number_format($totalallokerat, 0, ',', ' ');
-				echo "<tr>";
-				echo "<td align=\"left\"><b>Totalt:</b></td>";
-				echo "<td align=\"right\"><b></b></td>";
-				echo "<td align=\"right\"><b>$totalvarde SEK&nbsp;</b></td>";
-				echo "<td align=\"right\"><b>$totalallokerat SEK&nbsp;</b></td>";
-				echo "</tr>";
+				echo "</tbody>";
+				echo "<tfoot><tr>";
+				echo "<td><b>Totalt:</b></td>";
+				echo "<td></td>";
+				echo "<td style=\"text-align:right\"><b>$totalvarde SEK</b></td>";
+				echo "<td style=\"text-align:right\"><b>$totalallokerat SEK</b></td>";
+				echo "</tr></tfoot>";
 				echo "</table>";	
 			} else {
 				header('Content-type: application/ms-excel');
