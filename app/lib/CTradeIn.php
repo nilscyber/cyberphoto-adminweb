@@ -2553,41 +2553,42 @@ Class CTradeIn {
 		if (mysqli_num_rows($res) > 0) {
 
 			if ($oldies) {
-				echo "<div class=\"count_data bold italic\">Inkommande paket - Raderade poster</div>\n";
+				echo "<h2>Raderade poster</h2>\n";
 			} else {
-				echo "<div class=\"count_data bold italic\">Inkommande paket</div>\n";
+				echo "<h2>Aktuella poster</h2>\n";
 			}
-			if ($oldies) {
-				echo "<table id=\"begg_wishlist_old\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-			} else {
-				echo "<table id=\"begg_wishlist\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-			}
+			echo "<table id=\"" . ($oldies ? "ping_incomming_list_old" : "ping_incomming_list") . "\" class=\"table-list\">\n";
+			echo "\t<thead>\n\t\t<tr>\n";
+			echo "\t\t\t<th>Tid</th>\n";
+			echo "\t\t\t<th class=\"c\">Antal</th>\n";
+			echo "\t\t\t<th class=\"c\">Varav köp</th>\n";
+			echo "\t\t\t<th>Ändrad av</th>\n";
+			echo "\t\t\t<th class=\"c\"></th>\n";
+			echo "\t\t</tr>\n\t</thead>\n\t<tbody>\n";
 
 			while ($row = mysqli_fetch_object($res)) {
-				
+
 				$datecreated = $this->dayFromCreated($row->ping_Time);
-				
-				echo "\t<tr>";
-				echo "\t\t<td width=\"120\" class=\"mark_black\">" . date("Y-m-d H:i", strtotime($row->ping_Time)) . "</td>\n";
-				echo "\t\t<td width=\"45\" class=\"mark_black align_center\">$row->ping_Parcels</td>\n";
-				echo "\t\t<td width=\"45\" class=\"mark_black align_center\">$row->ping_ParcelsBuy</td>\n";
+
+				echo "\t\t<tr>\n";
+				echo "\t\t\t<td>" . date("Y-m-d H:i", strtotime($row->ping_Time)) . "</td>\n";
+				echo "\t\t\t<td class=\"c\">$row->ping_Parcels</td>\n";
+				echo "\t\t\t<td class=\"c\">$row->ping_ParcelsBuy</td>\n";
 				if ($row->ping_changeby != "") {
-					echo "\t\t<td width=\"300\" class=\"align_left\">" . $row->ping_changeby . "</td>\n";
+					echo "\t\t\t<td>" . $row->ping_changeby . "</td>\n";
 				} else {
-					echo "\t\t<td width=\"300\" class=\"mark_black\">&nbsp;</td>\n";
+					echo "\t\t\t<td>&nbsp;</td>\n";
 				}
-				echo "<td width=\"50\" align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $row->ping_ID . "\">Ändra</a></td>\n";
-				if ($_COOKIE['login_mail'] == 'sjabo@cyberphoto.nu') {
-				}
-				echo "\t</tr>\n";
-				
+				echo "\t\t\t<td class=\"c\"><a href=\"" . $_SERVER['PHP_SELF'] . "?change=" . $row->ping_ID . "\" class=\"btn-link-sm\">Ändra</a></td>\n";
+				echo "\t\t</tr>\n";
+
 				$countrow++;
 
 			}
-		
-		echo "</table>\n";
+
+		echo "\t</tbody>\n</table>\n";
 		if ($countrow > 0) {
-			echo "<div class=\"count_data bold\">" . $countrow . " st</div>\n";
+			echo "<div class=\"muted\">" . $countrow . " st</div>\n";
 		}
 
 		}
