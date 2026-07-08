@@ -156,6 +156,7 @@ if ($type === 'customer') {
 	if (class_exists('CCheckIP')) {
 		if (method_exists('CCheckIP','checkIfLoginIsTradeIn'))  { try { $isTradeIn  = (bool) CCheckIP::checkIfLoginIsTradeIn(); }  catch (Exception $e) {} }
 		if (method_exists('CCheckIP','checkIfLoginIsPriority')) { try { $isPriority = (bool) CCheckIP::checkIfLoginIsPriority(); } catch (Exception $e) {} }
+		if (!$isPriority && method_exists('CCheckIP','checkIfCanSeeUpcomingProducts')) { try { $isPriority = (bool) CCheckIP::checkIfCanSeeUpcomingProducts(); } catch (Exception $e) {} }
 	}
 
 	if ($row) {

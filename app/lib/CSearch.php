@@ -102,6 +102,9 @@ public static function searchProductsAD($q, $limit = 50, $page = 1, $opts = arra
     if (class_exists('CCheckIP') && method_exists('CCheckIP', 'checkIfLoginIsPriority')) {
         try { $isPriority = (bool) CCheckIP::checkIfLoginIsPriority(); } catch (Exception $e) {}
     }
+    if (!$isPriority && class_exists('CCheckIP') && method_exists('CCheckIP', 'checkIfCanSeeUpcomingProducts')) {
+        try { $isPriority = (bool) CCheckIP::checkIfCanSeeUpcomingProducts(); } catch (Exception $e) {}
+    }
 
     // Söksträng  trim + säker UTF-8
     $q = trim((string)$q);
