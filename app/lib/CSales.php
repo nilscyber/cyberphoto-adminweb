@@ -913,6 +913,80 @@ public function getNewProductsForPage($daysBack = 14)
     return $out;
 }
 
+public function getUpcomingProductsForPage($daysAhead = 60)
+{
+    $daysAhead = (int)$daysAhead;
+    if ($daysAhead <= 0) { $daysAhead = 60; }
+
+    $dbAD = Db::getConnectionAD(false);
+
+    // Produkter vars launchdate ligger i framtiden (ej lanserade än)
+    $sql = "
+        SELECT
+            p.m_product_id,
+            p.value AS artnr,
+            p.name  AS description,
+            COALESCE(mf.name, '') AS manufacturer,
+            p.launchdate AS launch_ts,
+
+            COALESCE(bp.name, '')      AS supplier_name,
+            COALESCE(rep.level_min, 0) AS min_level,
+            COALESCE(rep.level_max, 0) AS max_level,
+            COALESCE(au_buyer.name, '') AS buyer_name
+
+        FROM m_product p
+        LEFT JOIN xc_manufacturer mf
+               ON mf.xc_manufacturer_id = p.xc_manufacturer_id
+
+        LEFT JOIN m_product_po mpo
+               ON mpo.m_product_id = p.m_product_id
+              AND mpo.isactive = 'Y'
+              AND mpo.iscurrentvendor = 'Y'
+
+        LEFT JOIN c_bpartner bp
+               ON bp.c_bpartner_id = mpo.c_bpartner_id
+
+        LEFT JOIN m_replenish rep
+               ON rep.m_product_id = mpo.m_product_id
+
+        LEFT JOIN ad_user au_buyer
+               ON au_buyer.ad_user_id = bp.salesrep_id
+
+        WHERE p.isactive = 'Y'
+          AND p.launchdate IS NOT NULL
+          AND p.launchdate > NOW()
+          AND p.launchdate <= (NOW() + ($1::int * INTERVAL '1 day'))
+
+		  AND p.iswebstoreproduct = 'Y'
+		  AND COALESCE(p.istradein,'N') <> 'Y'
+		  AND COALESCE(p.demo_product,'N') <> 'Y'
+
+        ORDER BY p.launchdate ASC, p.value
+    ";
+
+    $res = ($dbAD) ? @pg_query_params($dbAD, $sql, array($daysAhead)) : false;
+    if (!$res) { return array(); }
+
+    $out = array();
+    while ($res && $r = pg_fetch_assoc($res)) {
+        $ts = (string)$r['launch_ts'];
+
+        $out[] = array(
+            'm_product_id' => (int)$r['m_product_id'],
+            'launch_date'  => $ts ? date('Y-m-d H:i', strtotime($ts)) : '',
+            'artnr'        => (string)$r['artnr'],
+            'manufacturer' => (string)$r['manufacturer'],
+            'description'  => (string)$r['description'],
+            'supplier'     => (string)$r['supplier_name'],
+            'buyer'        => (string)$r['buyer_name'],
+            'min_stock'    => (int)$r['min_level'],
+            'max_stock'    => (int)$r['max_level'],
+        );
+    }
+
+    return $out;
+}
+
 public function getNewProductsForMail($hoursBack = 24)
 {
     $hoursBack = (int)$hoursBack;

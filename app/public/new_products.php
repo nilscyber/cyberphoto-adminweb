@@ -13,6 +13,19 @@ if (isset($_GET['export']) && $_GET['export'] == '1') {
     exit;
 }
 
+if (isset($_GET['export']) && $_GET['export'] == 'upcoming') {
+    include_once("top.php"); // laddar $sales
+
+    if (!CCheckIP::checkIfCanSeeUpcomingProducts()) {
+        exit;
+    }
+
+    $rows = $sales->getUpcomingProductsForPage();
+
+    $sales->exportNewProductsCsvLatin1($rows, 'kommande_produkter_' . date('YmdHi') . '.csv');
+    exit;
+}
+
 include_once("top.php");
 include_once("header.php");
 
@@ -23,6 +36,9 @@ if ($days <= 0) { $days = 14; }
 
 // Sida: visa bara produkter där launchdate har passerats (viktigt)
 $rows = $sales->getNewProductsForPage($days);
+
+$canSeeUpcoming = CCheckIP::checkIfCanSeeUpcomingProducts();
+$upcomingRows = $canSeeUpcoming ? $sales->getUpcomingProductsForPage() : array();
 
 // Undvik redeclare genom closure
 $h_latin1 = function ($s) {
@@ -43,6 +59,68 @@ $h_latin1 = function ($s) {
   .copy-artnr { cursor:pointer; }
   .copy-artnr:hover { text-decoration: underline; }
 </style>
+
+<?php if ($canSeeUpcoming) { ?>
+<div class="actions">
+  <div class="muted">
+    Kommande produkter (ej lanserade än).
+  </div>
+
+  <?php if (!empty($upcomingRows)) { ?>
+    <a class="btn" href="?export=upcoming">Exportera till Excel</a>
+  <?php } ?>
+</div>
+
+<table class="table-list" style="width:100%;">
+  <thead>
+    <tr>
+      <th>Launchdatum</th>
+      <th>Artnr</th>
+      <th>Produkt</th>
+      <th>Leverantör</th>
+      <th>Inköpare</th>
+      <th class="num">Minlagersaldo</th>
+      <th class="num">Maxlagersaldo</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  <?php if (empty($upcomingRows)) { ?>
+    <tr><td colspan="8">Inga kommande produkter hittades.</td></tr>
+  <?php } else { ?>
+    <?php foreach ($upcomingRows as $r) {
+		$artnr = (string)$r['artnr'];
+		$pid   = (int)$r['m_product_id'];
+		$productUrl = 'search_dispatch.php?q=' . urlencode($artnr) . '&open=product&id=' . $pid . '#';
+
+		$productLabel = trim((string)$r['manufacturer'] . ' ' . (string)$r['description']);
+    ?>
+      <tr>
+		<td><?php echo htmlspecialchars((string)$r['launch_date'], ENT_QUOTES); ?></td>
+
+		<td>
+		  <span class="copy-artnr" data-copy="<?php echo htmlspecialchars($artnr, ENT_QUOTES); ?>" title="Klicka för att kopiera">
+			<?php echo htmlspecialchars($artnr, ENT_QUOTES); ?>
+		  </span>
+		</td>
+
+		<td>
+		  <a href="<?php echo htmlspecialchars($productUrl, ENT_QUOTES); ?>" target="_blank" rel="noopener">
+			<?php echo $h_latin1($productLabel); ?>
+		  </a>
+		</td>
+        <td><?php echo $h_latin1($r['supplier']); ?></td>
+        <td><?php echo $h_latin1($r['buyer']); ?></td>
+        <td class="num"><?php echo (int)$r['min_stock']; ?></td>
+        <td class="num"><?php echo (int)$r['max_stock']; ?></td>
+      </tr>
+    <?php } ?>
+  <?php } ?>
+  </tbody>
+</table>
+
+<hr style="margin: 24px 0;">
+<?php } ?>
 
 <div class="actions">
   <div class="muted">

@@ -1,7 +1,34 @@
 <?php
 
 Class CCheckIP {
-	public static function getClientIP($ip_adress){    
+
+	private static $permCache = null;
+
+	// Databasbackad behörighetskontroll - se cyberadmin.employees / permissions / employee_permissions
+	static function hasPermission($permissionKey) {
+		if (self::$permCache === null) {
+			self::$permCache = self::loadPermissionsForCurrentUser();
+		}
+		return in_array($permissionKey, self::$permCache, true);
+	}
+
+	private static function loadPermissionsForCurrentUser() {
+		$mail = isset($_COOKIE['login_mail']) ? $_COOKIE['login_mail'] : '';
+		if ($mail === '') { return array(); }
+
+		$db = Db::getConnection(false);
+		$mailEsc = mysqli_real_escape_string($db, $mail);
+		$sql = "SELECT ep.permission_key
+				FROM cyberadmin.employees e
+				JOIN cyberadmin.employee_permissions ep ON ep.employee_id = e.employee_id
+				WHERE e.login_mail = '$mailEsc' AND e.active = 1";
+		$res = mysqli_query($db, $sql);
+		$out = array();
+		while ($res && $row = mysqli_fetch_assoc($res)) { $out[] = $row['permission_key']; }
+		return $out;
+	}
+
+	public static function getClientIP($ip_adress){
 		$ip = $ip_adress;
 		 if (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)){
 				$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];  
@@ -81,126 +108,34 @@ Class CCheckIP {
 	
 	// Denna kollar om personen jobbar med inbyten
 	static function checkIfLoginIsTradeIn() {
-		$ip_adress = CCheckIP::getClientIP($ip_adress);	
-		if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'borje@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'albin@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'marcus.johansson@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'albin.soderlind@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'andreas.almquist@cyberphoto.se') {
-			return true;
-		} else {
-			return false;
-		}
-	
+		return self::hasPermission('trade_in');
 	}
-	// Denna kollar om personen jobbar med inbyten
+	// Denna kollar om personen har prioritetsvisning
 	static function checkIfLoginIsPriority() {
-		$ip_adress = CCheckIP::getClientIP($ip_adress);	
-		if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'jonas@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'emil.lindberg@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'albin@cyberphoto.seX') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'emma@cyberphoto.seX') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'borje@cyberphoto.seX') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.se') {
-			return true;
-		} else {
-			return false;
-		}
-	
+		return self::hasPermission('priority');
 	}
-	// Denna kollar om personen jobbar med inbyten
+	// Denna kollar om personen har inköpsbehörighet
 	static function checkIfPurchaseValid() {
-		$ip_adress = CCheckIP::getClientIP($ip_adress);	
-		if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'borje@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'albin@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'marcus.johansson@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'ulrika@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'malin@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'nils@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'maria@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'erik@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'finbar@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'jonas@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'andreas.almquist@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'sandra.strandgren@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'jennie.hedstrom@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'anna@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'louise@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'kenneth.ly@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'emil.lindberg@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'robin@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'boyd@cyberphoto.se') {
-			return true;
-		} else {
-			return false;
-		}
-	
+		return self::hasPermission('purchase_valid');
 	}
 	// För ett cleanare sök
 	static function forCleanerSearch() {
-		if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'robin@cyberphoto.seX') {
-			return true;
-		} else {
-			return false;
-		}
-	
+		return self::hasPermission('clean_search');
 	}
-	// Denna kollar om personen jobbar med inbyten
+	// Denna kollar om personen får se ej lanserade produkter (kommande launchdate) på new_products.php
+	static function checkIfCanSeeUpcomingProducts() {
+		return self::hasPermission('product_permissions');
+	}
+	// Denna kollar om personen är inköpskollega
 	static function checkIfPurchaseColleague() {
-		$ip_adress = CCheckIP::getClientIP($ip_adress);	
-		if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'boyd@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'emil.lindberg@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'malin@cyberphoto.se') {
-			return true;
-		} elseif ($_COOKIE['login_mail'] == 'jennie.hedstrom@cyberphoto.se') {
-			return true;
-		} else {
-			return false;
-		}
-	
+		return self::hasPermission('purchase_colleague');
 	}
-	
+
+	// Denna kollar om personen får administrera behörigheter (denna sida)
+	static function checkIfCanManagePermissions() {
+		return self::hasPermission('manage_permissions');
+	}
+
 }
 
 ?>

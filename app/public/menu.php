@@ -32,6 +32,9 @@
     <li><a href="banners.php?choose_site=1&choose_department=1&choose_section=201" <?php if (preg_match("/banners\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>TV:s butiken</a></li>
     <li><a href="check_incoming.php" <?php if (preg_match("/check_incoming\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Filter inkommande</a></li>
     <li><a href="monitor_articles.php" <?php if (preg_match("/monitor_articles\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Bevaka artiklar</a></li>
+    <?php if (CCheckIP::checkIfCanManagePermissions()) { ?>
+    <li><a href="permissions_admin.php" <?php if (preg_match("/permissions_admin\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Behörigheter</a></li>
+    <?php } ?>
     <?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
 	<?php } ?>
 	</ul>
