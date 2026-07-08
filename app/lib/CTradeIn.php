@@ -1905,7 +1905,7 @@ Class CTradeIn {
 			
 	}
 
-	function findDoublets($all,$sok = false) {
+	function findDoublets($all,$sok = false,$tv = false) {
 		global $dagensdatum;
 		
 		$countrow = 0;
@@ -1942,43 +1942,72 @@ Class CTradeIn {
 		
 		
 		if ($res && pg_num_rows($res) > 0) {
-		
-			if ($all) {
-				echo "<div class=\"count_data bold italic\">Samtliga produkter fler än 1st</div>\n";
-			} else {
-				echo "<div class=\"count_data bold italic\">Produkter fler än 2st</div>\n";
-			}
-			echo "<table id=\"begg_miss5555\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-		
-			while ($res && $row = pg_fetch_object($res)) {
 
-				$trimmaprodukten = $row->beskrivning;
-				
-				if (strlen($trimmaprodukten) >= 50)
-					$trimmaprodukten = substr ($trimmaprodukten, 0, 50) . "...";
-				
-				echo "\t<tr>";
-				echo "\t\t<td width=\"40\" class=\"align_center mark_black\">$row->antaldubletter</td>\n";
-				if ($sok) {
-					echo "\t\t<td class=\"mark_black\"><a target=\"_blank\" href=\"https://cyberphoto.se/sok?q=$trimmaprodukten\">NYA</a></td>\n";
-					echo "\t\t<td class=\"mark_black\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/search?q=$trimmaprodukten\">GAMLA</a></td>\n";
+			if ($tv) {
+
+				echo "<div class=\"count_data bold italic\">" . ($all ? "Samtliga produkter fler än 1st" : "Produkter fler än 2st") . "</div>\n";
+				echo "<table id=\"begg_miss5555\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
+
+				while ($res && $row = pg_fetch_object($res)) {
+
+					$trimmaprodukten = $row->beskrivning;
+
+					if (strlen($trimmaprodukten) >= 50)
+						$trimmaprodukten = substr ($trimmaprodukten, 0, 50) . "...";
+
+					echo "\t<tr>";
+					echo "\t\t<td width=\"40\" class=\"align_center mark_black\">$row->antaldubletter</td>\n";
+					echo "\t\t<td class=\"mark_black\">$row->tillverkare $trimmaprodukten</td>\n";
+					echo "\t</tr>\n";
+
+					$countrow++;
+
 				}
-				echo "\t\t<td class=\"mark_black\">$row->tillverkare $trimmaprodukten</td>\n";
-				echo "\t</tr>\n";
-				
-				$countrow++;
-				
+
+				echo "</table>\n";
+
+			} else {
+
+				echo "<h2>" . ($all ? "Samtliga produkter fler än 1st" : "Produkter fler än 2st") . "</h2>\n";
+				echo "<table id=\"begg_dubletter\" class=\"table-list\">\n";
+				echo "\t<thead>\n\t\t<tr>\n";
+				echo "\t\t\t<th class=\"c\">Antal</th>\n";
+				if ($sok) {
+					echo "\t\t\t<th class=\"c\">Sök</th>\n";
+				}
+				echo "\t\t\t<th>Produkt</th>\n";
+				echo "\t\t</tr>\n\t</thead>\n\t<tbody>\n";
+
+				while ($res && $row = pg_fetch_object($res)) {
+
+					$trimmaprodukten = $row->beskrivning;
+
+					if (strlen($trimmaprodukten) >= 50)
+						$trimmaprodukten = substr ($trimmaprodukten, 0, 50) . "...";
+
+					echo "\t\t<tr>\n";
+					echo "\t\t\t<td class=\"c\">$row->antaldubletter</td>\n";
+					if ($sok) {
+						$webbUrl = "https://cyberphoto.se/sok?q=" . rawurlencode($trimmaprodukten);
+						$adminUrl = "/search_dispatch.php?mode=product&q=" . rawurlencode($trimmaprodukten);
+						echo "\t\t\t<td class=\"c nowrap\">";
+						echo "<a target=\"_blank\" href=\"$webbUrl\" class=\"btn-link-sm\">Webb</a> ";
+						echo "<a target=\"_blank\" href=\"$adminUrl\" class=\"btn-link-sm\">Admin</a>";
+						echo "</td>\n";
+					}
+					echo "\t\t\t<td>$row->tillverkare $trimmaprodukten</td>\n";
+					echo "\t\t</tr>\n";
+
+					$countrow++;
+
+				}
+
+				echo "\t</tbody>\n</table>\n";
+
 			}
-			
-			echo "</table>\n";
-			/*
-			if ($countrow > 0) {
-				echo "<div class=\"count_data bold\">" . $countrow . " st</div>\n";
-			}
-			*/
-		
+
 		}
-			
+
 	}
 
 	function KOTlist() {
