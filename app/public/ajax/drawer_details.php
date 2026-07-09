@@ -1472,6 +1472,114 @@ if ($type === 'customer') {
 		echo '</div>';
 	}
 
+	// ===== Leveranstid: snitt totalt + per månad (senaste 6 mån) =====
+	$sqlDelivStats = "
+		SELECT
+			COUNT(*) AS antal,
+			ROUND(AVG(ol.datedelivered::date - ol.dateordered::date), 1) AS snitt_dagar,
+			MIN(ol.datedelivered::date - ol.dateordered::date) AS min_dagar,
+			MAX(ol.datedelivered::date - ol.dateordered::date) AS max_dagar
+		FROM c_orderline ol
+		JOIN c_order o ON o.c_order_id = ol.c_order_id
+		WHERE ol.m_product_id = $1
+		  AND o.issotrx = 'Y'
+		  AND o.docstatus NOT IN ('VO','RE')
+		  AND ol.datedelivered IS NOT NULL
+		  AND ol.dateordered   IS NOT NULL
+		  AND ol.qtydelivered  >= ol.qtyordered
+		  AND ol.datedelivered >= ol.dateordered
+	";
+	$delivStats = null;
+	if ($resDS = ($conn) ? @pg_query_params($conn, $sqlDelivStats, array($pid)) : false) {
+		$delivStats = $resDS ? pg_fetch_assoc($resDS) : null;
+		pg_free_result($resDS);
+	}
+
+	$sqlDelivMonth = "
+		SELECT
+			date_trunc('month', ol.dateordered) AS month_start,
+			COUNT(*) AS antal,
+			ROUND(AVG(ol.datedelivered::date - ol.dateordered::date), 1) AS snitt_dagar
+		FROM c_orderline ol
+		JOIN c_order o ON o.c_order_id = ol.c_order_id
+		WHERE ol.m_product_id = $1
+		  AND o.issotrx = 'Y'
+		  AND o.docstatus NOT IN ('VO','RE')
+		  AND ol.datedelivered IS NOT NULL
+		  AND ol.dateordered   IS NOT NULL
+		  AND ol.qtydelivered  >= ol.qtyordered
+		  AND ol.datedelivered >= ol.dateordered
+		  AND ol.dateordered  >= date_trunc('month', now()) - interval '6 months'
+		GROUP BY month_start
+		ORDER BY month_start DESC
+		LIMIT 6
+	";
+	$delivMonthByKey = array();
+	if ($resDM = ($conn) ? @pg_query_params($conn, $sqlDelivMonth, array($pid)) : false) {
+		while ($resDM && $rDM = pg_fetch_assoc($resDM)) {
+			$delivMonthByKey[substr($rDM['month_start'], 0, 7)] = $rDM;
+		}
+		pg_free_result($resDM);
+	}
+
+	$svMonths = array(1=>'Januari','Februari','Mars','April','Maj','Juni','Juli','Augusti','September','Oktober','November','December');
+
+	// Bygg alltid 6 rader (senaste 6 kalendermånaderna), oavsett om det finns leveranser eller ej
+	$delivMonthRows = array();
+	$tzDeliv = new DateTimeZone('Europe/Stockholm');
+	for ($i = 0; $i < 6; $i++) {
+		$mDt = new DateTime('first day of this month', $tzDeliv);
+		$mDt->modify('-' . $i . ' months');
+		$key = $mDt->format('Y-m');
+		if (isset($delivMonthByKey[$key])) {
+			$delivMonthRows[] = array(
+				'month_start' => $key . '-01',
+				'antal'       => $delivMonthByKey[$key]['antal'],
+				'snitt_dagar' => $delivMonthByKey[$key]['snitt_dagar'],
+			);
+		} else {
+			$delivMonthRows[] = array(
+				'month_start' => $key . '-01',
+				'antal'       => 0,
+				'snitt_dagar' => null,
+			);
+		}
+	}
+
+	echo '<div class="dw-card">';
+	  echo '<h3>Leveranstid totalt</h3>';
+
+	  if ($delivStats && (int)$delivStats['antal'] > 0) {
+	      echo '<div class="row">';
+	        echo '<div><span class="dw-label">Snitt: </span><strong class="dw-val">'.$h($delivStats['snitt_dagar']).' dagar</strong></div>';
+	        echo '<div><span class="dw-label">Antal leveranser: </span><strong class="dw-val">'.(int)$delivStats['antal'].'</strong></div>';
+	        echo '<div><span class="dw-label">Min: </span><strong class="dw-val">'.(int)$delivStats['min_dagar'].' dagar</strong></div>';
+	        echo '<div><span class="dw-label">Max: </span><strong class="dw-val">'.(int)$delivStats['max_dagar'].' dagar</strong></div>';
+	      echo '</div>';
+
+	      echo '<h3 style="margin-top:14px">Leveranstid senaste 6 månaderna</h3>';
+	      echo '<div style="margin-top:10px">';
+	      echo '<table class="dw-table" style="font-size:13px">';
+	      echo '<thead><tr><th>Månad</th><th class="text-center">Antal</th><th class="text-center">Snitt (dagar)</th></tr></thead><tbody>';
+	      foreach ($delivMonthRows as $dm) {
+	          $ts    = strtotime($dm['month_start']);
+	          $label = $h(date('Y', $ts) . ' ' . $svMonths[(int)date('n', $ts)]);
+	          $antal = (int)$dm['antal'];
+	          $snitt = ($dm['snitt_dagar'] !== null) ? $h($dm['snitt_dagar']) : '–';
+	          echo '<tr>';
+	          echo '<td>'.$label.'</td>';
+	          echo '<td class="text-center">'.$antal.'</td>';
+	          echo '<td class="text-center">'.$snitt.'</td>';
+	          echo '</tr>';
+	      }
+	      echo '</tbody></table>';
+	      echo '</div>';
+	  } else {
+	      echo '<div class="dw-muted">Inga levererade order hittades.</div>';
+	  }
+
+	echo '</div>';
+
 	echo '<div class="dw-card dw-card-meta" style="margin-top:10px;">';
     echo '<h3>Metadata</h3>';
 	echo '  <div style="font-size:13px;">';
