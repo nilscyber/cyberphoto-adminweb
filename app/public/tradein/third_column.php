@@ -16,7 +16,7 @@ if ($number % 2 == 0) {
 	}
 } else {
 	// $tradein->tradeInValue(false,true);
-	$tradein->findDoublets(false);
+	$tradein->findDoublets(false, false, true);
 	// echo file_get_contents("Begagnatlogg_Diagram_chart1.svg");
 }
 
