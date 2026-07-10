@@ -104,6 +104,7 @@ class Db {
                     getenv('AD_PASS') ?: ''
                 );
                 self::$conn_ad_master = @pg_pconnect($conn_string);
+                if (self::$conn_ad_master) { @pg_query(self::$conn_ad_master, "SET TIME ZONE 'Europe/Stockholm'"); }
             }
             if (self::$conn_ad_master) { pg_set_client_encoding(self::$conn_ad_master, "UTF-8"); }
             return self::$conn_ad_master;
@@ -118,6 +119,7 @@ class Db {
                     getenv('AD_PASS') ?: ''
                 );
                 self::$conn_ad_standard = @pg_pconnect($conn_string);
+                if (self::$conn_ad_standard) { @pg_query(self::$conn_ad_standard, "SET TIME ZONE 'Europe/Stockholm'"); }
             }
             if (self::$conn_ad_standard) { pg_set_client_encoding(self::$conn_ad_standard, "UTF-8"); }
             return self::$conn_ad_standard;
