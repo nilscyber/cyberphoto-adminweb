@@ -169,54 +169,24 @@ Class CButiken {
 	
 	}
 
-	function getPlingButiken() {
-		global $fi, $sv, $no;
-	
+	function getPlingButikenData() {
 		$select  = "SELECT DATE_FORMAT(plingTime,'%Y-%m') AS Datum, COUNT(plingID) AS Antal ";
 		$select .= "FROM cyberadmin.dorrpling ";
 		$select .= "WHERE plingTime >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 12 MONTH), '%Y-%m-01') ";
 		$select .= "GROUP BY DATE_FORMAT(plingTime,'%Y-%m') ";
 		$select .= "ORDER BY Datum DESC ";
-	
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo $select;
-		}
+
 		$res = mysqli_query(Db::getConnection(), $select);
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo mysqli_num_rows($res);
-			// exit;
-		}
-	
-		// $row = mysqli_fetch_object($res);
 
-		if (mysqli_num_rows($res) > 0) {
-		
-			echo "<div class=\"count_data bold italic\">Pling i butiken, per månad</div>\n";
-			echo "<table id=\"begg_saleready\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-		
-			while ($row = mysqli_fetch_object($res)) {
-
-				echo "\t<tr>";
-				echo "\t\t<td width=\"80\" class=\"mark_black\">$row->Datum</td>\n";
-				echo "\t\t<td class=\"mark_black\">$row->Antal</td>\n";
-				echo "\t</tr>\n";
-				
-				$countrow++;
-				
-			}
-			
-			echo "</table>\n";
-			/*
-			if ($countrow > 0) {
-				echo "<div class=\"count_data bold\">" . $countrow . " st</div>\n";
-			}
-			*/
-		
+		$data = array();
+		while ($res && $row = mysqli_fetch_object($res)) {
+			$data[$row->Datum] = $row->Antal;
 		}
 
+		return $data;
 	}
 
-	function getTurnoverButiken($year=false) {
+	function getTurnoverButikenData($year=false) {
 		global $dagensdatum;
 		
 		$countrow = 0;
@@ -243,40 +213,64 @@ Class CButiken {
 		}
 
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-			echo ($res ? pg_num_rows($res) : 0);
-			// exit;
+
+		$data = array();
+		while ($res && $row = pg_fetch_object($res)) {
+			$data[$row->datefrom] = array(
+				'antal' => $row->antal,
+				'total' => round($row->total, 0),
+			);
 		}
-		
-		
-		if ($res && pg_num_rows($res) > 0) {
-		
+
+		return $data;
+	}
+
+	function getPlingButiken() {
+		$data = $this->getPlingButikenData();
+
+		if (count($data) > 0) {
+
+			echo "<div class=\"count_data bold italic\">Pling i butiken, per månad</div>\n";
+			echo "<table id=\"begg_saleready\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
+
+			foreach ($data as $datum => $antal) {
+				echo "\t<tr>";
+				echo "\t\t<td width=\"80\" class=\"mark_black\">$datum</td>\n";
+				echo "\t\t<td class=\"mark_black\">$antal</td>\n";
+				echo "\t</tr>\n";
+			}
+
+			echo "</table>\n";
+
+		}
+
+	}
+
+	function getTurnoverButiken($year=false) {
+		$data = $this->getTurnoverButikenData($year);
+
+		if (count($data) > 0) {
+
 			if ($year) {
 				echo "<div class=\"count_data bold italic\">Omsättning i butiken, per år</div>\n";
 			} else {
 				echo "<div class=\"count_data bold italic\">Omsättning i butiken, per månad</div>\n";
 			}
 			echo "<table id=\"begg_saleready\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-		
-			while ($res && $row = pg_fetch_object($res)) {
 
+			foreach ($data as $datefrom => $row) {
 				echo "\t<tr>";
-				echo "\t\t<td width=\"80\" class=\"mark_black\">$row->datefrom</td>\n";
-				echo "\t\t<td width=\"80\" class=\"mark_black\">$row->antal</td>\n";
-				echo "\t\t<td class=\"mark_black\">" . round($row->total,0) . "</td>\n";
+				echo "\t\t<td width=\"80\" class=\"mark_black\">$datefrom</td>\n";
+				echo "\t\t<td width=\"80\" class=\"mark_black\">{$row['antal']}</td>\n";
+				echo "\t\t<td class=\"mark_black\">{$row['total']}</td>\n";
 				echo "\t</tr>\n";
-				
-				$countrow++;
-				
 			}
-			
+
 			echo "</table>\n";
-			if ($countrow > 0) {
-				echo "<div class=\"count_data bold\">" . $countrow . " st</div>\n";
-			}
-		
+			echo "<div class=\"count_data bold\">" . count($data) . " st</div>\n";
+
 		}
-			
+
 	}
 
 }
