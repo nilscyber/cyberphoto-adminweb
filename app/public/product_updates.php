@@ -1,7 +1,17 @@
-<?php 
+<?php
 	include_once("top.php");
 	include_once("header.php");
-	
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
+	echo '<style>
+	.col-icon{width:32px}
+	.col-date{width:60px}
+	.col-left{width:90px}
+	.col-art{width:110px}
+	.col-price{width:90px}
+	.col-status{width:75px}
+	.col-owner{width:70px}
+	</style>';
+
 	echo "<h1>Kommande produktuppdateringar</h1>\n";
 	echo "<div class='top10'>";
 	echo "<h2>Kommande</h2>\n";

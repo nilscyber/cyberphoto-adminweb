@@ -688,151 +688,122 @@ Class CProduct {
 		
 		// $res = mysqli_query($this->getConnectionDb(false), $select);
 		$res = (Db::getConnectionAD(false)) ? @pg_query(Db::getConnectionAD(false), $select) : false;
-		// $res = $res;
-		// $check = mysqli_num_rows($res);
-	
-		echo "<table cellspacing=\"1\" cellpadding=\"2\" width=\"100%\">";
-		echo "<tr>";
-		echo "<td class=\"bold align_left\" width=\"20\"></td>";
-		echo "<td class=\"bold align_left\" width=\"40\">Datum</td>";
-		echo "<td class=\"bold align_center\" width=\"100\">återstår</td>";
-		echo "<td class=\"bold align_left\" width=\"150\">Artikel</td>";
-		echo "<td class=\"bold align_left\" width=\"400\">Namn</td>";
-		echo "<td class=\"bold align_center\" width=\"75\">Nytt pris</td>";
-		echo "<td class=\"bold align_center\" width=\"75\">Visas</td>";
-		echo "<td class=\"bold align_center\" width=\"75\">Utgången</td>";
-		echo "<td class=\"bold align_center\" width=\"75\">Beskrivning</td>";
-		echo "<td class=\"bold align_center\" width=\"75\">Kommentar</td>";
-		echo "<td class=\"bold align_center\" width=\"75\">Ansvarig</td>";
-		echo "<td>&nbsp;</td>";
-		echo "</tr>";
-	
+
+		$h = function($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); };
+
+		$pencilSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+		           . '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
+
+		echo "<table class=\"table-list\">";
+		echo "<colgroup>";
+		echo "<col class=\"col-icon\" /><col class=\"col-date\" /><col class=\"col-left\" />";
+		echo "<col class=\"col-art\" /><col class=\"col-prod\" /><col class=\"col-price\" />";
+		echo "<col class=\"col-status\" /><col class=\"col-status\" /><col class=\"col-status\" /><col class=\"col-status\" />";
+		echo "<col class=\"col-owner\" /><col class=\"col-icon\" />";
+		echo "</colgroup>";
+		echo "<thead><tr>";
+		echo "<th></th>";
+		echo "<th>Datum</th>";
+		echo "<th class=\"text-center\">Återstår</th>";
+		echo "<th>Artikel</th>";
+		echo "<th>Namn</th>";
+		echo "<th class=\"text-center\">Nytt pris</th>";
+		echo "<th class=\"text-center\">Visas</th>";
+		echo "<th class=\"text-center\">Utgången</th>";
+		echo "<th class=\"text-center\">Beskrivning</th>";
+		echo "<th class=\"text-center\">Kommentar</th>";
+		echo "<th class=\"text-center\">Ansvarig</th>";
+		echo "<th></th>";
+		echo "</tr></thead>";
+		echo "<tbody>";
+
 		if ($res && pg_num_rows($res) > 0) {
-			
+
 			while ($res && $row = pg_fetch_object($res)) {
-				
-				// $row = $row;
-					
-				if ($desiderow == true) {
-					$rowcolor = "firstrow";
-				} else {
-					$rowcolor = "secondrow";
-				}
-	
+
 				if ($row->m_pricelist_id == 1000018) {
 					$utpris_moms = $row->pricestd * 1.24;
 					$valuta = "EUR";
-					$prod_linc = "http://www.cyberphoto.fi/info.php?article=";
 				} elseif ($row->m_pricelist_id == 1000280) {
 					$utpris_moms = $row->pricestd * 1.25;
 					$valuta = "NOK";
-					$prod_linc = "http://www.cyberphoto.no/info.php?article=";
 				} else {
 					$utpris_moms = $row->pricestd * 1.25;
 					$valuta = "SEK";
-					$prod_linc = "http://www2.cyberphoto.se/info.php?article=";
 				}
-				
+
 				$groupday = date("Y-m-d",strtotime($row->updatetime));
 
-				// if (date("Y-m-d",strtotime($row->updatetime)) == date("Y-m-d", time())) {
 				if ($groupday != $groupday2) {
 					if (date("Y-m-d",strtotime($row->updatetime)) == date("Y-m-d", time())) {
-						echo "<tr>";
-						echo "<td colspan=\"12\" class=\"bold\">Idag</td>";
+						echo "<tr class=\"cat-head\">";
+						echo "<td colspan=\"12\">Idag</td>";
 						echo "</tr>";
 					} else {
-						echo "<tr>";
-						echo "<td colspan=\"12\" class=\"bold\">&nbsp;</td>";
-						echo "</tr>";
-						echo "<tr>";
-						echo "<td colspan=\"12\" class=\"bold\">" . CDeparture::replace_days(date("l",strtotime($row->updatetime))) . " " . date("Y-m-d",strtotime($row->updatetime)) . "</td>";
+						echo "<tr class=\"cat-head\">";
+						echo "<td colspan=\"12\">" . $h(CDeparture::replace_days(date("l",strtotime($row->updatetime)))) . " " . $h(date("Y-m-d",strtotime($row->updatetime))) . "</td>";
 						echo "</tr>";
 					}
 				}
-				
-				// echo date("Y-m-d",strtotime($row->updatetime)) . "-";
-				// echo date("Y-m-d", strtotime(time()));
-				
+
+				$editUrl = "/product_update.php?edit=yes&artnr=" . rawurlencode($row->artnr) . "&m_product_id=" . (int)$row->m_product_id . "&ID=" . (int)$row->m_product_update_id;
+				$editPopupName = "product_update_" . (int)$row->m_product_update_id;
+				$editLink = '<a href="' . $h($editUrl) . '" class="edit-btn popup-link" title="Redigera" data-popup="' . $h($editPopupName) . '">' . $pencilSvg . '</a>';
+
+				$productUrl = "search_dispatch.php?q=" . rawurlencode($row->artnr) . "&open=product&id=" . (int)$row->m_product_id . "#";
+
 				echo "<tr>";
-				echo "\t\t<td>\n";
-				// echo "<a href=\"javascript:winPopupCenter(900, 800, '/order/product_update.php?edit=yes&artnr=$row->artnr&m_product_id=$row->m_product_id&ID=$row->m_product_update_id');\">";
-				echo "<a href=\"javascript:winPopupCenter(900, 800, '/product_update.php?edit=yes&artnr=$row->artnr&m_product_id=$row->m_product_id&ID=$row->m_product_update_id');\">";
-				if ($row->m_pricelist_id == 1000018) {
-					echo "<img border=\"0\" src=\"fi_mini.jpg\">";
-				} elseif ($row->m_pricelist_id == 1000280) {
-					echo "<img border=\"0\" src=\"no_mini.jpg\">";
-				} else {
-					echo "<img border=\"0\" src=\"sv_mini.jpg\">";
-				}
-				echo "</a>\n";
-				echo "</td>\n";
-				echo "\t\t<td class=\"$rowcolor align_center\">" . date("H:i",strtotime($row->updatetime)) . "</td>";
+				echo "\t\t<td></td>\n";
+				echo "\t\t<td class=\"nowrap\">" . $h(date("H:i",strtotime($row->updatetime))) . "</td>";
 				if (!$old) {
-					echo "\t\t<td class=\"$rowcolor align_center\">" . CCampaignCheck::getTimeLeftNew($row->updatetime) . "</td>";
+					echo "\t\t<td class=\"text-center nowrap\">" . $h(CCampaignCheck::getTimeLeftNew($row->updatetime)) . "</td>";
 				} else {
-					echo "\t\t<td class=\"$rowcolor align_center\"><i>Utförd</i></td>";
+					echo "\t\t<td class=\"text-center muted\"><i>Utförd</i></td>";
 				}
-				echo "\t\t<td class=\"$rowcolor align_left\">" . $row->artnr . "</td>";
-				// echo "\t\t<td class=\"$rowcolor align_left\"><a target=\"_blank\" href=\"" . $prod_linc . $row->artnr . "\">" . $row->name . "</a></td>";
-				echo "\t\t<td class=\"$rowcolor align_left\"><a target=\"_blank\" href=\"" . $prod_linc . $row->artnr . "\">" . $row->name . "</a></td>";
+				echo "\t\t<td>" . $h($row->artnr) . "</td>";
+				echo "\t\t<td><a target=\"_blank\" rel=\"noopener\" href=\"" . $h($productUrl) . "\">" . $h($row->name) . "</a></td>";
 				if ($row->isupdtpricestd == "Y") {
-					echo "\t\t<td class=\"$rowcolor align_right\">" . number_format($utpris_moms, 0, ',', ' ') . " " . $valuta . "</td>";
+					echo "\t\t<td class=\"text-center nowrap\">" . $h(number_format($utpris_moms, 0, ',', ' ') . " " . $valuta) . "</td>";
 				} else {
-					echo "<td class=\"$rowcolor\">&nbsp;</td>";
+					echo "<td></td>";
 				}
 				if ($row->isupdtselfservice == "Y") {
-					if ($row->isselfservice == "Y") {
-						echo "\t\t<td class=\"$rowcolor align_center\"><img border=\"0\" src=\"status_green.png\"></td>\n";
-					} else {
-						echo "\t\t<td class=\"$rowcolor align_center\"><img border=\"0\" src=\"status_red.png\"></td>\n";
-					}
+					echo "\t\t<td class=\"text-center\"><img border=\"0\" src=\"status_" . ($row->isselfservice == "Y" ? "green" : "red") . ".png\"></td>\n";
 				} else {
-					echo "<td class=\"$rowcolor\">&nbsp;</td>";
+					echo "<td></td>";
 				}
 				if ($row->isupdtdiscontinued == "Y") {
-					if ($row->discontinued == "Y") {
-						echo "\t\t<td class=\"$rowcolor align_center\"><img border=\"0\" src=\"status_green.png\"></td>\n";
-					} else {
-						echo "\t\t<td class=\"$rowcolor align_center\"><img border=\"0\" src=\"status_red.png\"></td>\n";
-					}
+					echo "\t\t<td class=\"text-center\"><img border=\"0\" src=\"status_" . ($row->discontinued == "Y" ? "green" : "red") . ".png\"></td>\n";
 				} else {
-					echo "<td class=\"$rowcolor\">&nbsp;</td>";
+					echo "<td></td>";
 				}
 				if ($row->isupdtname == "Y") {
-					echo "\t\t<td class=\"$rowcolor align_center\"><img border=\"0\" src=\"status_green.png\"></td>\n";
+					echo "\t\t<td class=\"text-center\"><img border=\"0\" src=\"status_green.png\"></td>\n";
 				} else {
-					echo "<td class=\"$rowcolor\">&nbsp;</td>";
+					echo "<td></td>";
 				}
 				if ($row->isupdtdescription == "Y") {
-					echo "\t\t<td class=\"$rowcolor align_center\"><img border=\"0\" src=\"status_green.png\"></td>\n";
+					echo "\t\t<td class=\"text-center\"><img border=\"0\" src=\"status_green.png\"></td>\n";
 				} else {
-					echo "<td class=\"$rowcolor\">&nbsp;</td>";
+					echo "<td></td>";
 				}
-				echo "\t\t<td class=\"$rowcolor align_center\">" . strtoupper($row->user) . "</td>";
-				// echo "<td class=\"$rowcolor\">&nbsp;</td>";
-				echo "<td>&nbsp;</td>";
+				echo "\t\t<td class=\"text-center\">" . $h(strtoupper($row->user)) . "</td>";
+				echo "\t\t<td class=\"text-center\">" . (!$old ? $editLink : "") . "</td>";
 				echo "</tr>";
-	
-				if ($desiderow == true) {
-					$desiderow = false;
-				} else {
-					$desiderow = true;
-				}
-				
+
 				$groupday2 = date("Y-m-d",strtotime($row->updatetime));
-				
-	
+
+
 			}
-	
+
 		} else {
 			echo "<tr>";
-			echo "<td colspan=\"12\" class=\"italic\">Inga produktuppdateringar finns registrerade&nbsp;</td>";
+			echo "<td colspan=\"12\" class=\"muted\"><i>Inga produktuppdateringar finns registrerade</i></td>";
 			echo "</tr>";
 		}
-	
-		echo "</table>";
-	
+
+		echo "</tbody></table>";
+
 	}
 
 	function listArticleUpdates($artnr,$old) {

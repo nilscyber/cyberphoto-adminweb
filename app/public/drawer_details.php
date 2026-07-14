@@ -2,7 +2,7 @@
 // /admin/ajax/drawer_details.php
 header('Content-Type: text/html; charset=UTF-8');
 
-include_once(__DIR__ . '/../Db.php');
+include_once("Db.php");
 
 $type = isset($_GET['type']) ? $_GET['type'] : '';
 $id   = isset($_GET['id'])   ? trim($_GET['id']) : '';
