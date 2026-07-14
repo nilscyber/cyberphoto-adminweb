@@ -1117,53 +1117,60 @@ Class CProduct {
 		
 		$tot_count = 0;
 	
-		$select  = "SELECT COUNT(pu.m_product_update_id) AS antal, u.value AS user ";
+		$select  = "SELECT COUNT(pu.m_product_update_id) AS antal, u.name AS user_name ";
 		$select .= "FROM m_product_update pu ";
 		$select .= "JOIN m_product p ON p.m_product_id = pu.m_product_id ";
 		$select .= "JOIN m_pricelist pl ON pl.m_pricelist_id = pu.m_pricelist_id ";
 		$select .= "JOIN ad_user u ON u.ad_user_id = pu.salesrep_id ";
 		$select .= "WHERE isupdated = 'Y' ";
-		$select .= "GROUP BY u.value ";
+		$select .= "GROUP BY u.name ";
 		$select .= "ORDER BY Antal DESC ";
-		
+
 		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
 			echo $select;
 		}
-	
+
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-		// $row = pg_fetch_object($res);
-		// echo pg_num_rows($res);
-	
+
+		$h = function($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); };
+
 		if ($res && pg_num_rows($res) > 0) {
 
-			echo "<div class=\"bottom10\">\n";
-			echo "<table border=\"0\" cellpadding=\"0\" cellspacing=\"5\">\n";
-			echo "\t<tr>\n";
-			echo "\t\t<td class=\"bold\" width=\"100\">Användare</td>\n";
-			echo "\t\t<td class=\"align_center bold\">Antal</td>\n";
-			echo "\t</tr>\n";
-				
-			// while ($row2 = pg_fetch_row($res)) {
+			$rows = array();
+			$maxCount = 0;
 			while ($res && $row = pg_fetch_object($res)) {
-				
-				echo "\t<tr>\n";
-				echo "\t\t<td>" . strtoupper($row->user) . "</td>\n";
-				echo "\t\t<td class=\"align_right\">" . $row->antal . " st</td>\n";
-				echo "\t</tr>\n";
-				
+				$rows[] = $row;
+				if ((int)$row->antal > $maxCount) { $maxCount = (int)$row->antal; }
 				$tot_count = $tot_count + $row->antal;
-				
 			}
 
-			echo "\t<tr>\n";
-			echo "\t\t<td class=\"bold\">Totalt:</td>\n";
-			echo "\t\t<td class=\"align_right bold\">" . $tot_count ." st</td>\n";
+			echo "<table class=\"table-list\">\n";
+			echo "<colgroup><col /><col style=\"width:220px\" /><col style=\"width:90px\" /></colgroup>\n";
+			echo "<thead><tr>";
+			echo "<th>Användare</th>";
+			echo "<th>Fördelning</th>";
+			echo "<th class=\"text-right\">Antal</th>";
+			echo "</tr></thead>\n";
+			echo "<tbody>\n";
+
+			foreach ($rows as $row) {
+				$pct = $maxCount > 0 ? round(((int)$row->antal / $maxCount) * 100) : 0;
+				echo "\t<tr>\n";
+				echo "\t\t<td>" . $h($row->user_name) . "</td>\n";
+				echo "\t\t<td><div class=\"bar-track\"><div class=\"bar-fill\" style=\"width:" . $pct . "%\"></div></div></td>\n";
+				echo "\t\t<td class=\"text-right nowrap\">" . (int)$row->antal . " st</td>\n";
+				echo "\t</tr>\n";
+			}
+
+			echo "\t<tr class=\"summary-row\">\n";
+			echo "\t\t<td>Totalt</td>\n";
+			echo "\t\t<td></td>\n";
+			echo "\t\t<td class=\"text-right nowrap\">" . (int)$tot_count . " st</td>\n";
 			echo "\t</tr>\n";
-			echo "</table>\n";
-			echo "</div>\n";
-				
+			echo "</tbody></table>\n";
+
 		}
-			
+
 	}
 
 	function listLastAddedProducts() {

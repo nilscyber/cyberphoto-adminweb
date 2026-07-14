@@ -10,6 +10,8 @@
 	.col-price{width:90px}
 	.col-status{width:75px}
 	.col-owner{width:70px}
+	.bar-track{background:#eef2f5;border-radius:999px;height:10px;overflow:hidden}
+	.bar-fill{background:#0d9488;height:100%;border-radius:999px}
 	</style>';
 
 	echo "<h1>Kommande produktuppdateringar</h1>\n";
