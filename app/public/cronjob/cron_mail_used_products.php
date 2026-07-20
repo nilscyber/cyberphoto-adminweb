@@ -7,7 +7,7 @@ include_once("../top.php");
 $from          = 'no-reply@cyberphoto.se';
 $recipientsTO  = array('stefan@cyberphoto.se');
 $to            = implode(', ', $recipientsTO);
-$recipientsBCC = array('borje@cyberphoto.se','albin@cyberphoto.se','albin.soderlind@cyberphoto.se','andreas.almquist@cyberphoto.se');
+$recipientsBCC = array('borje@cyberphoto.se','albin@cyberphoto.se','albin.soderlind@cyberphoto.se');
 $bcc           = implode(', ', $recipientsBCC);
 
 $rows = $tool->getOldProducts('used', 90);

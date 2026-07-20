@@ -324,7 +324,7 @@
 			echo "<div class=\"box_artnr\"><div>" . $article->artnr . "</div></div>";
 			// echo "<div class=\"box_update_product\"><a href=\"javascript:winPopupCenter(900, 800, '/order/product_update.php?artnr=$article->artnr&m_product_id=$article->m_product_id');\">Uppdatera</a></div>";
 			echo "<div class=\"box_update_product\"><a href=\"javascript:winPopupCenter(900, 800, 'https://admin.cyberphoto.se/product_update.php?artnr=$article->artnr&m_product_id=$article->m_product_id');\">Uppdatera</a></div>";
-			if ($_COOKIE['login_mail'] == 'sjabo@cyberphoto.nu' || $_COOKIE['login_mail'] == 'borje@cyberphoto.nu' || $_COOKIE['login_mail'] == 'oskar.wernersson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'jonas@cyberphoto.nu' || $_COOKIE['login_mail'] == 'albin.larsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'amanda.karlsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'mikael@cyberphoto.nu' || $_COOKIE['login_mail'] == 'louise@cyberphoto.nu' || $_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'andreas.almquist@cyberphoto.nu' || $_COOKIE['login_mail'] == 'robin@cyberphoto.nu') {
+			if ($_COOKIE['login_mail'] == 'sjabo@cyberphoto.nu' || $_COOKIE['login_mail'] == 'borje@cyberphoto.nu' || $_COOKIE['login_mail'] == 'oskar.wernersson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'jonas@cyberphoto.nu' || $_COOKIE['login_mail'] == 'albin.larsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'amanda.karlsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'mikael@cyberphoto.nu' || $_COOKIE['login_mail'] == 'louise@cyberphoto.nu' || $_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'robin@cyberphoto.nu') {
 				// echo "<div class=\"box_sold_articles\"><a href=\"javascript:winPopupCenter(900, 800, '/order/product_update.php?artnr=$article->artnr&m_product_id=$article->m_product_id&hcampaign=yes');\">HELG</a> -</div>";
 				// echo "<div class=\"box_sold_articles\"><a href=\"javascript:winPopupCenter(150, 400, '/order/admin/add_campaign_article.php?article=$article->artnr');\">KID</a> -</div>";
 				echo "<div class=\"box_sold_articles\"><a target=\"_blank\" href=\"https://admin.cyberphoto.se/monitor_articles.php?add=yes&addArtnr=$article->artnr\">Bevaka</a> -</div>";
@@ -366,7 +366,7 @@
 			$_COOKIE['login_mail'] == 'borje@cyberphoto.nu' || $_COOKIE['login_mail'] == 'jonas@cyberphoto.nu' ||
 			$_COOKIE['login_mail'] == 'albin.larsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'amanda.karlsson@cyberphoto.nu' ||
 			$_COOKIE['login_mail'] == 'mikael@cyberphoto.nu' || $_COOKIE['login_mail'] == 'louise@cyberphoto.nu' ||
-			$_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'andreas.almquist@cyberphoto.nu' ||
+			$_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.nu' ||
 			$_COOKIE['login_mail'] == 'robin@cyberphoto.nu' || $_COOKIE['login_mail'] == 'fabian.lundkvist@cyberphoto.nu')) {
 				if ($article->demo == -1) {
 					$now = time(); // or your date as well
@@ -409,7 +409,7 @@
 				} else {
 					echo "<div class=\"box_margin\">&nbsp;</div>";
 				}
-				if ($_COOKIE['login_mail'] == 'sjabo@cyberphoto.nu' || $_COOKIE['login_mail'] == 'borje@cyberphoto.nu' || $_COOKIE['login_mail'] == 'oskar.wernersson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'jonas@cyberphoto.nu' || $_COOKIE['login_mail'] == 'albin.larsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'amanda.karlsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'mikael@cyberphoto.nu' || $_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'andreas.almquist@cyberphoto.nu' || $_COOKIE['login_mail'] == 'robin@cyberphoto.nu' || $_COOKIE['login_mail'] == 'fabian.lundkvist@cyberphoto.nu') {
+				if ($_COOKIE['login_mail'] == 'sjabo@cyberphoto.nu' || $_COOKIE['login_mail'] == 'borje@cyberphoto.nu' || $_COOKIE['login_mail'] == 'oskar.wernersson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'jonas@cyberphoto.nu' || $_COOKIE['login_mail'] == 'albin.larsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'amanda.karlsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'mikael@cyberphoto.nu' || $_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'robin@cyberphoto.nu' || $_COOKIE['login_mail'] == 'fabian.lundkvist@cyberphoto.nu') {
 					echo "<div class=\"box_netto\">" . $pricelist->getMargin($article->artnr,true) . "</div>";
 					// echo "<div class=\"box_accessories\"><a class=\"mark_purple\" href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $article->artnr . "&addart=yes');\">Tillbehör</a></div>";
 					if ($article->momssats == 0.00) {
