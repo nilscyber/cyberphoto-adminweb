@@ -124,7 +124,7 @@ Class CCheckIP {
 	}
 	// Denna kollar om personen får se ej lanserade produkter (kommande launchdate) på new_products.php
 	static function checkIfCanSeeUpcomingProducts() {
-		return self::hasPermission('product_permissions');
+		return self::hasPermission('product_permissions') || self::hasPermission('priority');
 	}
 	// Denna kollar om personen är inköpskollega
 	static function checkIfPurchaseColleague() {
