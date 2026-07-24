@@ -3043,15 +3043,15 @@ ORDER BY manu.name ASC, prod.name ASC
             . '?artnr=' . rawurlencode($r['artnr'])
             . '&m_product_id=' . rawurlencode($r['m_product_id']);
 
-        $urlPublic = 'https://www2.cyberphoto.se/info.php?article='
-            . rawurlencode($r['artnr']);
+        $productUrl = 'search_dispatch.php?q=' . urlencode($r['artnr'])
+            . '&open=product&id=' . rawurlencode($r['m_product_id']) . '#';
 
         $trClass = $isDup ? ' class="dup-row"' : '';
 
         echo '<tr'.$trClass.'>';
         echo '<td class="nowrap">'.$h($r['artnr']).'</td>';
         echo '<td>';
-        echo '<a href="'.$h($urlPublic).'" target="_blank" rel="noopener">'.$h($fullName).'</a>';
+        echo '<a href="'.$h($productUrl).'" target="_blank" rel="noopener">'.$h($fullName).'</a>';
         if ($isDup) {
             echo '<span class="dup-badge" title="Likadan produkt kan finnas ute redan">Möjlig dubblett</span>';
         }
