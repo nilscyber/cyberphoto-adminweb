@@ -1560,7 +1560,38 @@ Class CTradeIn {
 		} else {
 			return true;
 		}
-			
+
+	}
+
+	// Som findReadyForSaleCheck() men returnerar vilka artnr/namn som matchade,
+	// s� man kan se p� sidan om det verkligen r�r sig om samma modell.
+	function findReadyForSaleMatches($m_product_parent_id) {
+		$conn = Db::getConnectionAD();
+		if (!$conn) {
+			return array();
+		}
+
+		$parentId = (int)$m_product_parent_id;
+
+		$select = "SELECT prod.value AS artnr, prod.name AS product_name, manu.name AS tillverkare ";
+		$select .= "FROM m_product_cache pstock ";
+		$select .= "JOIN m_product prod ON prod.m_product_id = pstock.m_product_id ";
+		$select .= "JOIN m_product_po prod_po ON pstock.m_product_id = prod_po.m_product_id ";
+		$select .= "JOIN c_bpartner cbp ON cbp.c_bpartner_id = prod_po.c_bpartner_id ";
+		$select .= "LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = prod.xc_manufacturer_id ";
+		$select .= "WHERE pstock.m_warehouse_id = 1000000 AND pstock.qtyavailable > 0 ";
+		$select .= "AND cbp.value = '5555' AND prod_po.iscurrentvendor = 'Y' ";
+		$select .= "AND prod.IsSelfService = 'Y' ";
+		$select .= "AND prod.m_product_parent_id = " . $parentId . " ";
+
+		$res = @pg_query($conn, $select);
+
+		$matches = array();
+		while ($res && $row = pg_fetch_assoc($res)) {
+			$matches[] = trim($row['tillverkare'] . ' ' . $row['product_name']) . ' (' . $row['artnr'] . ')';
+		}
+
+		return $matches;
 	}
 
 	function bookedNotShipped() {
@@ -3029,15 +3060,8 @@ ORDER BY manu.name ASC, prod.name ASC
 
         // Dubblettkontroll
         $parentId = (int)$r['m_product_parent_id'];
-        $raw = null;
-
-        if (method_exists($this, 'findReadyForSaleCheck')) {
-            $raw = $this->findReadyForSaleCheck($parentId);
-        } elseif (function_exists('findReadyForSaleCheck')) {
-            $raw = findReadyForSaleCheck($parentId);
-        }
-
-        $isDup = !$raw;
+        $dupMatches = $this->findReadyForSaleMatches($parentId);
+        $isDup = !empty($dupMatches);
 
         $urlAdmin = '/product_update.php'
             . '?artnr=' . rawurlencode($r['artnr'])
@@ -3053,7 +3077,8 @@ ORDER BY manu.name ASC, prod.name ASC
         echo '<td>';
         echo '<a href="'.$h($productUrl).'" target="_blank" rel="noopener">'.$h($fullName).'</a>';
         if ($isDup) {
-            echo '<span class="dup-badge" title="Likadan produkt kan finnas ute redan">Möjlig dubblett</span>';
+            $dupTitle = 'Redan publicerad: ' . implode(', ', $dupMatches);
+            echo '<span class="dup-badge" title="'.$h($dupTitle).'">Möjlig dubblett</span>';
         }
         echo '</td>';
         echo '<td class="nowrap">'.$h(substr($r['salestart'],0,10)).'</td>';
