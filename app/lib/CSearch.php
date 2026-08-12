@@ -2148,9 +2148,9 @@ public static function renderOrderDetailsAD($orderNo)
     if (!empty($order['shipper'])) {
         $html .= '  <div class="dw-row"><span class="dw-label">Leveranssätt:</span> <span class="dw-value"><strong>' . $eh($order['shipper']) . '</strong></span></div>';
     }
-    if ($pclassLabel !== '') {
-        $html .= '  <div class="dw-row"><span class="dw-label">Kreditklass:</span> <span class="dw-value"><strong>' . $eh($pclassLabel) . '</strong></span></div>';
-    }
+    // if ($pclassLabel !== '') {
+    //     $html .= '  <div class="dw-row"><span class="dw-label">Kreditklass:</span> <span class="dw-value"><strong>' . $eh($pclassLabel) . '</strong></span></div>';
+    // }
     $html .= '</div>';
 
     // === ADRESSBLOCK: EN eller TVÅ boxar beroende på c_location_id ===
