@@ -796,6 +796,73 @@ if ($type === 'customer') {
     echo '</div>';
 
 
+	/* ===== Kort: ARTIKLAR I PAKETET (endast för egna paket) ===== */
+	if ($isBundleForStats) {
+		$bundleLines = array();
+		$sqlBundle = "
+			SELECT
+				comp.m_product_id,
+				comp.value                                                      AS article,
+				TRIM(COALESCE(manu.name,'') || ' ' || COALESCE(comp.name,''))  AS product_full,
+				sl.qty,
+				COALESCE(psv.qtyavailable, 0)                                   AS available_qty
+			FROM xc_salesbundle sb
+			JOIN xc_salesbundle_lines sl
+			  ON sl.xc_salesbundle_id = sb.xc_salesbundle_id
+			 AND sl.isactive          = 'Y'
+			JOIN m_product comp
+			  ON comp.m_product_id = sl.m_product_id
+			LEFT JOIN xc_manufacturer manu
+			  ON manu.xc_manufacturer_id = comp.xc_manufacturer_id
+			LEFT JOIN m_product_stock_summary_v psv
+			  ON psv.m_product_id   = comp.m_product_id
+			 AND psv.m_warehouse_id = 1000000
+			WHERE sb.m_product_id = $1
+			  AND sb.isactive     = 'Y'
+			ORDER BY sl.xc_salesbundle_lines_id ASC
+		";
+		if ($rsB = ($conn) ? @pg_query_params($conn, $sqlBundle, array($row['m_product_id'])) : false) {
+			while ($rsB && $bl = pg_fetch_assoc($rsB)) $bundleLines[] = $bl;
+			pg_free_result($rsB);
+		}
+
+		if (!empty($bundleLines)) {
+			echo '<div class="dw-card">';
+			  echo '<h3>Artiklar i paketet</h3>';
+			  echo '<table class="dw-table" style="font-size:13px">';
+			  echo '<thead><tr>'
+			     . '<th>Artikelnr</th><th class="text-center">Antal</th><th>Produkt</th><th class="text-center">Tillgänglig</th>'
+			     . '</tr></thead><tbody>';
+			  foreach ($bundleLines as $bl) {
+				$compArticle = (string)$bl['article'];
+				$compPid     = (int)$bl['m_product_id'];
+				$compFull    = (string)$bl['product_full'];
+
+				$qtyRaw  = (float)$bl['qty'];
+				$qtyDisp = (floor($qtyRaw) == $qtyRaw)
+				         ? number_format($qtyRaw, 0, ',', ' ')
+				         : number_format($qtyRaw, 2, ',', ' ');
+
+				$compAvail      = (int)$bl['available_qty'];
+				$compAvailBadge = '<span class="dw-badge-pill '.($compAvail > 0 ? 'dw-badge-green' : 'dw-badge-red').'">'.$compAvail.' st</span>';
+
+				$qs      = array('mode'=>'product', 'q'=>$compArticle, 'open'=>'product', 'id'=>$compPid);
+				$compUrl = '/search_dispatch.php?' . http_build_query($qs);
+				$compLink = '<a href="'.$h($compUrl).'" target="_blank" rel="noopener">'.$h($compFull).'</a>';
+
+				echo '<tr>';
+				echo '<td><span class="copy-art" data-article="'.$h($compArticle).'" title="Kopiera artikelnummer">'.$h($compArticle).'</span></td>';
+				echo '<td class="text-center">'.$qtyDisp.'</td>';
+				echo '<td>'.$compLink.'</td>';
+				echo '<td class="text-center">'.$compAvailBadge.'</td>';
+				echo '</tr>';
+			  }
+			  echo '</tbody></table>';
+			echo '</div>';
+		}
+	}
+
+
 	/* ===== Kort: FÖRSÄLJNINGSHISTORIK (begagnat/fyndvara) ===== */
 	if ($showSalesHistory && !empty($salesHistory)) {
 		echo '<div class="dw-card" style="margin-top:10px">';
