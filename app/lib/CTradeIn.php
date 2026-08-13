@@ -3010,6 +3010,7 @@ SELECT
   prod.value               AS artnr,
   manu.name                AS tillverkare,
   prod.name                AS product_name,
+  prod.description         AS description_text,
   mloc.value               AS locator_value,
   prod.salestart           AS salestart,
   prod.m_product_id        AS m_product_id,
@@ -3058,6 +3059,13 @@ ORDER BY manu.name ASC, prod.name ASC
 
         $fullName = trim($r['tillverkare'].' '.$r['product_name']);
 
+        // Skickbetyg, t.ex. "(4/5)" i beskrivningen
+        $descRaw = isset($r['description_text']) ? trim((string)$r['description_text']) : '';
+        $conditionRating = '';
+        if ($descRaw !== '' && preg_match('/\((\d+\/\d+)\)/', $descRaw, $cm)) {
+            $conditionRating = $cm[1];
+        }
+
         // Dubblettkontroll
         $parentId = (int)$r['m_product_parent_id'];
         $dupMatches = $this->findReadyForSaleMatches($parentId);
@@ -3076,6 +3084,9 @@ ORDER BY manu.name ASC, prod.name ASC
         echo '<td class="nowrap">'.$h($r['artnr']).'</td>';
         echo '<td>';
         echo '<a href="'.$h($productUrl).'" target="_blank" rel="noopener">'.$h($fullName).'</a>';
+        if ($conditionRating !== '') {
+            echo ' <span class="badge badge-used" title="'.$h($descRaw).'">'.$h($conditionRating).'</span>';
+        }
         if ($isDup) {
             $dupTitle = 'Redan publicerad: ' . implode(', ', $dupMatches);
             echo '<span class="dup-badge" title="'.$h($dupTitle).'">Möjlig dubblett</span>';
