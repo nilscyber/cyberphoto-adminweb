@@ -262,16 +262,47 @@ if ($type === 'customer') {
 
     // Försäljningsstatistik - hämta EN gaang
     $st = null;
-    $sqlStat = "
-        SELECT qtyweek, qtymonth, qty3month, qty6month, qty12month, qty36month, qtytotal
-          FROM xc_product_statistics
-         WHERE m_product_id = $1 AND c_country_id = 313
-         ORDER BY updated DESC
-         LIMIT 1
-    ";
-    if ($resS = ($conn) ? @pg_query_params($conn, $sqlStat, array($row['m_product_id'])) : false) {
-        $st = $resS ? pg_fetch_assoc($resS) : null;
-        pg_free_result($resS);
+    $isBundleForStats = (isset($row['issalesbundle']) && strtoupper((string)$row['issalesbundle']) === 'Y');
+
+    if ($isBundleForStats) {
+        // Egna paket säljs inte via en orderrad med m_product_id = paketets id -
+        // komponentraderna taggas istället med packey = paketets artikelnummer.
+        // xc_product_statistics räknas (av externt jobb) på m_product_id och
+        // missar därför paketförsäljning helt. Räkna samma väg som
+        // bundle_overview.php gör istället, dvs via packey.
+        $sqlStat = "
+            SELECT
+                COUNT(DISTINCT ol.c_order_id) FILTER (WHERE o.created >= NOW() - INTERVAL '7 days')    AS qtyweek,
+                COUNT(DISTINCT ol.c_order_id) FILTER (WHERE o.created >= NOW() - INTERVAL '30 days')   AS qtymonth,
+                COUNT(DISTINCT ol.c_order_id) FILTER (WHERE o.created >= NOW() - INTERVAL '90 days')   AS qty3month,
+                COUNT(DISTINCT ol.c_order_id) FILTER (WHERE o.created >= NOW() - INTERVAL '180 days')  AS qty6month,
+                COUNT(DISTINCT ol.c_order_id) FILTER (WHERE o.created >= NOW() - INTERVAL '365 days')  AS qty12month,
+                COUNT(DISTINCT ol.c_order_id) FILTER (WHERE o.created >= NOW() - INTERVAL '1095 days') AS qty36month,
+                COUNT(DISTINCT ol.c_order_id)                                                          AS qtytotal
+            FROM c_orderline ol
+            INNER JOIN c_order o ON o.c_order_id = ol.c_order_id
+            WHERE ol.packey         = $1
+              AND o.c_doctype_id    = 1000030
+              AND o.docstatus       = 'CO'
+              AND ol.qtyordered     = ol.qtydelivered
+              AND ol.qtyordered     > 0
+        ";
+        if ($resS = ($conn) ? @pg_query_params($conn, $sqlStat, array($row['article'])) : false) {
+            $st = $resS ? pg_fetch_assoc($resS) : null;
+            pg_free_result($resS);
+        }
+    } else {
+        $sqlStat = "
+            SELECT qtyweek, qtymonth, qty3month, qty6month, qty12month, qty36month, qtytotal
+              FROM xc_product_statistics
+             WHERE m_product_id = $1 AND c_country_id = 313
+             ORDER BY updated DESC
+             LIMIT 1
+        ";
+        if ($resS = ($conn) ? @pg_query_params($conn, $sqlStat, array($row['m_product_id'])) : false) {
+            $st = $resS ? pg_fetch_assoc($resS) : null;
+            pg_free_result($resS);
+        }
     }
 
     // Interna kommentarer på produkten (ad_table_id = 208)
@@ -1180,7 +1211,7 @@ if ($type === 'customer') {
     $feedUrl = 'https://admin.cyberphoto.se/product_feedback.php?popup=1&artnr='.$art.'&ordernr=';
     $editUrl = 'https://admin.cyberphoto.se/product_update.php?artnr='.$art.'&m_product_id='.$pidOut;
 
-	$isBundle = (isset($row['issalesbundle']) && strtoupper((string)$row['issalesbundle']) === 'Y');
+	$isBundle = $isBundleForStats;
 	if ($isBundle) {
 		$soldUrl .= '&show_salesbundle=yes';
 	}
