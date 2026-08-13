@@ -805,7 +805,7 @@ if ($type === 'customer') {
 				comp.value                                                      AS article,
 				TRIM(COALESCE(manu.name,'') || ' ' || COALESCE(comp.name,''))  AS product_full,
 				sl.qty,
-				COALESCE(psv.qtyavailable, 0)                                   AS available_qty
+				COALESCE(ps.qtyavailable, 0)                                    AS available_qty
 			FROM xc_salesbundle sb
 			JOIN xc_salesbundle_lines sl
 			  ON sl.xc_salesbundle_id = sb.xc_salesbundle_id
@@ -814,9 +814,12 @@ if ($type === 'customer') {
 			  ON comp.m_product_id = sl.m_product_id
 			LEFT JOIN xc_manufacturer manu
 			  ON manu.xc_manufacturer_id = comp.xc_manufacturer_id
-			LEFT JOIN m_product_stock_summary_v psv
-			  ON psv.m_product_id   = comp.m_product_id
-			 AND psv.m_warehouse_id = 1000000
+			LEFT JOIN (
+				SELECT m_product_id, SUM(qtyavailable) AS qtyavailable
+				FROM m_product_cache
+				WHERE m_warehouse_id = 1000000
+				GROUP BY m_product_id
+			) ps ON ps.m_product_id = comp.m_product_id
 			WHERE sb.m_product_id = $1
 			  AND sb.isactive     = 'Y'
 			ORDER BY sl.xc_salesbundle_lines_id ASC
