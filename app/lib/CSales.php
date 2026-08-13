@@ -169,14 +169,23 @@ function displaySalesPerUser() {
 	$date_filter_last_year = "AND mio.updated >= '$start_last_year 00:00:00' AND mio.updated <= '$end_last_year 23:59:59'";
 
 	function fetch_sales_data($date_filter) {
-		$select  = "SELECT COUNT(o.c_order_id) AS antal, SUM(i.totallines) AS summa, ad.value, ad.firstname, ad.lastname ";
-		$select .= "FROM m_inout mio ";
-		$select .= "JOIN c_order o ON o.c_order_id=mio.c_order_id ";
-		$select .= "JOIN ad_user ad ON ad.ad_user_id = o.salesrep_id ";
-		$select .= "JOIN c_invoice i ON i.c_invoice_id=mio.c_invoice_id ";
-		$select .= "WHERE mio.docstatus IN ('CO') AND mio.deliveryViaRule IN ('S','P') AND mio.isSOTrx = 'Y' ";
-		$select .= "AND mio.isInDispute!='Y' and mio.isActive='Y' AND mio.AD_Client_ID=1000000 AND mio.M_rma_ID is null ";
-		$select .= $date_filter . " GROUP BY ad.value, ad.firstname, ad.lastname ORDER BY summa DESC, ad.lastname ASC, ad.firstname ASC";
+		// En order kan levereras i flera omgångar (flera m_inout-rader) men vara kopplad
+		// till samma faktura. Om vi bara JOIN:ar rakt av räknas fakturans totallines med
+		// en gång per m_inout-rad, vilket dubbelräknar summan för delade leveranser.
+		// Därför plockar vi bara med totallines för den första matchande m_inout-raden
+		// per faktura (ROW_NUMBER), medan "antal" fortsatt räknar alla leveransrader.
+		$select  = "SELECT COUNT(*) AS antal, SUM(inv_total) AS summa, value, firstname, lastname ";
+		$select .= "FROM ( ";
+		$select .= "  SELECT ad.value, ad.firstname, ad.lastname, ";
+		$select .= "         CASE WHEN ROW_NUMBER() OVER (PARTITION BY i.c_invoice_id ORDER BY mio.m_inout_id) = 1 THEN i.totallines ELSE 0 END AS inv_total ";
+		$select .= "  FROM m_inout mio ";
+		$select .= "  JOIN c_order o ON o.c_order_id=mio.c_order_id ";
+		$select .= "  JOIN ad_user ad ON ad.ad_user_id = o.salesrep_id ";
+		$select .= "  JOIN c_invoice i ON i.c_invoice_id=mio.c_invoice_id ";
+		$select .= "  WHERE mio.docstatus IN ('CO') AND mio.deliveryViaRule IN ('S','P') AND mio.isSOTrx = 'Y' ";
+		$select .= "  AND mio.isInDispute!='Y' and mio.isActive='Y' AND mio.AD_Client_ID=1000000 AND mio.M_rma_ID is null ";
+		$select .= "  " . $date_filter . " ";
+		$select .= ") x GROUP BY value, firstname, lastname ORDER BY summa DESC, lastname ASC, firstname ASC";
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
 		$data = [];
 		while ($res && $row = pg_fetch_object($res)) {
@@ -245,9 +254,11 @@ function displaySalesPerUser() {
 		$diff_color = ($diff >= 0) ? 'style="color: green;"' : 'style="color: red;"';
 		$diff_pct_color = ($diff_pct >= 0) ? 'style="color: green;"' : 'style="color: red;"';
 
-		echo "<tr class=\"$backcolor\">
-			<td align=\"left\">" . (isset($sales_now[$seller]['namn']) ? $sales_now[$seller]['namn'] :
-					(isset($sales_last[$seller]['namn']) ? $sales_last[$seller]['namn'] : $seller)) . "</td>
+		$seller_name = isset($sales_now[$seller]['namn']) ? $sales_now[$seller]['namn'] :
+				(isset($sales_last[$seller]['namn']) ? $sales_last[$seller]['namn'] : $seller);
+
+		echo "<tr class=\"$backcolor seller-row\" data-seller=\"" . htmlspecialchars($seller, ENT_QUOTES) . "\" data-name=\"" . htmlspecialchars($seller_name, ENT_QUOTES) . "\" data-start=\"" . htmlspecialchars($start, ENT_QUOTES) . "\" data-end=\"" . htmlspecialchars($end, ENT_QUOTES) . "\">
+			<td align=\"left\">" . $seller_name . "</td>
 			<td align=\"center\">$antal</td>
 			<td align=\"right\">" . number_format($summa, 0, ',', ' ') . " SEK</td>
 			<td align=\"right\">" . number_format($last_summa, 0, ',', ' ') . " SEK</td>
@@ -341,6 +352,136 @@ foreach ([
 	echo "<button type=\"submit\">Exportera till Excel</button>";
 	echo "</form>";
 }
+
+	/**
+	 * Produktdetaljer (per order) för en säljare inom en period (samma urval som displaySalesPerUser).
+	 *
+	 * @param string $sellerCode ad_user.value (samma nyckel som används i displaySalesPerUser)
+	 * @param string $start Startdatum (YYYY-MM-DD)
+	 * @param string $end Slutdatum (YYYY-MM-DD)
+	 * @return array Lista med ['order_no','artnr','m_product_id','label','antal','summa']
+	 */
+	function getSalesPerUserProductDetails($sellerCode, $start, $end) {
+		$dbAD = Db::getConnectionAD(false);
+		if (!$dbAD) {
+			return [];
+		}
+
+		$sellerCode = trim($sellerCode);
+		if ($sellerCode === '') {
+			return [];
+		}
+
+		// VIKTIGT: en order kan ha rader som ännu inte levererats/fakturerats
+		// (restnoterat). Om vi bara joinar på o.c_order_id räknar vi med hela
+		// ordern, inklusive rader som inte alls hör till just den här leveransen/
+		// fakturan – det gjorde tidigare version av frågan, vilket gav en för hög
+		// summa. Vi går därför via m_inoutline (leveransraden) som pekar ut exakt
+		// vilken c_orderline som levererades i just den m_inout-rad som matchar
+		// filtret. Beloppet proportioneras dessutom efter levererad/beställd kvantitet
+		// (movementqty / qtyordered) så att en rad som levererats i flera separata
+		// sändningar inte räknas dubbelt om flera sändningar råkar hamna i samma period.
+		//
+		// Begagnade/inbytesprodukter lagras som två orderrader: en "ankarrad" med
+		// m_product_id och en companion-rad utan produkt (packey satt) som bär
+		// marginalen. Samma mönster som sold_article.php/CSearch.php använder vi
+		// en LATERAL-join för att lägga companion-radens linenetamt på ankarraden,
+		// annars faller marginalen bort helt (INNER JOIN mot m_product utesluter
+		// companion-raden) och produktsumman blir lägre än fakturans totallines.
+		$sql  = "SELECT o.documentno AS order_no, p.value AS artnr, p.m_product_id, p.name AS product_name, COALESCE(mf.name, '') AS manufacturer, ";
+		$sql .= "SUM(miol.movementqty) AS antal, ";
+		$sql .= "SUM((ol.linenetamt + COALESCE(comp.linenetamt, 0)) * miol.movementqty / NULLIF(ol.qtyordered, 0)) AS summa ";
+		$sql .= "FROM m_inout mio ";
+		$sql .= "JOIN c_order o ON o.c_order_id = mio.c_order_id ";
+		$sql .= "JOIN ad_user ad ON ad.ad_user_id = o.salesrep_id ";
+		$sql .= "JOIN c_invoice i ON i.c_invoice_id = mio.c_invoice_id ";
+		$sql .= "JOIN m_inoutline miol ON miol.m_inout_id = mio.m_inout_id ";
+		$sql .= "JOIN c_orderline ol ON ol.c_orderline_id = miol.c_orderline_id AND ol.m_product_id IS NOT NULL ";
+		$sql .= "JOIN m_product p ON p.m_product_id = ol.m_product_id ";
+		$sql .= "LEFT JOIN xc_manufacturer mf ON mf.xc_manufacturer_id = p.xc_manufacturer_id ";
+		$sql .= "LEFT JOIN LATERAL ( ";
+		$sql .= "  SELECT c.linenetamt FROM c_orderline c ";
+		$sql .= "  WHERE c.c_order_id = ol.c_order_id AND c.m_product_id IS NULL AND c.packey IS NOT NULL ";
+		$sql .= "  AND ol.packey IS NOT NULL AND c.line > ol.line ";
+		$sql .= "  ORDER BY c.line ASC LIMIT 1 ";
+		$sql .= ") comp ON true ";
+		$sql .= "WHERE mio.docstatus IN ('CO') AND mio.deliveryViaRule IN ('S','P') AND mio.isSOTrx = 'Y' ";
+		$sql .= "AND mio.isInDispute!='Y' and mio.isActive='Y' AND mio.AD_Client_ID=1000000 AND mio.M_rma_ID is null ";
+		$sql .= "AND UPPER(TRIM(ad.value)) = UPPER(\$1) ";
+		$sql .= "AND mio.updated >= \$2 AND mio.updated <= \$3 ";
+		$sql .= "GROUP BY o.documentno, p.value, p.m_product_id, p.name, mf.name ORDER BY o.documentno DESC, summa DESC";
+
+		$res = @pg_query_params($dbAD, $sql, [$sellerCode, $start . ' 00:00:00', $end . ' 23:59:59']);
+
+		$out = [];
+		$breakdown_sum = 0.0;
+		while ($res && $row = pg_fetch_object($res)) {
+			$man = trim($row->manufacturer);
+			$name = trim($row->product_name);
+			$summa = (float)$row->summa;
+			$breakdown_sum += $summa;
+			$out[] = [
+				'order_no' => $row->order_no,
+				'artnr' => $row->artnr,
+				'm_product_id' => (int)$row->m_product_id,
+				'label' => ($man !== '') ? ($man . ' ' . $name) : $name,
+				'antal' => (int)$row->antal,
+				'summa' => $summa,
+			];
+		}
+
+		// Produktnedbrytningen bygger på antaganden (begagnat-companionrader m.m.)
+		// som inte nödvändigtvis täcker alla specialfall (krediterade rader,
+		// öresavrundning, ordrar utan produktkopplade rader osv). För att aldrig
+		// visa en siffra i modalen som inte går ihop med huvudrapporten stämmer vi
+		// alltid av mot samma fakturabaserade summa som displaySalesPerUser() visar,
+		// och redovisar en eventuell mellanskillnad som en egen rad i stället för
+		// att tyst tappa eller överskatta beloppet.
+		$true_total = $this->getSalesPerUserInvoiceTotal($sellerCode, $start, $end);
+		$diff = round($true_total - $breakdown_sum, 2);
+		if (abs($diff) >= 1) {
+			$out[] = [
+				'order_no' => '',
+				'artnr' => '',
+				'm_product_id' => 0,
+				'label' => 'Övrigt (ej fördelat per produkt)',
+				'antal' => null,
+				'summa' => $diff,
+			];
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Samma fakturabaserade summa (deduplicerad per faktura) som displaySalesPerUser()
+	 * visar för en enskild säljare inom en period. Används för att stämma av
+	 * produktnedbrytningen i getSalesPerUserProductDetails().
+	 */
+	private function getSalesPerUserInvoiceTotal($sellerCode, $start, $end) {
+		$dbAD = Db::getConnectionAD(false);
+		if (!$dbAD) {
+			return 0.0;
+		}
+
+		$sql  = "SELECT SUM(inv_total) AS summa FROM ( ";
+		$sql .= "  SELECT CASE WHEN ROW_NUMBER() OVER (PARTITION BY i.c_invoice_id ORDER BY mio.m_inout_id) = 1 THEN i.totallines ELSE 0 END AS inv_total ";
+		$sql .= "  FROM m_inout mio ";
+		$sql .= "  JOIN c_order o ON o.c_order_id = mio.c_order_id ";
+		$sql .= "  JOIN ad_user ad ON ad.ad_user_id = o.salesrep_id ";
+		$sql .= "  JOIN c_invoice i ON i.c_invoice_id = mio.c_invoice_id ";
+		$sql .= "  WHERE mio.docstatus IN ('CO') AND mio.deliveryViaRule IN ('S','P') AND mio.isSOTrx = 'Y' ";
+		$sql .= "  AND mio.isInDispute!='Y' and mio.isActive='Y' AND mio.AD_Client_ID=1000000 AND mio.M_rma_ID is null ";
+		$sql .= "  AND UPPER(TRIM(ad.value)) = UPPER(\$1) ";
+		$sql .= "  AND mio.updated >= \$2 AND mio.updated <= \$3 ";
+		$sql .= ") x";
+
+		$res = @pg_query_params($dbAD, $sql, [$sellerCode, $start . ' 00:00:00', $end . ' 23:59:59']);
+		if ($res && $row = pg_fetch_object($res)) {
+			return (float)$row->summa;
+		}
+		return 0.0;
+	}
 
 	function getEURrate($idag_date = "",$NOK = false) {
 

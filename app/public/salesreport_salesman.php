@@ -1,6 +1,8 @@
-<?php 
+<?php
 include_once("top.php");
 include_once("header.php");
+
+echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
 
 // Initiera $history om inte redan satt
 $history = isset($_GET['history']) ? $_GET['history'] : 'day';
@@ -62,3 +64,59 @@ echo '<hr style="border: 1px solid #C0C0C0;">';
 
 include_once("footer.php");
 ?>
+
+<div id="seller_modal_backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1000;">
+    <div id="seller_modal" style="background:#fff; max-width:700px; width:90%; margin:5% auto; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.3); max-height:80vh; display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; border-bottom:1px solid #e5e7eb;">
+            <h3 id="seller_modal_title" style="margin:0;">Produkter</h3>
+            <button type="button" id="seller_modal_close" aria-label="Stäng" style="background:none; border:none; font-size:22px; line-height:1; cursor:pointer; color:#555;">&times;</button>
+        </div>
+        <div id="seller_modal_body" style="padding:15px 20px; overflow-y:auto;">
+            <p class="italic">Laddar...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var backdrop = document.getElementById('seller_modal_backdrop');
+    var modalBody = document.getElementById('seller_modal_body');
+    var modalTitle = document.getElementById('seller_modal_title');
+
+    function openModal(seller, name, start, end) {
+        modalTitle.textContent = 'Produkter – ' + name;
+        modalBody.innerHTML = '<p class="italic">Laddar...</p>';
+        backdrop.style.display = 'block';
+
+        var url = 'ajax/salesman_products.php?seller=' + encodeURIComponent(seller)
+            + '&start=' + encodeURIComponent(start)
+            + '&end=' + encodeURIComponent(end);
+
+        fetch(url)
+            .then(function (res) { return res.text(); })
+            .then(function (html) { modalBody.innerHTML = html; })
+            .catch(function () { modalBody.innerHTML = '<p class="italic">Kunde inte hämta produkter.</p>'; });
+    }
+
+    function closeModal() {
+        backdrop.style.display = 'none';
+    }
+
+    document.addEventListener('click', function (e) {
+        var row = e.target.closest ? e.target.closest('tr[data-seller]') : null;
+        if (row) {
+            openModal(row.getAttribute('data-seller'), row.getAttribute('data-name'), row.getAttribute('data-start'), row.getAttribute('data-end'));
+            return;
+        }
+        if (e.target === backdrop || e.target.id === 'seller_modal_close') {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && backdrop.style.display === 'block') {
+            closeModal();
+        }
+    });
+})();
+</script>
