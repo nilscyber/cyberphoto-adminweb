@@ -888,6 +888,8 @@ if ($type === 'customer') {
 	}
 
 	/* ===== Kort: LAGER (Kö visas alltid) ===== */
+	/* Egna paket har inget eget lager/inköp - döljs helt för paketprodukter */
+	if (!$isBundleForStats) {
 	$availableRaw = isset($row['available_qty']) ? (int)$row['available_qty'] : 0;
 	$allocated    = isset($row['allocated_storage_qty']) ? (int)$row['allocated_storage_qty'] : 0;
 	$ordered      = isset($row['ordered_qty']) ? (int)$row['ordered_qty'] : 0;
@@ -1139,6 +1141,7 @@ if ($type === 'customer') {
 		  echo '</tbody></table>';
 		echo '</div>';
 	}
+	} // /if (!$isBundleForStats) - Lager
 
 
     // ===== Sparkline + Sålt över tid =====
@@ -1294,7 +1297,8 @@ if ($type === 'customer') {
       echo '<a href="#" class="dw-btn" onclick="window.open(\''.$editUrl.'\',\'product_update_'.$pidOut.'\',\'width=800,height=900,menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1\');return false;">Editera</a>';
     echo '</div>';
 
-    // ===== Aktuell leverantör =====
+    // ===== Aktuell leverantör (döljs för egna paket - har ingen egen leverantör) =====
+    if (!$isBundleForStats) {
     $sqlSupp = "
         SELECT
             bp.name                 AS supplier_name,
@@ -1367,6 +1371,7 @@ if ($type === 'customer') {
           echo '</div>';
         echo '</div>';
     }
+    } // /if (!$isBundleForStats) - Aktuell leverantör
 
     /* ===== Rapporterad missad försäljning (MySQL) - summering per orsak ===== */
     $grpRows    = array();
@@ -1434,7 +1439,8 @@ if ($type === 'customer') {
 	echo ' <a href="'.$feedDetailsUrl.'" class="dw-btn" target="_blank">Öppna rapporter</a>';
     echo '</div>';
 	
-    // Kolla senaste inköopsordrar
+    // Kolla senaste inköopsordrar (döljs för egna paket - inköps inte som helhet)
+	if (!$isBundleForStats) {
 	$poRows = array();
 	$pid    = (int)$row['m_product_id'];
 	
@@ -1511,6 +1517,7 @@ if ($type === 'customer') {
 
 		echo '</div>'; // dw-card
 	}
+	} // /if (!$isBundleForStats) - Inköpsordrar (historik)
 
 	// UTF-8-safe escape
 	$h = function($s){
@@ -1573,7 +1580,8 @@ if ($type === 'customer') {
 		echo '</div>';
 	}
 
-	// ===== Leveranstid: snitt totalt + per månad (senaste 6 mån) =====
+	// ===== Leveranstid: snitt totalt + per månad (senaste 6 mån) (döljs för egna paket) =====
+	if (!$isBundleForStats) {
 	$sqlDelivStats = "
 		SELECT
 			COUNT(*) AS antal,
@@ -1680,6 +1688,7 @@ if ($type === 'customer') {
 	  }
 
 	echo '</div>';
+	} // /if (!$isBundleForStats) - Leveranstid
 
 	echo '<div class="dw-card dw-card-meta" style="margin-top:10px;">';
     echo '<h3>Metadata</h3>';
