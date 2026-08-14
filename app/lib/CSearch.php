@@ -234,15 +234,23 @@ public static function searchProductsAD($q, $limit = 50, $page = 1, $opts = arra
     }
 
     // -------- Lager (endast 1000000) --------
-    $stockSub = "
-        SELECT m_product_id,
-               SUM(qtyonhand)    AS qtyonhand,
-               SUM(qtyreserved)  AS qtyreserved,
-               SUM(qtyordered)   AS qtyordered,
-               SUM(qtyavailable) AS qtyavailable
-          FROM m_product_cache
-         WHERE m_warehouse_id = 1000000
-         GROUP BY m_product_id
+    // OBS: skriven som LATERAL/korrelerad subquery (inte en förberäknad GROUP BY-deltabell)
+    // så att Postgres kan göra ett indexerat uppslag per produkt (m_product_id) istället
+    // för att räkna om hela lagergrupperingen på nytt för varje kandidatrad. Den gamla
+    // "LEFT JOIN (SELECT ... GROUP BY m_product_id) ps ON ps.m_product_id = p.m_product_id"
+    // kunde få planeraren att välja en Nested Loop som omberäknade HELA grupperingen en
+    // gång per kandidatprodukt när den underskattade antalet träffar (sett i EXPLAIN ANALYZE
+    // för t.ex. "sigma 70-200 2,8": ~8,5 miljoner rader borttagna av Join Filter, ~12s).
+    $stockJoinLateral = "
+        LEFT JOIN LATERAL (
+            SELECT SUM(mc.qtyonhand)    AS qtyonhand,
+                   SUM(mc.qtyreserved)  AS qtyreserved,
+                   SUM(mc.qtyordered)   AS qtyordered,
+                   SUM(mc.qtyavailable) AS qtyavailable
+              FROM m_product_cache mc
+             WHERE mc.m_product_id = p.m_product_id
+               AND mc.m_warehouse_id = 1000000
+        ) ps ON true
     ";
 
     // -------- Filterlogik --------
@@ -336,7 +344,7 @@ public static function searchProductsAD($q, $limit = 50, $page = 1, $opts = arra
         FROM m_product p
         LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
         LEFT JOIN m_product_category pc ON pc.m_product_category_id = p.m_product_category_id
-        LEFT JOIN ($stockSub) ps ON ps.m_product_id = p.m_product_id
+        $stockJoinLateral
         WHERE " . implode(' AND ', $wheres);
 
     $sqlCount = "SELECT COUNT(*) AS cnt " . $baseCount;
@@ -463,7 +471,7 @@ SELECT
 FROM m_product p
 LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
 LEFT JOIN m_product_category pc ON pc.m_product_category_id = p.m_product_category_id
-LEFT JOIN ($stockSub) ps ON ps.m_product_id = p.m_product_id
+$stockJoinLateral
 LEFT JOIN m_productprice pp
        ON pp.m_product_id = p.m_product_id
       AND pp.m_pricelist_version_id = 1000000
