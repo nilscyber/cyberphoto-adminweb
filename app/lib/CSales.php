@@ -401,8 +401,8 @@ foreach ([
 		$sql .= "LEFT JOIN xc_manufacturer mf ON mf.xc_manufacturer_id = p.xc_manufacturer_id ";
 		$sql .= "LEFT JOIN LATERAL ( ";
 		$sql .= "  SELECT c.linenetamt FROM c_orderline c ";
-		$sql .= "  WHERE c.c_order_id = ol.c_order_id AND c.m_product_id IS NULL AND c.packey IS NOT NULL ";
-		$sql .= "  AND ol.packey IS NOT NULL AND c.line > ol.line ";
+		$sql .= "  WHERE c.c_order_id = ol.c_order_id AND c.m_product_id IS NULL ";
+		$sql .= "  AND ol.packey IS NOT NULL AND c.packey = ol.packey AND c.line > ol.line ";
 		$sql .= "  ORDER BY c.line ASC LIMIT 1 ";
 		$sql .= ") comp ON true ";
 		$sql .= "WHERE mio.docstatus IN ('CO') AND mio.deliveryViaRule IN ('S','P') AND mio.isSOTrx = 'Y' ";

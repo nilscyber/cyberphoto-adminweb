@@ -775,13 +775,46 @@ costs AS (
     AND mc.isactive         = 'Y'
 ),
 product_lines AS (
+  -- Begagnat/inbytesprodukter lagras som två orderrader: en ankarrad vars
+  -- priceentered/linenetamt är INKÖPSPRISET (vad vi betalade privatpersonen,
+  -- inte vad kunden betalar) och en companion-rad (m_product_id IS NULL,
+  -- packey satt) som bär MARGINALEN kunden faktiskt betalar utöver det.
+  -- Samma mönster som lastSoldTradeInV2()/sold_article.php.
+  --
+  -- Utan specialhantering räknade den gamla frågan ankarradens linenetamt
+  -- som om det vore försäljningsintäkt och drog av ännu en (fel) kostnad
+  -- från den, samtidigt som companion-radens riktiga marginal aldrig togs
+  -- med (WHERE ol.m_product_id IS NOT NULL utesluter den). Det gav både
+  -- för låg omsättning (prod_net_sum) och missvisande/negativ TB för varje
+  -- order med begagnat i.
+  -- OBS: packey används även för offertpaket (flera vanliga produkter buntas
+  -- ihop under samma packey-värde, t.ex. 'offertpac') utan någon companion-
+  -- rad alls. Det är bara en genuin begagnat/inbytes-rad om vi faktiskt
+  -- HITTAR en matchande companion-rad (samma packey-värde, m_product_id NULL,
+  -- närmast efter) - annars ska raden räknas som en helt vanlig produktrad.
   SELECT
     ol.c_order_id,
-    SUM(ol.linenetamt) AS prod_net_sum,
-    SUM(ol.linenetamt - (ol.qtyordered * COALESCE(ol.pricelimit, c.currentcostprice, 0))) AS prod_tb_sum
+    SUM(
+      CASE WHEN comp.linenetamt IS NOT NULL
+           THEN ol.linenetamt + comp.linenetamt
+           ELSE ol.linenetamt
+      END
+    ) AS prod_net_sum,
+    SUM(
+      CASE WHEN comp.linenetamt IS NOT NULL
+           THEN comp.linenetamt
+           ELSE ol.linenetamt - (ol.qtyordered * COALESCE(ol.pricelimit, c.currentcostprice, 0))
+      END
+    ) AS prod_tb_sum
   FROM c_orderline ol
   JOIN orders o ON o.c_order_id = ol.c_order_id
   LEFT JOIN costs c ON c.m_product_id = ol.m_product_id
+  LEFT JOIN LATERAL (
+    SELECT comp2.linenetamt FROM c_orderline comp2
+    WHERE comp2.c_order_id = ol.c_order_id AND comp2.m_product_id IS NULL
+      AND ol.packey IS NOT NULL AND comp2.packey = ol.packey AND comp2.line > ol.line
+    ORDER BY comp2.line ASC LIMIT 1
+  ) comp ON true
   WHERE ol.m_product_id IS NOT NULL
     AND (ol.c_charge_id IS NULL OR ol.c_charge_id = 0)
   GROUP BY ol.c_order_id
@@ -839,11 +872,28 @@ orders AS (
     AND o.docstatus NOT IN ('VO','RE')
 ),
 product_lines AS (
+  -- Se motsvarande kommentar i variant 1 ovan: companion-radens (begagnat-
+  -- marginal) linenetamt måste räknas in i omsättningen för ankarraden,
+  -- annars blir prod_net_sum (nämnaren i TG%) för lågt för ordrar med
+  -- begagnat/inbyte. packey används även för offertpaket utan companion-rad,
+  -- så matchningen kräver att en companion-rad med SAMMA packey-värde
+  -- faktiskt hittas (annars adderas bara 0, se COALESCE nedan).
   SELECT
     ol.c_order_id,
-    SUM(ol.linenetamt) AS prod_net_sum
+    SUM(
+      CASE WHEN comp.linenetamt IS NOT NULL
+           THEN ol.linenetamt + comp.linenetamt
+           ELSE ol.linenetamt
+      END
+    ) AS prod_net_sum
   FROM c_orderline ol
   JOIN orders o ON o.c_order_id = ol.c_order_id
+  LEFT JOIN LATERAL (
+    SELECT comp2.linenetamt FROM c_orderline comp2
+    WHERE comp2.c_order_id = ol.c_order_id AND comp2.m_product_id IS NULL
+      AND ol.packey IS NOT NULL AND comp2.packey = ol.packey AND comp2.line > ol.line
+    ORDER BY comp2.line ASC LIMIT 1
+  ) comp ON true
   WHERE ol.m_product_id IS NOT NULL
     AND (ol.c_charge_id IS NULL OR ol.c_charge_id = 0)
   GROUP BY ol.c_order_id
