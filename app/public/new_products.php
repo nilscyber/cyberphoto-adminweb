@@ -127,9 +127,21 @@ $h_latin1 = function ($s) {
     Lanserade produkter. Period: senaste <b><?php echo (int)$days; ?></b> dagar.
   </div>
 
-  <?php if (!empty($rows)) { ?>
-    <a class="btn" href="?export=1&days=<?php echo (int)$days; ?>">Exportera till Excel</a>
-  <?php } ?>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <form method="get" style="display:flex; align-items:center; gap:6px;">
+      <label for="days" class="muted">Period:</label>
+      <select name="days" id="days" onchange="this.form.submit()">
+        <?php foreach (array(14, 30, 90, 180) as $opt) { ?>
+          <option value="<?php echo $opt; ?>" <?php echo ($opt == $days) ? 'selected' : ''; ?>><?php echo $opt; ?> dagar</option>
+        <?php } ?>
+      </select>
+      <noscript><button type="submit" class="btn">Visa</button></noscript>
+    </form>
+
+    <?php if (!empty($rows)) { ?>
+      <a class="btn" href="?export=1&days=<?php echo (int)$days; ?>">Exportera till Excel</a>
+    <?php } ?>
+  </div>
 </div>
 
 <table class="table-list" style="width:100%;">
