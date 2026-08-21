@@ -419,7 +419,8 @@ JS;
 		// att summera m_storage direkt gav för höga/felaktiga siffror jämfört med ERP:et.
 		$select = "SELECT pstock.value, cat.name, manu.name, prod.name, ";
 		$select .= "pstock.qtyavailable AS qty, ";
-		$select .= "STRING_AGG(DISTINCT mloc.value, ', ') AS platser ";
+		$select .= "STRING_AGG(DISTINCT mloc.value, ', ') AS platser, ";
+		$select .= "prod.m_product_id ";
 		$select .= "FROM m_product_stock_summary_v pstock  ";
 		$select .= "LEFT JOIN m_product prod ON pstock.m_product_id=prod.m_product_id ";
 		$select .= "LEFT JOIN m_storage store ON store.m_product_id = prod.m_product_id ";
@@ -431,7 +432,7 @@ JS;
 		} else {
 			$select .= "WHERE mloc.m_warehouse_id = 1000002 AND pstock.m_warehouse_id = 1000002 AND pstock.qtyavailable > 0 AND store.qtyonhand > 0 ";
 		}
-		$select .= "GROUP BY pstock.value, cat.name, manu.name, prod.name, pstock.qtyavailable ";
+		$select .= "GROUP BY pstock.value, cat.name, manu.name, prod.name, pstock.qtyavailable, prod.m_product_id ";
 		$select .= "ORDER BY prod.name ASC ";
 		// $select .= " ";
 		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
@@ -445,11 +446,13 @@ JS;
 
 			$artnr = htmlspecialchars($row[0]);
 			$namn = htmlspecialchars(trim($row[2] . " " . $row[3]));
+			$productId = (int)$row[6];
+			$productUrl = "/search_dispatch.php?mode=product&q=" . urlencode($row[0]) . "&open=product&id=" . $productId . "#";
 
 			echo "<tr>\n";
 			echo "<td><span class=\"copy-art\" data-article=\"$artnr\" title=\"Kopiera artikelnummer\">$artnr</span></td>\n";
 			echo "<td>" . htmlspecialchars($row[1]) . "</td>\n";
-			echo "<td><a target=\"_blank\" rel=\"noopener\" href=\"https://www.cyberphoto.se/info.php?article=" . urlencode($row[0]) . "\">$namn</a></td>\n";
+			echo "<td><a target=\"_blank\" rel=\"noopener\" href=\"" . htmlspecialchars($productUrl) . "\">$namn</a></td>\n";
 			echo "<td>" . (int)$row[4] . "</td>\n";
 			echo "<td>" . htmlspecialchars($row[5]) . "</td>\n";
 			echo "</tr>\n";
