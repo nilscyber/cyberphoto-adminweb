@@ -1,18 +1,21 @@
 <?php
 // /cronjob/cron_mail_new_products.php
 
+date_default_timezone_set('Europe/Stockholm');
+
 include_once("../top.php");
 
 // Inställningar
-$hoursBack = 24;
+// Produkter vars launchdate ligger inom detta fönster tas med, men bara EN
+// gång per produkt (redan aviserade produkter filtreras bort, se
+// CSales::getProductsForLaunchMail / new_product_mail_sent).
+$daysAhead = 14; // ta med produkter som lanseras inom X dagar
+$daysBack  = 14; // ta även med nyligen lanserade produkter (fallback/historik)
 
 $from = 'no-reply@cyberphoto.se';
 
 $recipientsTO = array(
-  'emil.lindberg@cyberphoto.se',
-  'jennie.hedstrom@cyberphoto.se',
-  'malin@cyberphoto.se',
-  'boyd@cyberphoto.se'
+  'grupp_inkop@cyberphoto.se'
 );
 $to = implode(', ', $recipientsTO);
 
@@ -21,7 +24,7 @@ $recipientsBCC = array(
 );
 $bcc = implode(', ', $recipientsBCC);
 
-$rows = $sales->getNewProductsForMail($hoursBack);
+$rows = $sales->getProductsForLaunchMail($daysAhead, $daysBack);
 
 if (empty($rows)) {
     echo "OK (no rows)\n";
@@ -42,25 +45,29 @@ $h = function($s) use ($toUtf8){
 $dtStr = date('Y-m-d H:i');
 
 // Subject (RFC2047, alltid UTF-8)
-$subjectText = "Nya produkter lanserade senaste {$hoursBack}h ({$dtStr})";
+$subjectText = "Produkter att bestalla - lansering inom {$daysAhead} dagar ({$dtStr})";
 $subjectText = $toUtf8($subjectText);
 $subject = '=?UTF-8?B?' . base64_encode($subjectText) . '?=';
 
 // HTML
 $html  = '<!doctype html><html><head><meta charset="UTF-8"></head>';
 $html .= '<body style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color:#111;">';
-$html .= '<p>Nya produkter som lanserats senaste ' . (int)$hoursBack . ' timmar.</p>';
+$html .= '<p>Nedan listas produkter vars lanseringsdatum &auml;r inom ' . (int)$daysAhead . ' dagar (eller som nyligen lanserats). '
+       . 'Varje produkt listas bara en g&aring;ng &ndash; &auml;ven om lanseringsdatumet &auml;ndras.</p>';
 
 $html .= '<table cellpadding="6" cellspacing="0" border="1" style="border-collapse:collapse; border:1px solid #ccc;">';
 $html .= '<tr style="background:#f2f2f2; font-weight:bold;">';
-$html .= '<th align="left">Datum</th>';
+$html .= '<th align="left">Lanseringsdatum</th>';
 $html .= '<th align="left">Artnr</th>';
 $html .= '<th align="left">Produkt</th>';
 $html .= '<th align="left">Leverant&ouml;r</th>';
 $html .= '<th align="left">Ink&ouml;pare</th>';
 $html .= '<th align="right">Min</th>';
 $html .= '<th align="right">Max</th>';
+$html .= '<th align="left">Status</th>';
 $html .= '</tr>';
+
+$now = time();
 
 foreach ($rows as $r) {
     $artnrRaw = (string)$r['artnr'];
@@ -86,6 +93,19 @@ foreach ($rows as $r) {
     $min = (int)$r['min_stock'];
     $max = (int)$r['max_stock'];
 
+    // Status: röd "NDA X dagar" om launchdate inte passerats, annars grön.
+    $launchTs = strtotime((string)$r['launch_date']);
+    if ($launchTs !== false && $launchTs > $now) {
+        $daysLeft = (int)ceil(($launchTs - $now) / 86400);
+        if ($daysLeft < 1) { $daysLeft = 1; }
+        $statusStyle = 'background:#f8d7da; color:#721c24;';
+        $statusText  = 'NDA ' . $daysLeft . ' dag' . ($daysLeft == 1 ? '' : 'ar');
+    } else {
+        $statusStyle = 'background:#d4edda; color:#155724;';
+        $statusText  = 'Lanserad';
+    }
+    $statusOut = $h($statusText);
+
     $html .= '<tr>';
     $html .= '<td>' . $date . '</td>';
     $html .= '<td>' . $art  . '</td>';
@@ -94,6 +114,7 @@ foreach ($rows as $r) {
     $html .= '<td>' . $buyOut . '</td>';
     $html .= '<td align="right">' . $min . '</td>';
     $html .= '<td align="right">' . $max . '</td>';
+    $html .= '<td align="center" style="' . $statusStyle . ' font-weight:bold; white-space:nowrap;">' . $statusOut . '</td>';
     $html .= '</tr>';
 }
 
@@ -133,4 +154,11 @@ $body .= chunk_split(base64_encode($csvLatin1)) . "\r\n";
 $body .= "--{$boundary}--\r\n";
 
 $ok = SmtpMail::send($to, $subject, $body, implode("\r\n", $headers));
+
+if ($ok) {
+    // Markera produkterna som aviserade FÖRST efter lyckad utskick, så att ett
+    // misslyckat mail inte "förbrukar" produkterna - de tas då med igen nästa körning.
+    $sales->markProductsNotifiedForLaunchMail($rows);
+}
+
 echo $ok ? "OK\n" : "FAILED\n";

@@ -1258,6 +1258,174 @@ public function exportNewProductsCsvLatin1($rows, $filename = null)
     exit;
 }
 
+/**
+ * Produkter för inköpsmailet: launchdate inom [-$daysBack, +$daysAhead] dagar,
+ * exklusive produkter som redan aviserats (se cyberadmin.new_product_mail_sent).
+ * Detta gör att en produkt bara skickas ut EN gång, oavsett hur många dagar
+ * kvar det är till lansering.
+ */
+public function getProductsForLaunchMail($daysAhead = 14, $daysBack = 14)
+{
+    $daysAhead = (int)$daysAhead;
+    if ($daysAhead <= 0) { $daysAhead = 14; }
+    $daysBack = (int)$daysBack;
+    if ($daysBack <= 0) { $daysBack = 14; }
+
+    $dbAD = Db::getConnectionAD(false);
+
+    $sql = "
+        SELECT
+            p.m_product_id,
+            p.value AS artnr,
+            p.name  AS description,
+            COALESCE(mf.name, '') AS manufacturer,
+            p.launchdate AS launch_ts,
+
+            COALESCE(bp.name, '')       AS supplier_name,
+            COALESCE(rep.level_min, 0)  AS min_level,
+            COALESCE(rep.level_max, 0)  AS max_level,
+            COALESCE(au_buyer.name, '') AS buyer_name
+
+        FROM m_product p
+        LEFT JOIN xc_manufacturer mf
+               ON mf.xc_manufacturer_id = p.xc_manufacturer_id
+
+        LEFT JOIN m_product_po mpo
+               ON mpo.m_product_id = p.m_product_id
+              AND mpo.isactive = 'Y'
+              AND mpo.iscurrentvendor = 'Y'
+
+        LEFT JOIN c_bpartner bp
+               ON bp.c_bpartner_id = mpo.c_bpartner_id
+
+        LEFT JOIN m_replenish rep
+               ON rep.m_product_id = mpo.m_product_id
+
+        LEFT JOIN ad_user au_buyer
+               ON au_buyer.ad_user_id = bp.salesrep_id
+
+        WHERE p.isactive = 'Y'
+          AND p.iswebstoreproduct = 'Y'
+          AND COALESCE(p.istradein,'N') <> 'Y'
+          AND COALESCE(p.demo_product,'N') <> 'Y'
+          AND p.launchdate IS NOT NULL
+
+          -- Fönster: från $daysBack dagar tillbaka till $daysAhead dagar fram.
+          -- Dubbelutskick förhindras separat via new_product_mail_sent.
+          AND p.launchdate <= (NOW() + ($1::int * INTERVAL '1 day'))
+          AND p.launchdate >= (NOW() - ($2::int * INTERVAL '1 day'))
+
+		ORDER BY
+		  p.launchdate ASC,
+		  COALESCE(bp.name,'') ASC,
+		  COALESCE(mf.name,'') ASC,
+		  p.name ASC,
+		  p.value ASC
+    ";
+
+    $res = ($dbAD) ? @pg_query_params($dbAD, $sql, array($daysAhead, $daysBack)) : false;
+    if (!$res) { return array(); }
+
+    $out = array();
+    while ($res && $r = pg_fetch_assoc($res)) {
+        $ts = (string)$r['launch_ts'];
+        $out[] = array(
+            'm_product_id'  => (int)$r['m_product_id'],
+            'launch_date'   => $ts ? date('Y-m-d H:i', strtotime($ts)) : '',
+            'artnr'         => (string)$r['artnr'],
+            'manufacturer'  => (string)$r['manufacturer'],
+            'description'   => (string)$r['description'],
+            'supplier'      => (string)$r['supplier_name'],
+            'buyer'         => (string)$r['buyer_name'],
+            'min_stock'     => (int)$r['min_level'],
+            'max_stock'     => (int)$r['max_level'],
+        );
+    }
+
+    if (empty($out)) { return $out; }
+
+    $ids = array();
+    foreach ($out as $r) { $ids[] = (int)$r['m_product_id']; }
+
+    $alreadySent = $this->getAlreadyNotifiedProductIds($ids);
+    if (!empty($alreadySent)) {
+        $out = array_values(array_filter($out, function($r) use ($alreadySent) {
+            return !isset($alreadySent[(int)$r['m_product_id']]);
+        }));
+    }
+
+    return $out;
+}
+
+/**
+ * Ser till att spårningstabellen finns (idempotent, körs billigt).
+ */
+private function ensureNewProductMailSentTable($db)
+{
+    if (!$db) { return; }
+    @mysqli_query($db, "
+        CREATE TABLE IF NOT EXISTS cyberadmin.new_product_mail_sent (
+            m_product_id INT UNSIGNED NOT NULL PRIMARY KEY,
+            artnr        VARCHAR(64) NULL,
+            sent_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+}
+
+/**
+ * Returnerar de m_product_id (som nycklar i en array) som redan finns i
+ * spårningstabellen, dvs redan har aviserats via inköpsmailet.
+ */
+private function getAlreadyNotifiedProductIds(array $productIds)
+{
+    $productIds = array_values(array_unique(array_map('intval', $productIds)));
+    if (empty($productIds)) { return array(); }
+
+    $db = Db::getConnection(true);
+    if (!$db) { return array(); }
+    $this->ensureNewProductMailSentTable($db);
+
+    $in = implode(',', $productIds); // enbart heltal, säkert att interpolera
+    $sql = "SELECT m_product_id FROM cyberadmin.new_product_mail_sent WHERE m_product_id IN ($in)";
+    $res = @mysqli_query($db, $sql);
+
+    $out = array();
+    if ($res) {
+        while ($r = mysqli_fetch_assoc($res)) {
+            $out[(int)$r['m_product_id']] = true;
+        }
+    }
+    return $out;
+}
+
+/**
+ * Markerar produkterna som aviserade så de inte skickas med igen.
+ * Ska anropas EFTER att mailet skickats iväg (via SmtpMail::send) med framgång.
+ */
+public function markProductsNotifiedForLaunchMail(array $rows)
+{
+    if (empty($rows)) { return true; }
+
+    $db = Db::getConnection(true);
+    if (!$db) { return false; }
+    $this->ensureNewProductMailSentTable($db);
+
+    $values = array();
+    foreach ($rows as $r) {
+        $pid = (int)$r['m_product_id'];
+        if ($pid <= 0) { continue; }
+        $artnr = mysqli_real_escape_string($db, (string)$r['artnr']);
+        $values[] = "({$pid}, '{$artnr}', NOW())";
+    }
+    if (empty($values)) { return true; }
+
+    $sql = "INSERT INTO cyberadmin.new_product_mail_sent (m_product_id, artnr, sent_at) "
+         . "VALUES " . implode(',', $values) . " "
+         . "ON DUPLICATE KEY UPDATE sent_at = sent_at";
+
+    return (bool)@mysqli_query($db, $sql);
+}
+
 public function buildNewProductsCsvLatin1String($rows)
 {
     $to_latin1 = function ($s) {
