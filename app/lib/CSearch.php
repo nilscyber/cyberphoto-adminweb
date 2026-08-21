@@ -440,30 +440,39 @@ SELECT
     CASE WHEN p.demo_product = 'Y' THEN 1 ELSE 0 END AS is_deal,
 
     COALESCE((
-      SELECT xs.qtyweek
-        FROM xc_product_statistics xs
-       WHERE xs.m_product_id = p.m_product_id
-         AND xs.c_country_id = 313
-       ORDER BY xs.updated DESC
-       LIMIT 1
+      SELECT SUM(ol.qtydelivered)
+        FROM c_orderline ol
+        INNER JOIN c_order o ON o.c_order_id = ol.c_order_id
+       WHERE ol.m_product_id = p.m_product_id
+         AND o.issotrx = 'Y'
+         AND o.docstatus NOT IN ('VO','RE')
+         AND o.c_doctypetarget_id NOT IN (1000027, 1000026)
+         AND ol.qtydelivered > 0
+         AND o.created >= NOW() - INTERVAL '7 days'
     ), 0) AS sold_7d,
 
     COALESCE((
-      SELECT xs.qtymonth
-        FROM xc_product_statistics xs
-       WHERE xs.m_product_id = p.m_product_id
-         AND xs.c_country_id = 313
-       ORDER BY xs.updated DESC
-       LIMIT 1
+      SELECT SUM(ol.qtydelivered)
+        FROM c_orderline ol
+        INNER JOIN c_order o ON o.c_order_id = ol.c_order_id
+       WHERE ol.m_product_id = p.m_product_id
+         AND o.issotrx = 'Y'
+         AND o.docstatus NOT IN ('VO','RE')
+         AND o.c_doctypetarget_id NOT IN (1000027, 1000026)
+         AND ol.qtydelivered > 0
+         AND o.created >= NOW() - INTERVAL '30 days'
     ), 0) AS sold_30d,
 
     COALESCE((
-      SELECT xs.qty3month
-        FROM xc_product_statistics xs
-       WHERE xs.m_product_id = p.m_product_id
-         AND xs.c_country_id = 313
-       ORDER BY xs.updated DESC
-       LIMIT 1
+      SELECT SUM(ol.qtydelivered)
+        FROM c_orderline ol
+        INNER JOIN c_order o ON o.c_order_id = ol.c_order_id
+       WHERE ol.m_product_id = p.m_product_id
+         AND o.issotrx = 'Y'
+         AND o.docstatus NOT IN ('VO','RE')
+         AND o.c_doctypetarget_id NOT IN (1000027, 1000026)
+         AND ol.qtydelivered > 0
+         AND o.created >= NOW() - INTERVAL '90 days'
     ), 0) AS sold_90d,
 
     NULLIF(TRIM(COALESCE(p.usedcomment, '')), '') AS used_comment

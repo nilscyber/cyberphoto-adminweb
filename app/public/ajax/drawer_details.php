@@ -292,12 +292,25 @@ if ($type === 'customer') {
             pg_free_result($resS);
         }
     } else {
+        // Räknas live mot orderraderna istället för cache-tabellen
+        // xc_product_statistics, som fylls av ett externt jobb och kan
+        // avvika kraftigt från verklig försäljning (se mestsalda.php).
         $sqlStat = "
-            SELECT qtyweek, qtymonth, qty3month, qty6month, qty12month, qty36month, qtytotal
-              FROM xc_product_statistics
-             WHERE m_product_id = $1 AND c_country_id = 313
-             ORDER BY updated DESC
-             LIMIT 1
+            SELECT
+                COALESCE(SUM(ol.qtydelivered) FILTER (WHERE o.created >= NOW() - INTERVAL '7 days'),    0) AS qtyweek,
+                COALESCE(SUM(ol.qtydelivered) FILTER (WHERE o.created >= NOW() - INTERVAL '30 days'),   0) AS qtymonth,
+                COALESCE(SUM(ol.qtydelivered) FILTER (WHERE o.created >= NOW() - INTERVAL '90 days'),   0) AS qty3month,
+                COALESCE(SUM(ol.qtydelivered) FILTER (WHERE o.created >= NOW() - INTERVAL '180 days'),  0) AS qty6month,
+                COALESCE(SUM(ol.qtydelivered) FILTER (WHERE o.created >= NOW() - INTERVAL '365 days'),  0) AS qty12month,
+                COALESCE(SUM(ol.qtydelivered) FILTER (WHERE o.created >= NOW() - INTERVAL '1095 days'), 0) AS qty36month,
+                COALESCE(SUM(ol.qtydelivered), 0)                                                           AS qtytotal
+            FROM c_orderline ol
+            INNER JOIN c_order o ON o.c_order_id = ol.c_order_id
+            WHERE ol.m_product_id = $1
+              AND o.issotrx = 'Y'
+              AND o.docstatus NOT IN ('VO','RE')
+              AND o.c_doctypetarget_id NOT IN (1000027, 1000026)
+              AND ol.qtydelivered > 0
         ";
         if ($resS = ($conn) ? @pg_query_params($conn, $sqlStat, array($row['m_product_id'])) : false) {
             $st = $resS ? pg_fetch_assoc($resS) : null;
