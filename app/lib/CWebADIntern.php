@@ -398,21 +398,28 @@ JS;
 
 	function printProductsADOffice($butiken = false) {
 
-		$rowcolor = true;
 		$countrows = 0;
-		$totsum = 0;
-		// echo "<div><h1>Skickade plocksedlar - Lagershop</h1></div>";
-		echo "<div>";
-		echo "<table border=\"0\" cellpadding=\"1\" cellspacing=\"1\">";
-		echo "<tr>";
-		echo "<td width=\"150\" class=\"rubrik\">Artikel nr</td>";
-		echo "<td width=\"200\" class=\"rubrik\">Kategori</td>";
-		echo "<td width=\"400\" class=\"rubrik\">Benämning</td>";
-		echo "<td width=\"50\" class=\"rubrik\">I lager</td>";
-		echo "<td width=\"100\" class=\"rubrik\">Plats</td>";
-		echo "</tr>";
-		
-		$select = "SELECT DISTINCT pstock.value, cat.name, manu.name, prod.name, pstock.qtyavailable, mloc.value ";
+
+		echo "<table class=\"table-list\">\n";
+		echo "<thead><tr>\n";
+		echo "<th>Artikel nr</th>\n";
+		echo "<th>Kategori</th>\n";
+		echo "<th>Benämning</th>\n";
+		echo "<th>I lager</th>\n";
+		echo "<th>Plats</th>\n";
+		echo "</tr></thead>\n";
+		echo "<tbody>\n";
+
+		// Platser aggregeras per artikel (GROUP BY) i stället för att joina det
+		// redan korrekta lagersaldot (pstock.qtyavailable, samma värde som ERP:et
+		// visar) mot varje enskild lagerplats-rad i m_storage. Den gamla varianten
+		// gav en rad per lagerplats men visade samma totala saldo på varje rad,
+		// vilket såg ut som dubbletter för artiklar på flera platser i lagret.
+		// Antalet hämtas fortfarande från pstock.qtyavailable (inte SUM(store.qtyonhand)) -
+		// att summera m_storage direkt gav för höga/felaktiga siffror jämfört med ERP:et.
+		$select = "SELECT pstock.value, cat.name, manu.name, prod.name, ";
+		$select .= "pstock.qtyavailable AS qty, ";
+		$select .= "STRING_AGG(DISTINCT mloc.value, ', ') AS platser ";
 		$select .= "FROM m_product_stock_summary_v pstock  ";
 		$select .= "LEFT JOIN m_product prod ON pstock.m_product_id=prod.m_product_id ";
 		$select .= "LEFT JOIN m_storage store ON store.m_product_id = prod.m_product_id ";
@@ -424,7 +431,8 @@ JS;
 		} else {
 			$select .= "WHERE mloc.m_warehouse_id = 1000002 AND pstock.m_warehouse_id = 1000002 AND pstock.qtyavailable > 0 AND store.qtyonhand > 0 ";
 		}
-		$select .= "ORDER BY mloc.value ASC ";
+		$select .= "GROUP BY pstock.value, cat.name, manu.name, prod.name, pstock.qtyavailable ";
+		$select .= "ORDER BY prod.name ASC ";
 		// $select .= " ";
 		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
 			echo $select;
@@ -432,42 +440,54 @@ JS;
 		}
 
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-		// $row = pg_fetch_array($res);
 
-			while ($res && $row = pg_fetch_row($res)) {
+		while ($res && $row = pg_fetch_row($res)) {
 
-			if ($rowcolor == true) {
-				$backcolor = "firstrow";
-			} else {
-				$backcolor = "secondrow";
-			}
+			$artnr = htmlspecialchars($row[0]);
+			$namn = htmlspecialchars(trim($row[2] . " " . $row[3]));
 
+			echo "<tr>\n";
+			echo "<td><span class=\"copy-art\" data-article=\"$artnr\" title=\"Kopiera artikelnummer\">$artnr</span></td>\n";
+			echo "<td>" . htmlspecialchars($row[1]) . "</td>\n";
+			echo "<td><a target=\"_blank\" rel=\"noopener\" href=\"https://www.cyberphoto.se/info.php?article=" . urlencode($row[0]) . "\">$namn</a></td>\n";
+			echo "<td>" . (int)$row[4] . "</td>\n";
+			echo "<td>" . htmlspecialchars($row[5]) . "</td>\n";
+			echo "</tr>\n";
+			$countrows++;
 
-				echo "<tr>";
-				echo "<td class=\"$backcolor\">$row[0]</td>";
-				echo "<td class=\"$backcolor\">".$row[1] . "</td>";
-				echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[0]\">" . $row[2] . " " . $row[3] . "</a></td>";
-				echo "<td align=\"center\" class=\"$backcolor\">$row[4]</td>";
-				echo "<td class=\"$backcolor\">$row[5]</td>";
-				echo "</tr>";
-				$countrows++;
-				$totsum = $totsum + (int)$row[3];
-			
-			if ($rowcolor == true) {
-				$row = true;
-				$rowcolor = false;
-			} else {
-				$row = false;
-				$rowcolor = true;
-			}
-			
-			}
+		}
 
-		echo "</table>";
-		echo "</div>";
+		echo "</tbody>\n";
+		echo "</table>\n";
 		echo "<div class=\"top5\"></div>\n";
 		echo "<div><b>Totalt: " . $countrows . " st</b></div>\n";
-		// echo "<div><h3>Total summa: " . round($totsum,0) . "<h3></div>";
+
+		echo <<<JS
+<script>
+(function(){
+  function copyText(t,cb){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(String(t||'')).then(function(){cb&&cb(true)},function(){cb&&cb(false)});
+    }else{
+      try{var ta=document.createElement('textarea');ta.value=String(t||'');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=document.execCommand('copy');document.body.removeChild(ta);cb&&cb(ok);}catch(e){cb&&cb(false);}
+    }
+  }
+  document.addEventListener('click',function(e){
+    var el=e.target&&e.target.closest?e.target.closest('.copy-art'):null;
+    if(!el)return;
+    e.preventDefault();
+    var art=el.getAttribute('data-article')||(el.textContent||'').trim();
+    copyText(art,function(ok){
+      if(!ok)return;
+      var old=el.getAttribute('title')||'Kopiera artikelnummer';
+      el.setAttribute('title','Kopierat!');
+      el.style.outline='2px solid #a7f3d0';el.style.outlineOffset='2px';
+      setTimeout(function(){el.style.outline='';el.style.outlineOffset='';el.setAttribute('title',old);},1200);
+    });
+  },false);
+})();
+</script>
+JS;
 
 	}
 

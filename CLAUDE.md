@@ -15,6 +15,8 @@ echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" .
 Pages that currently include `admin_core.css`:
 - `monitor_articles.php`
 - `incomingOrders.php`
+- `shop_products.php`
+- `office_products.php`
 
 Always use the classes from `admin_core.css` for new or modernised pages. Do **not** create page-specific `<style>` blocks that duplicate or override these.
 
