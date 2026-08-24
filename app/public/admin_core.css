@@ -297,6 +297,11 @@
     background: #fee2e2 !important;
 }
 
+/* Orderdatum färgat efter ålder – ju äldre ordern är, desto mer bör den pressas ut */
+.order-date-age.green  { color: #065f46; }
+.order-date-age.orange { color: #92400e; }
+.order-date-age.red    { color: #dc2626; }
+
 /* Ram runt varje ordergrupp så raderna som hör ihop syns tydligt som en enhet */
 .order-group-box td:first-child {
     border-left: 1px solid #9ca3af;

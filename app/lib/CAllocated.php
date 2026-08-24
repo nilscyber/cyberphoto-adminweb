@@ -220,8 +220,8 @@ Class CAllocated {
 
 		echo "<table class=\"table-list\">\n";
 		echo "<thead><tr>\n";
-		echo "<th>Order datum</th>\n";
 		echo "<th>Order nr</th>\n";
+		echo "<th>Order datum</th>\n";
 		echo "<th>Kund</th>\n";
 		echo "<th>Artnr</th>\n";
 		echo "<th>Produkt</th>\n";
@@ -239,12 +239,22 @@ Class CAllocated {
 				$sumF = number_format($group['sum'], 0, ',', ' ');
 				$orderUrl = "/search_dispatch.php?mode=order&page=1&q=" . urlencode($group['documentno']);
 
+				$orderDate = date("Y-m-d", strtotime($group['created']));
+				$ageDays = (int)floor((time() - strtotime($group['created'])) / 86400);
+				if ($ageDays <= 3) {
+					$ageClass = "green";
+				} elseif ($ageDays <= 14) {
+					$ageClass = "orange";
+				} else {
+					$ageClass = "red";
+				}
+
 				echo "<tr class=\"order-group-head order-group-box" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
 				echo "<td colspan=\"10\">";
 				echo "<div class=\"order-group-row\">";
 				echo "<span>";
 				echo "<b><a href=\"" . $orderUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($group['documentno']) . "</a></b>";
-				echo " &middot; " . date("Y-m-d", strtotime($group['created']));
+				echo " &middot; <b class=\"order-date-age " . $ageClass . "\" title=\"" . $ageDays . " dagar sedan orderdatum\">" . $orderDate . " (" . $ageDays . "d)</b>";
 				echo " &middot; " . htmlspecialchars($group['customer']);
 				echo " &middot; " . $sumF . " SEK";
 				echo "</span>";
