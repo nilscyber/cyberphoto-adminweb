@@ -22,7 +22,7 @@
 	echo "</div>\n";
 	echo "</form>\n";
 
-	echo "<div class=\"result-info\">Produkter som väntar på leverans grupperas per order. Ordrar där alla produkter redan är allokerade markeras röda &ndash; de bör skickas omgående.</div>\n";
+	echo "<div class=\"result-info\">Produkter som väntar på leverans grupperas per order och markeras blå. Ordrar där allt redan är allokerat får en grön \"KLAR ATT SKICKAS\"-flagga &ndash; de bör skickas omgående.</div>\n";
 	echo "<div>";
 	$allocated->displayOrderGroups("locked", $showtradein);
 	echo "</div>\n";
