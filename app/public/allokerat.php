@@ -7,7 +7,7 @@
 	$showtradein = isset($showtradein) ? $showtradein : "no";
 	$nopricelimit = isset($nopricelimit) ? $nopricelimit : "no";
 
-	echo "<h1>Låsta produkter (allokerade men ej levererade)</h1>\n";
+	echo "<h1>Låsta ordrar (DSLR &amp; värde &gt; 5000 SEK)</h1>\n";
 
 	echo "<form method=\"GET\">\n";
 	echo "<div class=\"filter-bar\">\n";
@@ -22,20 +22,6 @@
 	echo "</div>\n";
 	echo "</form>\n";
 
-	echo "<div class=\"top10\">";
-	$allocated->showActualMonitorAllocated();
-	echo "</div>\n";
-	if ($add != "yes") {
-		echo "<div class=\"top10\"><img border=\"0\" src=\"/pic/help.gif\">&nbsp;<b><a href=\"" . $_SERVER['PHP_SELF'] . "?add=yes\">Lägg till artikel för enskild bevakning</b></a></div>\n";
-	}
-	if ($wrongmess) {
-		echo "<div class=\"wrongmess\">" . $wrongmess . "</div>";
-	}
-	if ($add == "yes" || $addID != "") {
-		include("add_allocated.php");
-	}
-
-	echo "<h1>Låsta ordrar (DSLR &amp; värde &gt; 5000 SEK)</h1>\n";
 	echo "<div class=\"result-info\">Saknade produkter på samma order visas tillsammans. Ordrar där allt redan är allokerat markeras röda &ndash; de bör skickas omgående.</div>\n";
 	echo "<div>";
 	$allocated->displayLockedOrderGroups($nopricelimit, $showtradein);

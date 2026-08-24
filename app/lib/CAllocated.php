@@ -130,9 +130,8 @@ Class CAllocated {
 	function getLockedOrderGroups($nopricelimit, $showtradein) {
 
 		$select  = "SELECT o.c_order_id, o.created, o.documentno, p.value, manu.name, p.name, bp.name, ";
-		$select .= "col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.value, po.currentcostprice, ";
+		$select .= "col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.value, po.currentcostprice, p.m_product_id, ";
 		$select .= "o.xc_sales_order_status_id, ";
-		$select .= "CASE WHEN p.m_product_category_id IN (1000221) THEN 'DSLR' ELSE 'VARDE' END AS typ, ";
 		$select .= "(SELECT COUNT(*) FROM c_orderline col2 WHERE col2.c_order_id = o.c_order_id AND col2.qtyordered <> col2.qtyallocated) AS missing_lines ";
 		$select .= "FROM c_orderline col ";
 		$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
@@ -154,7 +153,7 @@ Class CAllocated {
 		}
 		$select .= "AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.currentcostprice > 0 ";
 		$select .= "AND NOT o.c_order_id IN (1889920,2224736,1080606,1446823,2258062) "; // tar borta interna ordrar såsom mats test, inbyte osv.
-		$select .= "ORDER BY o.created DESC, o.documentno ASC, typ ASC, manu.name ASC, p.name ASC ";
+		$select .= "ORDER BY o.created DESC, o.documentno ASC, manu.name ASC, p.name ASC ";
 
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
 
@@ -173,8 +172,8 @@ Class CAllocated {
 						'customer'     => $row[6],
 						'lockedreason' => $row[10],
 						'lockedto'     => $row[11],
-						'statusid'     => $row[13],
-						'complete'     => ($row[14] == 0),
+						'statusid'     => $row[14],
+						'complete'     => ($row[15] == 0),
 						'lines'        => array(),
 						'sum'          => 0,
 					);
@@ -184,13 +183,12 @@ Class CAllocated {
 				$pcost = $row[12] * $row[8];
 
 				$groups[$orderId]['lines'][] = array(
-					'artnr'       => $row[3],
-					'beskrivning' => $beskrivning,
-					'typ'         => $row[14],
-					'qtyordered'  => $row[7],
-					'qtyallocated'=> $row[8],
-					'qtydelivered'=> $row[9],
-					'cost'        => $pcost,
+					'artnr'        => $row[3],
+					'productid'    => $row[13],
+					'beskrivning'  => $beskrivning,
+					'qtyordered'   => $row[7],
+					'qtyallocated' => $row[8],
+					'cost'         => $pcost,
 				);
 
 				$groups[$orderId]['sum'] += $pcost;
@@ -218,10 +216,8 @@ Class CAllocated {
 		echo "<th>Kund</th>\n";
 		echo "<th>Artnr</th>\n";
 		echo "<th>Produkt</th>\n";
-		echo "<th class=\"c\">Typ</th>\n";
 		echo "<th class=\"c\">Best.</th>\n";
 		echo "<th class=\"c\">Allo.</th>\n";
-		echo "<th class=\"c\">Lev.</th>\n";
 		echo "<th>Låst pga</th>\n";
 		echo "<th class=\"c\">Låst på</th>\n";
 		echo "<th class=\"r\">Kostnad</th>\n";
@@ -233,10 +229,11 @@ Class CAllocated {
 
 				$linecount = count($group['lines']);
 				$sumF = number_format($group['sum'], 0, ',', ' ');
+				$orderUrl = "/search_dispatch.php?mode=order&page=1&q=" . urlencode($group['documentno']);
 
 				echo "<tr class=\"cat-head" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
-				echo "<td colspan=\"12\">";
-				echo "<a href=\"javascript:winPopupCenter(500, 1000, '/order_info.php?order=" . $group['documentno'] . "');\">Order " . $group['documentno'] . "</a>";
+				echo "<td colspan=\"10\">";
+				echo "<a href=\"" . $orderUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($group['documentno']) . "</a>";
 				echo " &middot; " . date("Y-m-d", strtotime($group['created']));
 				echo " &middot; " . htmlspecialchars($group['customer']);
 				echo " &middot; " . $linecount . " saknad(e) produkt(er) &middot; " . $sumF . " SEK";
@@ -253,18 +250,16 @@ Class CAllocated {
 						$beskrivning = substr($beskrivning, 0, 55) . "....";
 					}
 					$costF = number_format($line['cost'], 0, ',', ' ');
-					$typLabel = ($line['typ'] == 'DSLR') ? 'DSLR' : 'Värde';
+					$productUrl = "/search_dispatch.php?mode=product&q=" . urlencode($line['artnr']) . "&open=product&id=" . (int)$line['productid'];
 
 					echo "<tr" . ($group['complete'] ? " class=\"order-complete-alert\"" : "") . ">\n";
 					echo "<td></td>\n";
 					echo "<td></td>\n";
 					echo "<td></td>\n";
 					echo "<td>" . htmlspecialchars($line['artnr']) . "</td>\n";
-					echo "<td><a target=\"_blank\" href=\"/?info.php?article=" . urlencode($line['artnr']) . "\">" . htmlspecialchars($beskrivning) . "</a></td>\n";
-					echo "<td class=\"c\">" . $typLabel . "</td>\n";
+					echo "<td><a href=\"" . $productUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($beskrivning) . "</a></td>\n";
 					echo "<td class=\"c\">" . $line['qtyordered'] . "</td>\n";
 					echo "<td class=\"c\">" . $line['qtyallocated'] . "</td>\n";
-					echo "<td class=\"c\">" . $line['qtydelivered'] . "</td>\n";
 					echo "<td>" . htmlspecialchars($group['lockedreason']) . "</td>\n";
 					echo "<td class=\"c\">" . strtoupper($group['lockedto']) . "</td>\n";
 					echo "<td class=\"r\">" . $costF . " SEK</td>\n";
@@ -279,14 +274,14 @@ Class CAllocated {
 
 		} else {
 
-			echo "<tr>\n<td colspan=\"12\"><i>Inga produkter i listan. Utmärkt!</i></td>\n</tr>\n";
+			echo "<tr>\n<td colspan=\"10\"><i>Inga produkter i listan. Utmärkt!</i></td>\n</tr>\n";
 
 		}
 
 		$totsumF = number_format($totsum, 0, ',', ' ');
 		echo "</tbody>\n<tfoot>\n";
 		echo "<tr class=\"total-row\">\n";
-		echo "<td colspan=\"11\">Totalt: " . $countrow . " produkt(er) på " . count($groups) . " order(rar), varav " . $completecount . " helt allokerade</td>\n";
+		echo "<td colspan=\"9\">Totalt: " . $countrow . " produkt(er) på " . count($groups) . " order(rar), varav " . $completecount . " helt allokerade</td>\n";
 		echo "<td class=\"r\">" . $totsumF . " SEK</td>\n";
 		echo "</tr>\n";
 		echo "</tfoot>\n</table>\n";
