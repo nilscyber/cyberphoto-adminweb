@@ -281,7 +281,7 @@
 .order-group-head td {
     background: #f3f4f6;
     font-weight: 400;
-    border-top: 2px solid var(--tbl-border);
+    border-top: 2px solid #9ca3af;
 }
 
 /* Håller en eventuell badge på fast plats längst till höger, oavsett hur lång texten före är */
@@ -295,6 +295,24 @@
 /* Order som är helt allokerad men ännu inte skickad – kräver uppmärksamhet */
 .order-complete-alert {
     background: #fee2e2 !important;
+}
+
+/* Ram runt varje ordergrupp så raderna som hör ihop syns tydligt som en enhet */
+.order-group-box td:first-child {
+    border-left: 1px solid #9ca3af;
+}
+.order-group-box td:last-child {
+    border-right: 1px solid #9ca3af;
+}
+.order-group-box-end td {
+    border-bottom: 2px solid #9ca3af;
+}
+
+/* Luft mellan varje ordergrupp */
+.order-group-spacer td {
+    border: none;
+    padding: 6px 0 0;
+    background: transparent;
 }
 
 /* ------------------------------------------------------------

@@ -239,7 +239,7 @@ Class CAllocated {
 				$sumF = number_format($group['sum'], 0, ',', ' ');
 				$orderUrl = "/search_dispatch.php?mode=order&page=1&q=" . urlencode($group['documentno']);
 
-				echo "<tr class=\"order-group-head" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
+				echo "<tr class=\"order-group-head order-group-box" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
 				echo "<td colspan=\"10\">";
 				echo "<div class=\"order-group-row\">";
 				echo "<span>";
@@ -255,8 +255,12 @@ Class CAllocated {
 				echo "</div>";
 				echo "</td>\n</tr>\n";
 
+				$linenr = 0;
+				$linecount = count($group['lines']);
+
 				foreach ($group['lines'] as $line) {
 
+					$linenr++;
 					$beskrivning = $line['beskrivning'];
 					if (strlen($beskrivning) > 55) {
 						$beskrivning = substr($beskrivning, 0, 55) . "....";
@@ -264,7 +268,9 @@ Class CAllocated {
 					$costF = number_format($line['cost'], 0, ',', ' ');
 					$productUrl = "/search_dispatch.php?mode=product&q=" . urlencode($line['artnr']) . "&open=product&id=" . (int)$line['productid'];
 
-					echo "<tr" . ($group['complete'] ? " class=\"order-complete-alert\"" : "") . ">\n";
+					$rowclass = "order-group-box" . ($linenr == $linecount ? " order-group-box-end" : "") . ($group['complete'] ? " order-complete-alert" : "");
+
+					echo "<tr class=\"" . $rowclass . "\">\n";
 					echo "<td></td>\n";
 					echo "<td></td>\n";
 					echo "<td></td>\n";
@@ -281,6 +287,8 @@ Class CAllocated {
 					$countrow++;
 
 				}
+
+				echo "<tr class=\"order-group-spacer\"><td colspan=\"10\"></td></tr>\n";
 
 			}
 
