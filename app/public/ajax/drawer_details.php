@@ -64,6 +64,12 @@ if ($type === 'customer') {
 			COALESCE(psv.qtyavailable,          0) AS available_qty,
 			COALESCE(psv.qtyordered,            0) AS ordered_qty,
 
+			-- Lager fraan vyn för Direktleverans-lagret (1000003) - endast relevant för Dropship-produkter,
+			-- men hämtas alltid saa baade standard- och direktlager kan visas samtidigt (det ena utesluter inte det andra).
+			COALESCE(psv_ds.qtyavailable,       0) AS ds_available_qty,
+			COALESCE(psv_ds.qty_allocated_lines,0) AS ds_allocated_qty,
+			COALESCE(psv_ds.qtyordered,         0) AS ds_ordered_qty,
+
 			COALESCE(pp.pricelimit, c.currentcostprice, 0) AS net_price,
 
 			COALESCE((
@@ -126,6 +132,9 @@ if ($type === 'customer') {
 		LEFT JOIN m_product_stock_summary_v psv
 			   ON psv.m_product_id = p.m_product_id
 			  AND psv.m_warehouse_id = 1000000
+		LEFT JOIN m_product_stock_summary_v psv_ds
+			   ON psv_ds.m_product_id = p.m_product_id
+			  AND psv_ds.m_warehouse_id = 1000003
 		LEFT JOIN m_productprice pp
 			   ON pp.m_product_id = p.m_product_id
 			  AND pp.m_pricelist_version_id = 1000000
@@ -447,6 +456,7 @@ if ($type === 'customer') {
 	  .dw-badge-blue{   background:#2563eb; border-color:#1e40af; color:#fff; }
 	  .dw-badge-grey{   background:#757575; border-color:#434343; color:#fff; }
 	  .dw-badge-fuchsia{ background:#fä8ff; border-color:#f5d0fe; color:#86198f; }
+	  .dw-badge-none{   background:#f3f4f6; border-color:#e5e7eb; color:#6b7280; }
 
 	  /* osynlig rad som tar plats för att jämna ut höjden */
 	  .dw-row-spacer .dw-label,
@@ -911,6 +921,12 @@ if ($type === 'customer') {
 	$queue        = ($availableRaw < 0) ? abs($availableRaw) : 0;
 	$hasQueueLink = ($queue > 0);
 
+	// Kö i Direktleverans-lagret (1000003) - endast intressant för Dropship-produkter.
+	// Visas som ett eget värde, utöver kön i standardlagret ovan - det ena utesluter inte det andra.
+	$dsAvailableRaw = isset($row['ds_available_qty']) ? (int)$row['ds_available_qty'] : 0;
+	$dsQueue        = ($dsAvailableRaw < 0) ? abs($dsAvailableRaw) : 0;
+	$dsHasQueueLink = ($dsQueue > 0);
+
 	$artWait  = $h($row['article']);
 	$artValue = isset($row['article']) ? $row['article'] : '';
 	$waitUrl  = 'https://admin.cyberphoto.se/waitinglist.php?artnr='.$artWait;
@@ -971,6 +987,7 @@ if ($type === 'customer') {
 	$queueBadge   = '<span class="dw-badge-pill dw-badge-fuchsia">'.$queue.' st</span>';
 	$orderedBadge = '<span class="dw-badge-pill dw-badge-amber">'.$ordered.' st</span>';
 	$shelfBadge   = '<span class="dw-badge-pill dw-badge-grey">'.$h($shelfTxt).'</span>';
+	$dsQueueBadge = '<span class="dw-badge-pill '.($dsQueue>0?'dw-badge-fuchsia':'dw-badge-none').'">'.$dsQueue.' st</span>';
 
 
 	echo '<div class="dw-card dw-card-stock">';
@@ -997,6 +1014,19 @@ if ($type === 'customer') {
 			echo $queueBadge;
 		  }
 		  echo '</span></div>';
+
+		  // Kö i Direktleverans-lagret - visas endast för Dropship-produkter, som ett eget värde
+		  // utöver kön i standardlagret ovan (det ena utesluter inte det andra).
+		  if ($isDropShip) {
+			echo '<div class="dw-row" title="Kö i Direktleverans-lagret">'
+			   . '<span class="dw-label">Kö (Direkt):</span><span class="dw-val">';
+			if ($dsHasQueueLink) {
+				echo '<a href="#" class="dw-vallink" onclick="dwToggleBlock(\'dw-queue-block\');return false;">'.$dsQueueBadge.'</a>';
+			} else {
+				echo $dsQueueBadge;
+			}
+			echo '</span></div>';
+		  }
 
 		  echo '<div class="dw-row"><span class="dw-label">Beställda:</span><span class="dw-val">';
 		  if ($ordered > 0) {
