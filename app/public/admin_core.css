@@ -373,7 +373,8 @@
     user-select: none;
     white-space: nowrap;
 }
-.filter-bar input[type=checkbox] {
+.filter-bar input[type=checkbox],
+.filter-bar input[type=radio] {
     width: 15px;
     height: 15px;
     cursor: pointer;
