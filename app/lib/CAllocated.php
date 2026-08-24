@@ -347,8 +347,10 @@ Class CAllocated {
 					}
 					$productUrl = "/search_dispatch.php?mode=product&q=" . urlencode($line['artnr']) . "&open=product&id=" . (int)$line['productid'];
 
+					// Bakgrunden är per rad: allokerade produkter är alltid blå/indigo, oavsett om
+					// hela ordern är komplett eller ej - det är den enskilda raden som är allokerad.
 					$rowclass = "order-group-box" . ($linenr == $linecount ? " order-group-box-end" : "");
-					$rowclass .= $line['missing'] ? " order-line-missing" : ($group['complete'] ? " order-complete-alert" : "");
+					$rowclass .= $line['missing'] ? " order-line-missing" : " order-complete-alert";
 
 					echo "<tr class=\"" . $rowclass . "\">\n";
 					echo "<td></td>\n";
