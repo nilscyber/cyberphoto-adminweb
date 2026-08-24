@@ -124,15 +124,15 @@ Class CAllocated {
 
 	}
 	
-	// Hämtar alla låsta men allokerade orderrader (värde > 5000 SEK om inte nopricelimit) grupperade
-	// per order, så att flera låsta produkter på samma order hamnar tillsammans. Endast ordrar som
-	// faktiskt är låsta räknas med (har en låsanledning eller är låst till en säljare) - inte alla
-	// ordrar där en produkt råkar vara allokerad men ännu inte levererad.
+	// Hämtar alla låsta men allokerade orderrader grupperade per order, så att flera låsta
+	// produkter på samma order hamnar tillsammans. Endast ordrar som faktiskt är låsta räknas
+	// med (har en låsanledning eller är låst till en säljare) - inte alla ordrar där en produkt
+	// råkar vara allokerad men ännu inte levererad.
 	// $showtradein == "yes" visar ENDAST ordrar låsta på inbytesaffärer (annars döljs de helt).
 	// "complete" = alla FYSISKA produkter (producttype='I', dvs ej tjänster som frakt/försäkring)
 	// på ordern är allokerade. Sådana tjänsterader blir aldrig allokerade och ska därför inte
 	// räknas med, annars flaggas ordern felaktigt som ofullständig.
-	function getLockedOrderGroups($nopricelimit, $showtradein) {
+	function getLockedOrderGroups($showtradein) {
 
 		$select  = "SELECT o.c_order_id, o.created, o.documentno, p.value, manu.name, p.name, bp.name, ";
 		$select .= "col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.name, po.currentcostprice, p.m_product_id, ";
@@ -150,9 +150,6 @@ Class CAllocated {
 		$select .= "LEFT JOIN AD_User us ON us.AD_User_ID = o.locked_to_id ";
 		$select .= "WHERE o.c_doctype_id = 1000030 AND NOT o.docstatus IN ('VO') AND col.qtyordered = col.qtyallocated AND col.qtyallocated > col.qtydelivered ";
 		$select .= "AND (o.xc_sales_order_status_id IS NOT NULL OR o.locked_to_id IS NOT NULL) "; // endast ordrar som faktiskt är låsta (anledning eller säljare), inte alla som råkar vänta på leverans
-		if ($nopricelimit != "yes") {
-			$select .= "AND col.pricelimit > 5000 ";
-		}
 		if ($showtradein == "yes") {
 			$select .= "AND o.xc_sales_order_status_id = 1000015 "; // visar ENDAST ordrar låsta på inbytesaffärer
 		} else {
@@ -210,9 +207,9 @@ Class CAllocated {
 
 	}
 
-	function displayLockedOrderGroups($nopricelimit, $showtradein) {
+	function displayLockedOrderGroups($showtradein) {
 
-		$groups = $this->getLockedOrderGroups($nopricelimit, $showtradein);
+		$groups = $this->getLockedOrderGroups($showtradein);
 
 		$totsum = 0;
 		$countrow = 0;
