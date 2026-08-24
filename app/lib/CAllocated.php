@@ -26,66 +26,47 @@ Class CAllocated {
 
 	function showActualMonitorAllocated() {
 
-		$rowcolor = true;
-
-		echo "<table border=\"0\" cellpadding=\"1\" cellspacing=\"2\">\n";
-		echo "<tr>\n";
-		echo "<td width=\"110\"><b>Artikel nr</b></td>\n";
-		echo "<td width=\"380\"><b>Produkt</b></td>\n";
-		echo "<td width=\"55\" align=\"center\"><b>&nbsp;</b></td>\n";
-		echo "</tr>\n";
+		echo "<table class=\"table-list\">\n";
+		echo "<thead><tr>\n";
+		echo "<th>Artikel nr</th>\n";
+		echo "<th>Produkt</th>\n";
+		echo "<th class=\"c\">&nbsp;</th>\n";
+		echo "</tr></thead>\n<tbody>\n";
 
 		$select  = "SELECT allID, allArtnr, Tillverkare, beskrivning ";
 		$select .= "FROM MonitorAllocated ";
 		$select .= "JOIN Artiklar ON Artiklar.artnr = MonitorAllocated.allArtnr ";
 		$select .= "JOIN Tillverkare ON Artiklar.tillverkar_id = Tillverkare.tillverkar_id ";
-		// $select .= "WHERE allActive = 1 AND allArtnr = '$addArtnr' ";
 		$select .= "WHERE allActive = 1 ";
-			// echo $select;
-			// exit;
 
 		$res = mysqli_query($this->conn_my, $select);
 
 			if (mysqli_num_rows($res) > 0) {
 
 				while ($row = mysqli_fetch_array($res)):
-			
+
 				extract($row);
 
-				if ($rowcolor == true) {
-					$backcolor = "firstrow";
-				} else {
-					$backcolor = "secondrow";
-				}
 				if (strlen($beskrivning) > 55) {
 					$beskrivning = substr ($beskrivning, 0, 55) . "....";
 				}
 
-
 				echo "<tr>";
-				echo "<td class=\"$backcolor\">$allArtnr</td>\n";
-				echo "<td class=\"$backcolor\"><a target=\"_blank\" href=\"/?info.php?article=" . $allArtnr . "\">$tillverkare $beskrivning</a></td>\n";
-				echo "<td align=\"center\"><a href=\"" . $_SERVER['PHP_SELF'] . "?delete=" . $allID . "\">avsluta</a></td>\n";
+				echo "<td>" . htmlspecialchars($allArtnr) . "</td>\n";
+				echo "<td><a target=\"_blank\" href=\"/?info.php?article=" . urlencode($allArtnr) . "\">" . htmlspecialchars($tillverkare . " " . $beskrivning) . "</a></td>\n";
+				echo "<td class=\"c\"><a href=\"" . $_SERVER['PHP_SELF'] . "?delete=" . $allID . "\">avsluta</a></td>\n";
 				echo "</tr>\n";
 
-				if ($rowcolor == true) {
-					$row = true;
-					$rowcolor = false;
-				} else {
-					$row = false;
-					$rowcolor = true;
-				}
-			
 				endwhile;
-				
+
 			} else {
-			
+
 				echo "<tr>\n";
-				echo "<td colspan=\"3\"><font color=\"#000000\"><b>Inga enskilda bevakningar finns upplagda i systemet</b></td>\n";
+				echo "<td colspan=\"3\"><i>Inga enskilda bevakningar finns upplagda i systemet</i></td>\n";
 				echo "</tr>\n";
-			
+
 			}
-				echo "</table>\n";
+				echo "</tbody>\n</table>\n";
 
 	}
 
@@ -143,137 +124,173 @@ Class CAllocated {
 
 	}
 	
-	function displayAllocatedButReady($type) {
-		global $istradein, $nopricelimit;
+	// Hämtar alla låsta men allokerade orderrader (DSLR + värdegräns) grupperade per order,
+	// så att flera saknade produkter på samma order hamnar tillsammans.
+	// $showtradein == "yes" visar även ordrar låsta på inbytesaffärer (annars döljs de).
+	function getLockedOrderGroups($nopricelimit, $showtradein) {
 
-		$countrow = 0;
+		$select  = "SELECT o.c_order_id, o.created, o.documentno, p.value, manu.name, p.name, bp.name, ";
+		$select .= "col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.value, po.currentcostprice, ";
+		$select .= "o.xc_sales_order_status_id, ";
+		$select .= "CASE WHEN p.m_product_category_id IN (1000221) THEN 'DSLR' ELSE 'VARDE' END AS typ, ";
+		$select .= "(SELECT COUNT(*) FROM c_orderline col2 WHERE col2.c_order_id = o.c_order_id AND col2.qtyordered <> col2.qtyallocated) AS missing_lines ";
+		$select .= "FROM c_orderline col ";
+		$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
+		$select .= "JOIN c_order o ON col.c_order_id = o.c_order_id ";
+		$select .= "JOIN m_product p ON col.m_product_id = p.m_product_id ";
+		$select .= "JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id ";
+		$select .= "JOIN m_cost po ON po.m_product_id = p.m_product_id ";
+		$select .= "LEFT JOIN xc_sales_order_status xc ON xc.xc_sales_order_status_id = o.xc_sales_order_status_id ";
+		$select .= "LEFT JOIN AD_User us ON us.AD_User_ID = o.locked_to_id ";
+		$select .= "WHERE o.c_doctype_id = 1000030 AND NOT o.docstatus IN ('VO') AND col.qtyordered = col.qtyallocated AND col.qtyallocated > col.qtydelivered ";
+		$select .= "AND ( p.m_product_category_id IN (1000221) ";
+		if ($nopricelimit == "yes") {
+			$select .= "OR NOT p.m_product_category_id IN (1000221) ) ";
+		} else {
+			$select .= "OR (NOT p.m_product_category_id IN (1000221) AND col.pricelimit > 5000) ) ";
+		}
+		if ($showtradein != "yes") {
+			$select .= "AND NOT o.xc_sales_order_status_id = 1000015 "; // döljer ordrar låsta på inbytesaffärer som standard
+		}
+		$select .= "AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.currentcostprice > 0 ";
+		$select .= "AND NOT o.c_order_id IN (1889920,2224736,1080606,1446823,2258062) "; // tar borta interna ordrar såsom mats test, inbyte osv.
+		$select .= "ORDER BY o.created DESC, o.documentno ASC, typ ASC, manu.name ASC, p.name ASC ";
+
+		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
+
+		$groups = array();
+
+		if ($res && pg_num_rows($res) > 0) {
+
+			while ($res && $row = pg_fetch_row($res)) {
+
+				$orderId = $row[0];
+
+				if (!isset($groups[$orderId])) {
+					$groups[$orderId] = array(
+						'created'      => $row[1],
+						'documentno'   => $row[2],
+						'customer'     => $row[6],
+						'lockedreason' => $row[10],
+						'lockedto'     => $row[11],
+						'statusid'     => $row[13],
+						'complete'     => ($row[14] == 0),
+						'lines'        => array(),
+						'sum'          => 0,
+					);
+				}
+
+				$beskrivning = $row[4] . " " . $row[5];
+				$pcost = $row[12] * $row[8];
+
+				$groups[$orderId]['lines'][] = array(
+					'artnr'       => $row[3],
+					'beskrivning' => $beskrivning,
+					'typ'         => $row[14],
+					'qtyordered'  => $row[7],
+					'qtyallocated'=> $row[8],
+					'qtydelivered'=> $row[9],
+					'cost'        => $pcost,
+				);
+
+				$groups[$orderId]['sum'] += $pcost;
+
+			}
+
+		}
+
+		return $groups;
+
+	}
+
+	function displayLockedOrderGroups($nopricelimit, $showtradein) {
+
+		$groups = $this->getLockedOrderGroups($nopricelimit, $showtradein);
+
 		$totsum = 0;
-		// echo "<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">\n";
-		echo "<table border=\"0\" cellpadding=\"1\" cellspacing=\"2\">\n";
-		echo "\t<tr>\n";
-		// echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-		echo "\t\t<td align=\"left\" width=\"100\"><b>Order datum</b></td>\n";
-		echo "\t\t<td align=\"left\" width=\"110\"><b>Artnr</b></td>\n";
-		echo "\t\t<td align=\"left\" width=\"230\"><b>Produkt</b></td>\n";
-		echo "\t\t<td align=\"center\" width=\"80\"><b>Order nr</b></td>\n";
-		echo "\t\t<td align=\"left\" width=\"250\"><b>Kund</b></td>\n";
-		echo "\t\t<td align=\"center\" width=\"55\"><b>Best.</b></td>\n";
-		echo "\t\t<td align=\"center\" width=\"55\"><b>Allo.</b></td>\n";
-		echo "\t\t<td align=\"center\" width=\"55\"><b>Lev.</b></td>\n";
-		echo "\t\t<td align=\"left\" width=\"200\"><b>Låst pga</b></td>\n";
-		echo "\t\t<td align=\"center\" width=\"50\"><b>Låst på</b></td>\n";
-		echo "\t\t<td align=\"center\" width=\"85\"><b>Kostnad</b></td>\n";
-		echo "\t</tr>\n";
-			
-			$select = "SELECT o.created, p.value, manu.name, p.name, o.documentno, bp.name, col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.value, po.currentcostprice, o.xc_sales_order_status_id ";
-			$select .= "FROM c_orderline col ";
-			$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
-			$select .= "JOIN c_order o ON col.c_order_id = o.c_order_id ";
-			$select .= "JOIN m_product p ON col.m_product_id = p.m_product_id ";
-			$select .= "JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id ";
-			$select .= "JOIN m_cost po ON po.m_product_id = p.m_product_id "; // ny
-			$select .= "LEFT JOIN xc_sales_order_status xc ON xc.xc_sales_order_status_id = o.xc_sales_order_status_id ";
-			$select .= "LEFT JOIN AD_User us ON us.AD_User_ID = o.locked_to_id ";
-			// $select .= "WHERE o.c_doctype_id = 1000030 AND NOT o.docstatus IN ('VO') AND col.qtyordered = col.qtyallocated AND col.qtyallocated > col.qtydelivered AND (o.xc_sales_order_status_id = 1000004 OR NOT (o.locked_to_id IS NULL)) ";
-			$select .= "WHERE o.c_doctype_id = 1000030 AND NOT o.docstatus IN ('VO') AND col.qtyordered = col.qtyallocated AND col.qtyallocated > col.qtydelivered ";
-			
-			if ($type == 2) {
-				if ($nopricelimit == "yes") {
-					$select .= "AND NOT p.m_product_category_ID IN(1000221) ";
-				} else {
-					$select .= "AND NOT p.m_product_category_ID IN(1000221) AND col.pricelimit > 5000 ";
+		$countrow = 0;
+		$completecount = 0;
+
+		echo "<table class=\"table-list\">\n";
+		echo "<thead><tr>\n";
+		echo "<th>Order datum</th>\n";
+		echo "<th>Order nr</th>\n";
+		echo "<th>Kund</th>\n";
+		echo "<th>Artnr</th>\n";
+		echo "<th>Produkt</th>\n";
+		echo "<th class=\"c\">Typ</th>\n";
+		echo "<th class=\"c\">Best.</th>\n";
+		echo "<th class=\"c\">Allo.</th>\n";
+		echo "<th class=\"c\">Lev.</th>\n";
+		echo "<th>Låst pga</th>\n";
+		echo "<th class=\"c\">Låst på</th>\n";
+		echo "<th class=\"r\">Kostnad</th>\n";
+		echo "</tr></thead>\n<tbody>\n";
+
+		if (count($groups) > 0) {
+
+			foreach ($groups as $orderId => $group) {
+
+				$linecount = count($group['lines']);
+				$sumF = number_format($group['sum'], 0, ',', ' ');
+
+				echo "<tr class=\"cat-head" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
+				echo "<td colspan=\"12\">";
+				echo "<a href=\"javascript:winPopupCenter(500, 1000, '/order_info.php?order=" . $group['documentno'] . "');\">Order " . $group['documentno'] . "</a>";
+				echo " &middot; " . date("Y-m-d", strtotime($group['created']));
+				echo " &middot; " . htmlspecialchars($group['customer']);
+				echo " &middot; " . $linecount . " saknad(e) produkt(er) &middot; " . $sumF . " SEK";
+				if ($group['complete']) {
+					echo " &nbsp;<span class=\"badge badge-priority\">HELA ORDERN ÄR ALLOKERAD &ndash; varför är den inte skickad?</span>";
+					$completecount++;
 				}
-			} else {
-				$select .= "AND p.m_product_category_ID IN(1000221) ";
-			}
-			if ($istradein == "no") {
-				// $select .= "AND NOT o.xc_sales_order_status_id IN (1000015) "; // tar bort ordrar låsta på inbytesaffärer
-			}
-			// $select .= "AND NOT o.xc_sales_order_status_ID=1000015 "; // tar bort ordrar låsta på inbytesaffärer
-			
-			$select .= "AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.currentcostprice > 0 "; // ny
-			$select .= "AND NOT o.c_order_id IN (1889920,2224736,1080606,1446823,2258062) "; // tar borta interna ordrar såsom mats test, inbyte osv.
-			// $select .= "AND NOT o.xc_sales_order_status_id IS NULL "; 
-			$select .= "ORDER BY o.created DESC, manu.name ASC, p.name ASC ";
-			if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-				echo $select;
-				// exit;
-			}
+				echo "</td>\n</tr>\n";
 
-			// $res = pg_query($this->conn_ad, $select);
-			$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-			// $row = pg_fetch_object($res);
+				foreach ($group['lines'] as $line) {
 
-				if ($res && pg_num_rows($res) > 0) {
-				
-					while ($res && $row = pg_fetch_row($res)) {
-						
-						if (!($istradein == "no" && $row[12] == 1000015)) { // tar bort inbytesposter
-				
-							$beskrivning = $row[2] . " " . $row[3];
-							if (strlen($beskrivning) > 30) {
-								$beskrivning = substr ($beskrivning, 0, 30) . "....";
-							}
-							$customer = $row[5];
-							if (strlen($customer) > 35) {
-								$customer = substr ($customer, 0, 35) . "....";
-							}
-							$pcost = $row[11] * $row[7];
-							$pcostF = number_format($pcost, 0, ',', ' ');
-
-							if ($rowcolor == true) {
-								$backcolor = "firstrow";
-							} else {
-								$backcolor = "secondrow";
-							}
-
-							echo "\t<tr>";
-							// echo "\t\t<td>$countrow</td>\n";
-							// echo "\t\t<td align=\"left\">" . date("Y-m-d H:i",strtotime($row[0])) . "</td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"left\">" . date("Y-m-d",strtotime($row[0])) . "</td>\n";
-							echo "\t\t<td class=\"$backcolor\" class=\"$backcolor\" align=\"left\">$row[1]</td>\n";
-							// echo "\t\t<td class=\"$backcolor\" align=\"left\">" . $row[2] . " " . $row[3] . "</td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"left\">$beskrivning</td>\n";
-							// echo "\t\t<td class=\"$backcolor\" align=\"center\"><a href=\"javascript:winPopupCenter(500, 1000, '/order/order_info.php?order=$row[4]');\">$row[4]</a></td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"center\"><a href=\"javascript:winPopupCenter(500, 1000, '/order_info.php?order=$row[4]');\">$row[4]</a></td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"left\">$customer</td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"center\">$row[6]</td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"center\">$row[7]</td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"center\">$row[8]</td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"left\">$row[9]</td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"center\">". strtoupper($row[10]) . "</td>\n";
-							echo "\t\t<td class=\"$backcolor\" align=\"right\">$pcostF SEK</td>\n";
-							echo "\t</tr>\n";
-							
-							if ($rowcolor == true) {
-								$row = true;
-								$rowcolor = false;
-							} else {
-								$row = false;
-								$rowcolor = true;
-							}
-							$totsum = $pcost + $totsum;
-							$countrow++;
-						}
-
+					$beskrivning = $line['beskrivning'];
+					if (strlen($beskrivning) > 55) {
+						$beskrivning = substr($beskrivning, 0, 55) . "....";
 					}
-					
-				} else {
-				
-						echo "\t<tr>\n";
-						// echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-						echo "\t\t<td colspan=\"9\"><i>Inga produkter i listan. Utmärkt!</i></td>\n";
-						echo "\t</tr>\n";
-				
+					$costF = number_format($line['cost'], 0, ',', ' ');
+					$typLabel = ($line['typ'] == 'DSLR') ? 'DSLR' : 'Värde';
+
+					echo "<tr" . ($group['complete'] ? " class=\"order-complete-alert\"" : "") . ">\n";
+					echo "<td></td>\n";
+					echo "<td></td>\n";
+					echo "<td></td>\n";
+					echo "<td>" . htmlspecialchars($line['artnr']) . "</td>\n";
+					echo "<td><a target=\"_blank\" href=\"/?info.php?article=" . urlencode($line['artnr']) . "\">" . htmlspecialchars($beskrivning) . "</a></td>\n";
+					echo "<td class=\"c\">" . $typLabel . "</td>\n";
+					echo "<td class=\"c\">" . $line['qtyordered'] . "</td>\n";
+					echo "<td class=\"c\">" . $line['qtyallocated'] . "</td>\n";
+					echo "<td class=\"c\">" . $line['qtydelivered'] . "</td>\n";
+					echo "<td>" . htmlspecialchars($group['lockedreason']) . "</td>\n";
+					echo "<td class=\"c\">" . strtoupper($group['lockedto']) . "</td>\n";
+					echo "<td class=\"r\">" . $costF . " SEK</td>\n";
+					echo "</tr>\n";
+
+					$totsum += $line['cost'];
+					$countrow++;
+
 				}
-			
+
+			}
+
+		} else {
+
+			echo "<tr>\n<td colspan=\"12\"><i>Inga produkter i listan. Utmärkt!</i></td>\n</tr>\n";
+
+		}
+
 		$totsumF = number_format($totsum, 0, ',', ' ');
-		echo "\t<tr>\n";
-		echo "\t\t<td align=\"left\"><b>Totalt: $countrow st</b></td>\n";
-		echo "\t\t<td colspan=\"9\"></td>\n";
-		echo "\t\t<td align=\"right\"><b>$totsumF SEK</b></td>\n";
-		echo "\t</tr>\n";
-		echo "</table>\n";
+		echo "</tbody>\n<tfoot>\n";
+		echo "<tr class=\"total-row\">\n";
+		echo "<td colspan=\"11\">Totalt: " . $countrow . " produkt(er) på " . count($groups) . " order(rar), varav " . $completecount . " helt allokerade</td>\n";
+		echo "<td class=\"r\">" . $totsumF . " SEK</td>\n";
+		echo "</tr>\n";
+		echo "</tfoot>\n</table>\n";
+
 	}
 
 	function fetchAllocatedAndLocked($artnr) {

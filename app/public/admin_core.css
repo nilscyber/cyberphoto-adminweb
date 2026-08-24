@@ -277,6 +277,11 @@
 }
 .btn-link-sm:hover { background: #bfdbfe; }
 
+/* Order som är helt allokerad men ännu inte skickad – kräver uppmärksamhet */
+.order-complete-alert {
+    background: #fee2e2 !important;
+}
+
 /* ------------------------------------------------------------
    FILTER-FÄLT (checkbox-rad ovanför tabeller)
    ------------------------------------------------------------ */

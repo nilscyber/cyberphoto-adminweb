@@ -1,36 +1,31 @@
-<?php 
+<?php
 	include_once("top.php");
 	include_once("header.php");
-	
-	echo "<h1>Låsta produkter (enskilda bevakningar)</h1>\n";
-	echo "<div>\n";
-	echo "<form method=\"GET\">\n";
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
 
-	echo "<div style=\"float: left; width: 190px;\">\n";
-	if ($istradein == "no") {
-		echo "Visa Ej inbytesaffärer<input type=\"checkbox\" name=\"istradein\" value=\"no\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Visa Ej inbytesaffärer<input type=\"checkbox\" name=\"istradein\" value=\"no\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	echo "<div style=\"float: left; width: 190px;\">\n";
-	if ($nopricelimit == "yes") {
-		echo "Ingen prislimit<input type=\"checkbox\" name=\"nopricelimit\" value=\"yes\" onClick=\"submit()\" checked>\n";
-	} else {
-		echo "Ingen prislimit<input type=\"checkbox\" name=\"nopricelimit\" value=\"yes\" onClick=\"submit()\">\n";
-	}
-	echo "</div>\n";
-	
+	// Standard: dölj ordrar låsta på inbytesaffärer samt använd prislimit, tills man aktivt bockar i annat
+	$showtradein = isset($showtradein) ? $showtradein : "no";
+	$nopricelimit = isset($nopricelimit) ? $nopricelimit : "no";
+
+	echo "<h1>Låsta produkter (allokerade men ej levererade)</h1>\n";
+
+	echo "<form method=\"GET\">\n";
+	echo "<div class=\"filter-bar\">\n";
+	echo "<label>";
+	echo "<input type=\"checkbox\" name=\"showtradein\" value=\"yes\" onClick=\"submit()\"" . ($showtradein == "yes" ? " checked" : "") . ">";
+	echo "Visa ordrar låsta på inbytesaffärer";
+	echo "</label>\n";
+	echo "<label>";
+	echo "<input type=\"checkbox\" name=\"nopricelimit\" value=\"yes\" onClick=\"submit()\"" . ($nopricelimit == "yes" ? " checked" : "") . ">";
+	echo "Ingen prislimit";
+	echo "</label>\n";
 	echo "</div>\n";
 	echo "</form>\n";
-	echo "<div class=\"clear\"></div>\n";
 
 	echo "<div class=\"top10\">";
 	$allocated->showActualMonitorAllocated();
-	// $allocated->getActualMonitorAllocated();
 	echo "</div>\n";
 	if ($add != "yes") {
-		// echo "<p>&nbsp;</p>\n";
 		echo "<div class=\"top10\"><img border=\"0\" src=\"/pic/help.gif\">&nbsp;<b><a href=\"" . $_SERVER['PHP_SELF'] . "?add=yes\">Lägg till artikel för enskild bevakning</b></a></div>\n";
 	}
 	if ($wrongmess) {
@@ -39,14 +34,12 @@
 	if ($add == "yes" || $addID != "") {
 		include("add_allocated.php");
 	}
-	echo "<h1>Låsta produkter (DSLR)</h1>\n";
+
+	echo "<h1>Låsta ordrar (DSLR &amp; värde &gt; 5000 SEK)</h1>\n";
+	echo "<div class=\"result-info\">Saknade produkter på samma order visas tillsammans. Ordrar där allt redan är allokerat markeras röda &ndash; de bör skickas omgående.</div>\n";
 	echo "<div>";
-	$allocated->displayAllocatedButReady(1);
+	$allocated->displayLockedOrderGroups($nopricelimit, $showtradein);
 	echo "</div>\n";
-	echo "<h1>Låsta produkter (VÄRDE > 5000 SEK)</h1>\n";
-	echo "<div>";
-	$allocated->displayAllocatedButReady(2);
-	echo "</div>\n";
-	
+
 	include_once("footer.php");
 ?>
