@@ -171,6 +171,11 @@
     color: var(--badge-prio-color);
 }
 
+.badge-ready {
+    background: #059669;
+    color: #fff;
+}
+
 .badge-new {
     background: var(--badge-new-bg);
     color: var(--badge-new-color);
@@ -306,9 +311,17 @@
     color: #374151;
 }
 
-/* Order som är helt allokerad men ännu inte skickad – kräver uppmärksamhet */
+/* Order som är helt allokerad men ännu inte skickad – kräver uppmärksamhet. Samma blå/indigo som
+   "Allokerade"-badgen i drawer_details, så färgen inte tolkas som "ej allokerad" (röd) */
 .order-complete-alert {
-    background: #fee2e2 !important;
+    background: #eef2ff !important;
+}
+
+/* Produkt som INTE är allokerad ännu, visas som kontext på en annars låst/allokerad order */
+.order-line-missing td {
+    background: #f9fafb !important;
+    color: #6b7280;
+    font-style: italic;
 }
 
 /* Summan i gruppraden får en tydligare färg så den syns bland de neutrala badgarna */

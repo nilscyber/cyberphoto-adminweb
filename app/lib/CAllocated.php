@@ -204,6 +204,7 @@ Class CAllocated {
 					'qtyordered'   => $row[7],
 					'qtyallocated' => $row[8],
 					'cost'         => $pcost,
+					'missing'      => false,
 				);
 
 				$groups[$orderId]['sum'] += $pcost;
@@ -212,7 +213,65 @@ Class CAllocated {
 
 		}
 
+		// Lägg till de fysiska produkter på samma ordrar som INTE är allokerade ännu, så man ser
+		// vad som faktiskt saknas och orsakar att ordern inte kan skickas.
+		if (count($groups) > 0) {
+			$missingByOrder = $this->getMissingLinesForOrders(array_keys($groups));
+			foreach ($missingByOrder as $orderId => $missingLines) {
+				foreach ($missingLines as $ml) {
+					$groups[$orderId]['lines'][] = $ml;
+				}
+			}
+		}
+
 		return $groups;
+
+	}
+
+	// Hämtar fysiska produkter (producttype='I') på angivna ordrar som ännu inte är allokerade
+	// (qtyordered <> qtyallocated), grupperat per order. Används för att visa vad som saknas på
+	// en order utöver de produkter som redan är låsta/allokerade.
+	function getMissingLinesForOrders($orderIds) {
+
+		$ids = array_map('intval', $orderIds);
+		if (count($ids) == 0) {
+			return array();
+		}
+
+		$select  = "SELECT col.c_order_id, p.value, manu.name, p.name, p.m_product_id, col.qtyordered, col.qtyallocated ";
+		$select .= "FROM c_orderline col ";
+		$select .= "JOIN m_product p ON col.m_product_id = p.m_product_id ";
+		$select .= "JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id ";
+		$select .= "WHERE col.c_order_id IN (" . implode(",", $ids) . ") ";
+		$select .= "AND p.producttype = 'I' AND col.qtyordered <> col.qtyallocated ";
+		$select .= "ORDER BY col.c_order_id, manu.name ASC, p.name ASC ";
+
+		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
+
+		$missing = array();
+
+		if ($res && pg_num_rows($res) > 0) {
+
+			while ($res && $row = pg_fetch_row($res)) {
+
+				$orderId = $row[0];
+				$beskrivning = $row[2] . " " . $row[3];
+
+				$missing[$orderId][] = array(
+					'artnr'        => $row[1],
+					'productid'    => $row[4],
+					'beskrivning'  => $beskrivning,
+					'qtyordered'   => $row[5],
+					'qtyallocated' => $row[6],
+					'cost'         => 0,
+					'missing'      => true,
+				);
+
+			}
+
+		}
+
+		return $missing;
 
 	}
 
@@ -267,8 +326,10 @@ Class CAllocated {
 				echo "<span class=\"order-group-right\">";
 				echo "<span class=\"badge order-sum-badge\">" . $sumF . " kr</span>";
 				if ($group['complete']) {
-					echo "<span class=\"badge badge-priority\">HELA ORDERN ÄR ALLOKERAD</span>";
+					echo "<span class=\"badge badge-ready\">KLAR ATT SKICKAS</span>";
 					$completecount++;
+				} else {
+					echo "<span class=\"badge badge-priority\">EJ KOMPLETT</span>";
 				}
 				echo "</span>";
 				echo "</div>";
@@ -284,10 +345,10 @@ Class CAllocated {
 					if (strlen($beskrivning) > 55) {
 						$beskrivning = substr($beskrivning, 0, 55) . "....";
 					}
-					$costF = number_format($line['cost'], 0, ',', ' ');
 					$productUrl = "/search_dispatch.php?mode=product&q=" . urlencode($line['artnr']) . "&open=product&id=" . (int)$line['productid'];
 
-					$rowclass = "order-group-box" . ($linenr == $linecount ? " order-group-box-end" : "") . ($group['complete'] ? " order-complete-alert" : "");
+					$rowclass = "order-group-box" . ($linenr == $linecount ? " order-group-box-end" : "");
+					$rowclass .= $line['missing'] ? " order-line-missing" : ($group['complete'] ? " order-complete-alert" : "");
 
 					echo "<tr class=\"" . $rowclass . "\">\n";
 					echo "<td></td>\n";
@@ -297,13 +358,19 @@ Class CAllocated {
 					echo "<td><a href=\"" . $productUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($beskrivning) . "</a></td>\n";
 					echo "<td class=\"c\">" . $line['qtyordered'] . "</td>\n";
 					echo "<td class=\"c\">" . $line['qtyallocated'] . "</td>\n";
-					echo "<td>" . htmlspecialchars($group['lockedreason']) . "</td>\n";
-					echo "<td class=\"c\">" . strtoupper($group['lockedto']) . "</td>\n";
-					echo "<td class=\"r\">" . $costF . " kr</td>\n";
+					if ($line['missing']) {
+						echo "<td><i>Ej allokerad &ndash; väntar på leverans</i></td>\n";
+						echo "<td class=\"c\">&ndash;</td>\n";
+						echo "<td class=\"r\">&ndash;</td>\n";
+					} else {
+						$costF = number_format($line['cost'], 0, ',', ' ');
+						echo "<td>" . htmlspecialchars($group['lockedreason']) . "</td>\n";
+						echo "<td class=\"c\">" . strtoupper($group['lockedto']) . "</td>\n";
+						echo "<td class=\"r\">" . $costF . " kr</td>\n";
+						$totsum += $line['cost'];
+						$countrow++;
+					}
 					echo "</tr>\n";
-
-					$totsum += $line['cost'];
-					$countrow++;
 
 				}
 
