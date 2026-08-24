@@ -125,7 +125,9 @@ Class CAllocated {
 	}
 	
 	// Hämtar alla låsta men allokerade orderrader (värde > 5000 SEK om inte nopricelimit) grupperade
-	// per order, så att flera låsta produkter på samma order hamnar tillsammans.
+	// per order, så att flera låsta produkter på samma order hamnar tillsammans. Endast ordrar som
+	// faktiskt är låsta räknas med (har en låsanledning eller är låst till en säljare) - inte alla
+	// ordrar där en produkt råkar vara allokerad men ännu inte levererad.
 	// $showtradein == "yes" visar ENDAST ordrar låsta på inbytesaffärer (annars döljs de helt).
 	// "complete" = alla FYSISKA produkter (producttype='I', dvs ej tjänster som frakt/försäkring)
 	// på ordern är allokerade. Sådana tjänsterader blir aldrig allokerade och ska därför inte
@@ -147,6 +149,7 @@ Class CAllocated {
 		$select .= "LEFT JOIN xc_sales_order_status xc ON xc.xc_sales_order_status_id = o.xc_sales_order_status_id ";
 		$select .= "LEFT JOIN AD_User us ON us.AD_User_ID = o.locked_to_id ";
 		$select .= "WHERE o.c_doctype_id = 1000030 AND NOT o.docstatus IN ('VO') AND col.qtyordered = col.qtyallocated AND col.qtyallocated > col.qtydelivered ";
+		$select .= "AND (o.xc_sales_order_status_id IS NOT NULL OR o.locked_to_id IS NOT NULL) "; // endast ordrar som faktiskt är låsta (anledning eller säljare), inte alla som råkar vänta på leverans
 		if ($nopricelimit != "yes") {
 			$select .= "AND col.pricelimit > 5000 ";
 		}
