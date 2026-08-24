@@ -417,9 +417,17 @@ JS;
 		// vilket såg ut som dubbletter för artiklar på flera platser i lagret.
 		// Antalet hämtas fortfarande från pstock.qtyavailable (inte SUM(store.qtyonhand)) -
 		// att summera m_storage direkt gav för höga/felaktiga siffror jämfört med ERP:et.
+		//
+		// m_storage kan innehålla gamla/ej utrensade rader med qtyonhand > 0 på fler
+		// än ett hyllplats för samma artikel (kvarglömda poster efter flytt/justering
+		// som aldrig nollställdes), trots att pstock.qtyavailable redan nettar bort
+		// detta i antalet. Därför väljs bara platsen från den senast uppdaterade
+		// m_storage-raden som "Plats" - övriga räknas men visas inte som om varan
+		// låg på flera ställen samtidigt.
 		$select = "SELECT pstock.value, cat.name, manu.name, prod.name, ";
 		$select .= "pstock.qtyavailable AS qty, ";
-		$select .= "STRING_AGG(DISTINCT mloc.value, ', ') AS platser, ";
+		$select .= "(ARRAY_AGG(mloc.value ORDER BY store.updated DESC))[1] AS plats, ";
+		$select .= "COUNT(DISTINCT mloc.value) AS platsantal, ";
 		$select .= "prod.m_product_id ";
 		$select .= "FROM m_product_stock_summary_v pstock  ";
 		$select .= "LEFT JOIN m_product prod ON pstock.m_product_id=prod.m_product_id ";
@@ -446,15 +454,24 @@ JS;
 
 			$artnr = htmlspecialchars($row[0]);
 			$namn = htmlspecialchars(trim($row[2] . " " . $row[3]));
-			$productId = (int)$row[6];
+			$productId = (int)$row[7];
 			$productUrl = "/search_dispatch.php?mode=product&q=" . urlencode($row[0]) . "&open=product&id=" . $productId . "#";
+
+			$plats = htmlspecialchars($row[5]);
+			$platsantal = (int)$row[6];
+			if ($platsantal > 1) {
+				// Fler m_storage-rader med qtyonhand > 0 hittades för artikeln, men
+				// bara den senast uppdaterade platsen visas eftersom övriga med
+				// stor sannolikhet är ej utrensade poster (se kommentar ovan).
+				$plats .= " <span title=\"Ytterligare " . ($platsantal - 1) . " hyllplats(er) med lagersaldo &gt; 0 hittades i m_storage - troligen ej utrensade poster efter flytt/justering.\">⚠️</span>";
+			}
 
 			echo "<tr>\n";
 			echo "<td><span class=\"copy-art\" data-article=\"$artnr\" title=\"Kopiera artikelnummer\">$artnr</span></td>\n";
 			echo "<td>" . htmlspecialchars($row[1]) . "</td>\n";
 			echo "<td><a target=\"_blank\" rel=\"noopener\" href=\"" . htmlspecialchars($productUrl) . "\">$namn</a></td>\n";
 			echo "<td>" . (int)$row[4] . "</td>\n";
-			echo "<td>" . htmlspecialchars($row[5]) . "</td>\n";
+			echo "<td>" . $plats . "</td>\n";
 			echo "</tr>\n";
 			$countrows++;
 
