@@ -168,7 +168,7 @@ Class CAllocated {
 		}
 		$select .= "AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.currentcostprice > 0 ";
 		$select .= "AND NOT o.c_order_id IN (1889920,2224736,1080606,1446823,2258062) "; // tar borta interna ordrar såsom mats test, inbyte osv.
-		$select .= "ORDER BY o.created DESC, o.documentno ASC, manu.name ASC, p.name ASC ";
+		$select .= "ORDER BY o.created ASC, o.documentno ASC, manu.name ASC, p.name ASC "; // äldsta ordrarna överst - de bör pressas ut först
 
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
 
