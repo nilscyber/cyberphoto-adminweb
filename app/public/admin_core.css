@@ -284,12 +284,26 @@
     border-top: 2px solid #9ca3af;
 }
 
-/* Håller en eventuell badge på fast plats längst till höger, oavsett hur lång texten före är */
+/* Håller höger sida (summa/badge) på fast plats längst till höger, oavsett innehåll till vänster */
 .order-group-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+}
+.order-group-left,
+.order-group-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.order-group-right {
+    flex-shrink: 0;
+}
+.order-group-customer {
+    color: #374151;
 }
 
 /* Order som är helt allokerad men ännu inte skickad – kräver uppmärksamhet */
@@ -297,10 +311,12 @@
     background: #fee2e2 !important;
 }
 
-/* Orderdatum färgat efter ålder – ju äldre ordern är, desto mer bör den pressas ut */
-.order-date-age.green  { color: #065f46; }
-.order-date-age.orange { color: #92400e; }
-.order-date-age.red    { color: #dc2626; }
+/* Summan i gruppraden får en tydligare färg så den syns bland de neutrala badgarna */
+.order-sum-badge {
+    background: #0d9488;
+    color: #fff;
+    border-color: #0d9488;
+}
 
 /* Ram runt varje ordergrupp så raderna som hör ihop syns tydligt som en enhet */
 .order-group-box td:first-child {

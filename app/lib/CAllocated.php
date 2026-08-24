@@ -258,16 +258,19 @@ Class CAllocated {
 				echo "<tr class=\"order-group-head order-group-box" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
 				echo "<td colspan=\"10\">";
 				echo "<div class=\"order-group-row\">";
-				echo "<span>";
-				echo "<b><a href=\"" . $orderUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($group['documentno']) . "</a></b>";
-				echo " &middot; <b class=\"order-date-age " . $ageClass . "\" title=\"" . $ageDays . " dagar sedan orderdatum\">" . $orderDate . " (" . $ageDays . "d)</b>";
-				echo " &middot; " . htmlspecialchars($group['customer']);
-				echo " &middot; " . $sumF . " SEK";
+				echo "<span class=\"order-group-left\">";
+				echo "<a class=\"badge\" href=\"" . $orderUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($group['documentno']) . "</a>";
+				echo "<span class=\"badge\">" . $orderDate . "</span>";
+				echo "<span class=\"badge-age " . $ageClass . "\" title=\"" . $ageDays . " dagar sedan orderdatum\">" . $ageDays . "d</span>";
+				echo "<span class=\"order-group-customer\">" . htmlspecialchars($group['customer']) . "</span>";
 				echo "</span>";
+				echo "<span class=\"order-group-right\">";
+				echo "<span class=\"badge order-sum-badge\">" . $sumF . " kr</span>";
 				if ($group['complete']) {
 					echo "<span class=\"badge badge-priority\">HELA ORDERN ÄR ALLOKERAD</span>";
 					$completecount++;
 				}
+				echo "</span>";
 				echo "</div>";
 				echo "</td>\n</tr>\n";
 
@@ -296,7 +299,7 @@ Class CAllocated {
 					echo "<td class=\"c\">" . $line['qtyallocated'] . "</td>\n";
 					echo "<td>" . htmlspecialchars($group['lockedreason']) . "</td>\n";
 					echo "<td class=\"c\">" . strtoupper($group['lockedto']) . "</td>\n";
-					echo "<td class=\"r\">" . $costF . " SEK</td>\n";
+					echo "<td class=\"r\">" . $costF . " kr</td>\n";
 					echo "</tr>\n";
 
 					$totsum += $line['cost'];
@@ -322,7 +325,7 @@ Class CAllocated {
 		echo "</tbody>\n<tfoot>\n";
 		echo "<tr class=\"total-row\">\n";
 		echo "<td colspan=\"9\">" . $totalLabel . "</td>\n";
-		echo "<td class=\"r\">" . $totsumF . " SEK</td>\n";
+		echo "<td class=\"r\">" . $totsumF . " kr</td>\n";
 		echo "</tr>\n";
 		echo "</tfoot>\n</table>\n";
 
