@@ -124,9 +124,9 @@ Class CAllocated {
 
 	}
 	
-	// Hämtar alla låsta men allokerade orderrader (DSLR + värdegräns) grupperade per order,
-	// så att flera låsta produkter på samma order hamnar tillsammans.
-	// $showtradein == "yes" visar även ordrar låsta på inbytesaffärer (annars döljs de).
+	// Hämtar alla låsta men allokerade orderrader (värde > 5000 SEK om inte nopricelimit) grupperade
+	// per order, så att flera låsta produkter på samma order hamnar tillsammans.
+	// $showtradein == "yes" visar ENDAST ordrar låsta på inbytesaffärer (annars döljs de helt).
 	// "complete" = alla FYSISKA produkter (producttype='I', dvs ej tjänster som frakt/försäkring)
 	// på ordern är allokerade. Sådana tjänsterader blir aldrig allokerade och ska därför inte
 	// räknas med, annars flaggas ordern felaktigt som ofullständig.
@@ -147,13 +147,12 @@ Class CAllocated {
 		$select .= "LEFT JOIN xc_sales_order_status xc ON xc.xc_sales_order_status_id = o.xc_sales_order_status_id ";
 		$select .= "LEFT JOIN AD_User us ON us.AD_User_ID = o.locked_to_id ";
 		$select .= "WHERE o.c_doctype_id = 1000030 AND NOT o.docstatus IN ('VO') AND col.qtyordered = col.qtyallocated AND col.qtyallocated > col.qtydelivered ";
-		$select .= "AND ( p.m_product_category_id IN (1000221) ";
-		if ($nopricelimit == "yes") {
-			$select .= "OR NOT p.m_product_category_id IN (1000221) ) ";
-		} else {
-			$select .= "OR (NOT p.m_product_category_id IN (1000221) AND col.pricelimit > 5000) ) ";
+		if ($nopricelimit != "yes") {
+			$select .= "AND col.pricelimit > 5000 ";
 		}
-		if ($showtradein != "yes") {
+		if ($showtradein == "yes") {
+			$select .= "AND o.xc_sales_order_status_id = 1000015 "; // visar ENDAST ordrar låsta på inbytesaffärer
+		} else {
 			$select .= "AND NOT o.xc_sales_order_status_id = 1000015 "; // döljer ordrar låsta på inbytesaffärer som standard
 		}
 		$select .= "AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.currentcostprice > 0 ";

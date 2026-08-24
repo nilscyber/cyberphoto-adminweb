@@ -7,13 +7,13 @@
 	$showtradein = isset($showtradein) ? $showtradein : "no";
 	$nopricelimit = isset($nopricelimit) ? $nopricelimit : "no";
 
-	echo "<h1>Låsta ordrar (DSLR &amp; värde &gt; 5000 SEK)</h1>\n";
+	echo "<h1>Låsta ordrar &gt; 5000 SEK</h1>\n";
 
 	echo "<form method=\"GET\">\n";
 	echo "<div class=\"filter-bar\">\n";
 	echo "<label>";
 	echo "<input type=\"checkbox\" name=\"showtradein\" value=\"yes\" onClick=\"submit()\"" . ($showtradein == "yes" ? " checked" : "") . ">";
-	echo "Visa ordrar låsta på inbytesaffärer";
+	echo "Visa inbytesaffärer";
 	echo "</label>\n";
 	echo "<label>";
 	echo "<input type=\"checkbox\" name=\"nopricelimit\" value=\"yes\" onClick=\"submit()\"" . ($nopricelimit == "yes" ? " checked" : "") . ">";
