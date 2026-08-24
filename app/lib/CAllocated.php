@@ -124,15 +124,17 @@ Class CAllocated {
 
 	}
 	
-	// Hämtar alla låsta men allokerade orderrader grupperade per order, så att flera låsta
-	// produkter på samma order hamnar tillsammans. Endast ordrar som faktiskt är låsta räknas
-	// med (har en låsanledning eller är låst till en säljare) - inte alla ordrar där en produkt
-	// råkar vara allokerad men ännu inte levererad.
-	// $showtradein == "yes" visar ENDAST ordrar låsta på inbytesaffärer (annars döljs de helt).
+	// Hämtar allokerade men ej levererade orderrader grupperade per order, så att flera produkter
+	// på samma order hamnar tillsammans.
+	// $mode = "locked" (standard): endast ordrar som faktiskt är låsta (har en låsanledning eller
+	//   är låst till en säljare). $showtradein == "yes" visar då ENDAST ordrar låsta på
+	//   inbytesaffärer, annars döljs de.
+	// $mode = "incomplete": ordrar som INTE är låsta men ändå inte kan skickas eftersom minst en
+	//   annan fysisk produkt på samma order fortfarande väntar på att komma in.
 	// "complete" = alla FYSISKA produkter (producttype='I', dvs ej tjänster som frakt/försäkring)
 	// på ordern är allokerade. Sådana tjänsterader blir aldrig allokerade och ska därför inte
 	// räknas med, annars flaggas ordern felaktigt som ofullständig.
-	function getLockedOrderGroups($showtradein) {
+	function getOrderGroups($mode, $showtradein) {
 
 		$select  = "SELECT o.c_order_id, o.created, o.documentno, p.value, manu.name, p.name, bp.name, ";
 		$select .= "col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.name, po.currentcostprice, p.m_product_id, ";
@@ -149,13 +151,20 @@ Class CAllocated {
 		$select .= "LEFT JOIN xc_sales_order_status xc ON xc.xc_sales_order_status_id = o.xc_sales_order_status_id ";
 		$select .= "LEFT JOIN AD_User us ON us.AD_User_ID = o.locked_to_id ";
 		$select .= "WHERE o.c_doctype_id = 1000030 AND NOT o.docstatus IN ('VO') AND col.qtyordered = col.qtyallocated AND col.qtyallocated > col.qtydelivered ";
-		$select .= "AND (o.xc_sales_order_status_id IS NOT NULL OR o.locked_to_id IS NOT NULL) "; // endast ordrar som faktiskt är låsta (anledning eller säljare), inte alla som råkar vänta på leverans
-		if ($showtradein == "yes") {
-			$select .= "AND o.xc_sales_order_status_id = 1000015 "; // visar ENDAST ordrar låsta på inbytesaffärer
+		if ($mode == "incomplete") {
+			$select .= "AND o.xc_sales_order_status_id IS NULL AND o.locked_to_id IS NULL "; // ej administrativt låst
+			$select .= "AND EXISTS (SELECT 1 FROM c_orderline col3 ";
+			$select .= "JOIN m_product p3 ON col3.m_product_id = p3.m_product_id ";
+			$select .= "WHERE col3.c_order_id = o.c_order_id AND p3.producttype = 'I' AND col3.qtyordered <> col3.qtyallocated) "; // väntar på minst en annan fysisk produkt
 		} else {
-			// döljer ordrar låsta på inbytesaffärer som standard. Måste hantera NULL explicit,
-			// annars faller ordrar utan xc_sales_order_status_id (t.ex. låsta enbart på säljare) bort.
-			$select .= "AND (o.xc_sales_order_status_id IS NULL OR o.xc_sales_order_status_id <> 1000015) ";
+			$select .= "AND (o.xc_sales_order_status_id IS NOT NULL OR o.locked_to_id IS NOT NULL) "; // endast ordrar som faktiskt är låsta (anledning eller säljare)
+			if ($showtradein == "yes") {
+				$select .= "AND o.xc_sales_order_status_id = 1000015 "; // visar ENDAST ordrar låsta på inbytesaffärer
+			} else {
+				// döljer ordrar låsta på inbytesaffärer som standard. Måste hantera NULL explicit,
+				// annars faller ordrar utan xc_sales_order_status_id (t.ex. låsta enbart på säljare) bort.
+				$select .= "AND (o.xc_sales_order_status_id IS NULL OR o.xc_sales_order_status_id <> 1000015) ";
+			}
 		}
 		$select .= "AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.currentcostprice > 0 ";
 		$select .= "AND NOT o.c_order_id IN (1889920,2224736,1080606,1446823,2258062) "; // tar borta interna ordrar såsom mats test, inbyte osv.
@@ -207,9 +216,9 @@ Class CAllocated {
 
 	}
 
-	function displayLockedOrderGroups($showtradein) {
+	function displayOrderGroups($mode, $showtradein) {
 
-		$groups = $this->getLockedOrderGroups($showtradein);
+		$groups = $this->getOrderGroups($mode, $showtradein);
 
 		$totsum = 0;
 		$countrow = 0;
@@ -306,9 +315,13 @@ Class CAllocated {
 		}
 
 		$totsumF = number_format($totsum, 0, ',', ' ');
+		$totalLabel = "Totalt: " . $countrow . " produkt(er) på " . count($groups) . " order(rar)";
+		if ($mode != "incomplete") {
+			$totalLabel .= ", varav " . $completecount . " helt allokerade";
+		}
 		echo "</tbody>\n<tfoot>\n";
 		echo "<tr class=\"total-row\">\n";
-		echo "<td colspan=\"9\">Totalt: " . $countrow . " produkt(er) på " . count($groups) . " order(rar), varav " . $completecount . " helt allokerade</td>\n";
+		echo "<td colspan=\"9\">" . $totalLabel . "</td>\n";
 		echo "<td class=\"r\">" . $totsumF . " SEK</td>\n";
 		echo "</tr>\n";
 		echo "</tfoot>\n</table>\n";
