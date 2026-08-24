@@ -125,14 +125,19 @@ Class CAllocated {
 	}
 	
 	// Hämtar alla låsta men allokerade orderrader (DSLR + värdegräns) grupperade per order,
-	// så att flera saknade produkter på samma order hamnar tillsammans.
+	// så att flera låsta produkter på samma order hamnar tillsammans.
 	// $showtradein == "yes" visar även ordrar låsta på inbytesaffärer (annars döljs de).
+	// "complete" = alla FYSISKA produkter (producttype='I', dvs ej tjänster som frakt/försäkring)
+	// på ordern är allokerade. Sådana tjänsterader blir aldrig allokerade och ska därför inte
+	// räknas med, annars flaggas ordern felaktigt som ofullständig.
 	function getLockedOrderGroups($nopricelimit, $showtradein) {
 
 		$select  = "SELECT o.c_order_id, o.created, o.documentno, p.value, manu.name, p.name, bp.name, ";
 		$select .= "col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.value, po.currentcostprice, p.m_product_id, ";
 		$select .= "o.xc_sales_order_status_id, ";
-		$select .= "(SELECT COUNT(*) FROM c_orderline col2 WHERE col2.c_order_id = o.c_order_id AND col2.qtyordered <> col2.qtyallocated) AS missing_lines ";
+		$select .= "(SELECT COUNT(*) FROM c_orderline col2 ";
+		$select .= "JOIN m_product p2 ON col2.m_product_id = p2.m_product_id ";
+		$select .= "WHERE col2.c_order_id = o.c_order_id AND p2.producttype = 'I' AND col2.qtyordered <> col2.qtyallocated) AS missing_lines ";
 		$select .= "FROM c_orderline col ";
 		$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
 		$select .= "JOIN c_order o ON col.c_order_id = o.c_order_id ";
@@ -233,12 +238,12 @@ Class CAllocated {
 
 				echo "<tr class=\"cat-head" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
 				echo "<td colspan=\"10\">";
-				echo "<a href=\"" . $orderUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($group['documentno']) . "</a>";
+				echo "<b><a href=\"" . $orderUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($group['documentno']) . "</a></b>";
 				echo " &middot; " . date("Y-m-d", strtotime($group['created']));
 				echo " &middot; " . htmlspecialchars($group['customer']);
-				echo " &middot; " . $linecount . " saknad(e) produkt(er) &middot; " . $sumF . " SEK";
+				echo " &middot; " . $linecount . " produkt(er) väntar på leverans &middot; " . $sumF . " SEK";
 				if ($group['complete']) {
-					echo " &nbsp;<span class=\"badge badge-priority\">HELA ORDERN ÄR ALLOKERAD &ndash; varför är den inte skickad?</span>";
+					echo " &nbsp;<span class=\"badge badge-priority\">HELA ORDERN ÄR ALLOKERAD</span>";
 					$completecount++;
 				}
 				echo "</td>\n</tr>\n";

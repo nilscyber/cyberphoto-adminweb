@@ -22,7 +22,7 @@
 	echo "</div>\n";
 	echo "</form>\n";
 
-	echo "<div class=\"result-info\">Saknade produkter på samma order visas tillsammans. Ordrar där allt redan är allokerat markeras röda &ndash; de bör skickas omgående.</div>\n";
+	echo "<div class=\"result-info\">Produkter som väntar på leverans grupperas per order. Ordrar där alla produkter redan är allokerade markeras röda &ndash; de bör skickas omgående.</div>\n";
 	echo "<div>";
 	$allocated->displayLockedOrderGroups($nopricelimit, $showtradein);
 	echo "</div>\n";
