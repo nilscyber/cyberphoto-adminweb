@@ -232,16 +232,15 @@ Class CAllocated {
 
 			foreach ($groups as $orderId => $group) {
 
-				$linecount = count($group['lines']);
 				$sumF = number_format($group['sum'], 0, ',', ' ');
 				$orderUrl = "/search_dispatch.php?mode=order&page=1&q=" . urlencode($group['documentno']);
 
-				echo "<tr class=\"cat-head" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
+				echo "<tr class=\"order-group-head" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
 				echo "<td colspan=\"10\">";
 				echo "<b><a href=\"" . $orderUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($group['documentno']) . "</a></b>";
 				echo " &middot; " . date("Y-m-d", strtotime($group['created']));
 				echo " &middot; " . htmlspecialchars($group['customer']);
-				echo " &middot; " . $linecount . " produkt(er) väntar på leverans &middot; " . $sumF . " SEK";
+				echo " &middot; " . $sumF . " SEK";
 				if ($group['complete']) {
 					echo " &nbsp;<span class=\"badge badge-priority\">HELA ORDERN ÄR ALLOKERAD</span>";
 					$completecount++;

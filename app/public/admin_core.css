@@ -277,6 +277,13 @@
 }
 .btn-link-sm:hover { background: #bfdbfe; }
 
+/* Grupprubrikrad per order (inte fet som .cat-head – bara ordernumret ska stå ut) */
+.order-group-head td {
+    background: #f3f4f6;
+    font-weight: 400;
+    border-top: 2px solid var(--tbl-border);
+}
+
 /* Order som är helt allokerad men ännu inte skickad – kräver uppmärksamhet */
 .order-complete-alert {
     background: #fee2e2 !important;
