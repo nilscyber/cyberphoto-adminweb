@@ -406,7 +406,6 @@ JS;
 		echo "<th>Kategori</th>\n";
 		echo "<th>Benämning</th>\n";
 		echo "<th>I lager</th>\n";
-		echo "<th>Plats</th>\n";
 		echo "</tr></thead>\n";
 		echo "<tbody>\n";
 
@@ -441,7 +440,7 @@ JS;
 			$select .= "WHERE mloc.m_warehouse_id = 1000002 AND pstock.m_warehouse_id = 1000002 AND pstock.qtyavailable > 0 AND store.qtyonhand > 0 ";
 		}
 		$select .= "GROUP BY pstock.value, cat.name, manu.name, prod.name, pstock.qtyavailable, prod.m_product_id ";
-		$select .= "ORDER BY prod.name ASC ";
+		$select .= "ORDER BY plats ASC, prod.name ASC ";
 		// $select .= " ";
 		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
 			echo $select;
@@ -450,6 +449,8 @@ JS;
 
 		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
 
+		$currentPlats = null;
+
 		while ($res && $row = pg_fetch_row($res)) {
 
 			$artnr = htmlspecialchars($row[0]);
@@ -457,21 +458,28 @@ JS;
 			$productId = (int)$row[7];
 			$productUrl = "/search_dispatch.php?mode=product&q=" . urlencode($row[0]) . "&open=product&id=" . $productId . "#";
 
-			$plats = htmlspecialchars($row[5]);
+			$platsRaw = (string)$row[5];
 			$platsantal = (int)$row[6];
+			$qtyCell = (int)$row[4];
 			if ($platsantal > 1) {
 				// Fler m_storage-rader med qtyonhand > 0 hittades för artikeln, men
-				// bara den senast uppdaterade platsen visas eftersom övriga med
-				// stor sannolikhet är ej utrensade poster (se kommentar ovan).
-				$plats .= " <span title=\"Ytterligare " . ($platsantal - 1) . " hyllplats(er) med lagersaldo &gt; 0 hittades i m_storage - troligen ej utrensade poster efter flytt/justering.\">⚠️</span>";
+				// bara den senast uppdaterade platsen visas som grupprubrik eftersom
+				// övriga med stor sannolikhet är ej utrensade poster (se kommentar ovan).
+				$qtyCell .= " <span title=\"Ytterligare " . ($platsantal - 1) . " hyllplats(er) med lagersaldo &gt; 0 hittades i m_storage - troligen ej utrensade poster efter flytt/justering.\">⚠️</span>";
+			}
+
+			// Listan är sorterad på plats, så vi grupperar visuellt per hyllplats
+			// för att det ska gå snabbt att se vilka produkter som ligger var.
+			if ($platsRaw !== $currentPlats) {
+				$currentPlats = $platsRaw;
+				echo "<tr class=\"cat-head\"><th colspan=\"4\">" . htmlspecialchars($platsRaw !== "" ? $platsRaw : "Okänd plats") . "</th></tr>\n";
 			}
 
 			echo "<tr>\n";
 			echo "<td><span class=\"copy-art\" data-article=\"$artnr\" title=\"Kopiera artikelnummer\">$artnr</span></td>\n";
 			echo "<td>" . htmlspecialchars($row[1]) . "</td>\n";
 			echo "<td><a target=\"_blank\" rel=\"noopener\" href=\"" . htmlspecialchars($productUrl) . "\">$namn</a></td>\n";
-			echo "<td>" . (int)$row[4] . "</td>\n";
-			echo "<td>" . $plats . "</td>\n";
+			echo "<td>" . $qtyCell . "</td>\n";
 			echo "</tr>\n";
 			$countrows++;
 
