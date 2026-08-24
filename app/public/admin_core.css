@@ -284,6 +284,14 @@
     border-top: 2px solid var(--tbl-border);
 }
 
+/* Håller en eventuell badge på fast plats längst till höger, oavsett hur lång texten före är */
+.order-group-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
 /* Order som är helt allokerad men ännu inte skickad – kräver uppmärksamhet */
 .order-complete-alert {
     background: #fee2e2 !important;

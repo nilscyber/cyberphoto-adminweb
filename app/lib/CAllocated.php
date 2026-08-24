@@ -133,7 +133,7 @@ Class CAllocated {
 	function getLockedOrderGroups($nopricelimit, $showtradein) {
 
 		$select  = "SELECT o.c_order_id, o.created, o.documentno, p.value, manu.name, p.name, bp.name, ";
-		$select .= "col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.value, po.currentcostprice, p.m_product_id, ";
+		$select .= "col.qtyordered, col.qtyallocated, col.qtydelivered, xc.name, us.name, po.currentcostprice, p.m_product_id, ";
 		$select .= "o.xc_sales_order_status_id, ";
 		$select .= "(SELECT COUNT(*) FROM c_orderline col2 ";
 		$select .= "JOIN m_product p2 ON col2.m_product_id = p2.m_product_id ";
@@ -153,7 +153,9 @@ Class CAllocated {
 		if ($showtradein == "yes") {
 			$select .= "AND o.xc_sales_order_status_id = 1000015 "; // visar ENDAST ordrar låsta på inbytesaffärer
 		} else {
-			$select .= "AND NOT o.xc_sales_order_status_id = 1000015 "; // döljer ordrar låsta på inbytesaffärer som standard
+			// döljer ordrar låsta på inbytesaffärer som standard. Måste hantera NULL explicit,
+			// annars faller ordrar utan xc_sales_order_status_id (t.ex. låsta enbart på säljare) bort.
+			$select .= "AND (o.xc_sales_order_status_id IS NULL OR o.xc_sales_order_status_id <> 1000015) ";
 		}
 		$select .= "AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.currentcostprice > 0 ";
 		$select .= "AND NOT o.c_order_id IN (1889920,2224736,1080606,1446823,2258062) "; // tar borta interna ordrar såsom mats test, inbyte osv.
@@ -236,14 +238,18 @@ Class CAllocated {
 
 				echo "<tr class=\"order-group-head" . ($group['complete'] ? " order-complete-alert" : "") . "\">\n";
 				echo "<td colspan=\"10\">";
+				echo "<div class=\"order-group-row\">";
+				echo "<span>";
 				echo "<b><a href=\"" . $orderUrl . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($group['documentno']) . "</a></b>";
 				echo " &middot; " . date("Y-m-d", strtotime($group['created']));
 				echo " &middot; " . htmlspecialchars($group['customer']);
 				echo " &middot; " . $sumF . " SEK";
+				echo "</span>";
 				if ($group['complete']) {
-					echo " &nbsp;<span class=\"badge badge-priority\">HELA ORDERN ÄR ALLOKERAD</span>";
+					echo "<span class=\"badge badge-priority\">HELA ORDERN ÄR ALLOKERAD</span>";
 					$completecount++;
 				}
+				echo "</div>";
 				echo "</td>\n</tr>\n";
 
 				foreach ($group['lines'] as $line) {
