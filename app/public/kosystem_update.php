@@ -36,7 +36,7 @@ if ($subm) {
 
 <head>
 <title>Uppdatera KÖ nummer</title>
-<link rel="shortcut icon" href="https://admin.cyberphoto.se/kosystemet.ico">
+<link rel="shortcut icon" href="/kosystemet.ico">
 <style>
 .align_center { text-align: center }
 .align_right { text-align: right }

@@ -85,14 +85,14 @@ Class CBusinessPartner {
 				echo "<tr>";
 				echo "<td class=\"$backcolor table_artnr\">" . ($row->kundnr) . "</td>\n";
 				if ($row->lland_id == 358 || $row->lland_id == 999) {
-					echo "<td class=\"align_center\"><img border=\"\" src=\"https://admin.cyberphoto.se/fi_mini.jpg\"></td>\n";
+					echo "<td class=\"align_center\"><img border=\"\" src=\"/fi_mini.jpg\"></td>\n";
 				} elseif ($row->lland_id == 47) {
-					echo "<td class=\"align_center\"><img border=\"\" src=\"https://admin.cyberphoto.se/no_mini.jpg\"></td>\n";
+					echo "<td class=\"align_center\"><img border=\"\" src=\"/no_mini.jpg\"></td>\n";
 				} else {
-					echo "<td class=\"align_center\"><img border=\"\" src=\"https://admin.cyberphoto.se/sv_mini.jpg\"></td>\n";
+					echo "<td class=\"align_center\"><img border=\"\" src=\"/sv_mini.jpg\"></td>\n";
 				}
 				// echo "<td class=\"$backcolor table_lagersaldo\"><a class=\"$bold_order\" href=\"javascript:winPopupCenter(600, 350, '/order/customer_info.php?knr=" . $row->kundnr . "');\">" . ($row->namn) . "</a></td>\n";
-				echo "<td class=\"$backcolor table_lagersaldo\"><a class=\"$bold_order\" href=\"javascript:winPopupCenter(600, 350, 'https://admin.cyberphoto.se/customer_info.php?knr=" . $row->kundnr . "');\">" . ($row->namn) . "</a></td>\n";
+				echo "<td class=\"$backcolor table_lagersaldo\"><a class=\"$bold_order\" href=\"javascript:winPopupCenter(600, 350, '/customer_info.php?knr=" . $row->kundnr . "');\">" . ($row->namn) . "</a></td>\n";
 				echo "<td class=\"$backcolor table_lagersaldo\">" . ($row->postadr) . "</td>\n";
 				echo "<td class=\"$backcolor table_lagersaldo\">" . ($row->email) . "</td>\n";
 				echo "<td class=\"$backcolor table_lagersaldo align_center\">" . ($this->getLatestOrder($row->kundnr)) . "</td>\n";
@@ -367,35 +367,35 @@ Class CBusinessPartner {
 							echo "\t\t<td>" . date("Y-m-d",strtotime($row->created)) . "</td>\n";
 							// echo "\t\t<td align=\"center\"><a style=\"text-decoration: none;\" href=\"order_info.php?order=" . $row->documentno . "&artnr=$artnr&salda=yes\"> " . $row->documentno . "</a></td>\n";
 							// echo "\t\t<td align=\"center\"><a class=\"$bold_order\" href=\"javascript:winPopupCenter(500, 1000, '/order/order_info.php?order=" . $row->documentno . "');\">" . $row->documentno . "</a></td>\n";
-							echo "\t\t<td align=\"center\"><a class=\"$bold_order\" href=\"javascript:winPopupCenter(500, 1000, 'https://admin.cyberphoto.se/order_info.php?order=" . $row->documentno . "');\">" . $row->documentno . "</a></td>\n";
+							echo "\t\t<td align=\"center\"><a class=\"$bold_order\" href=\"javascript:winPopupCenter(500, 1000, '/order_info.php?order=" . $row->documentno . "');\">" . $row->documentno . "</a></td>\n";
 							echo "\t\t<td align=\"center\" class=\"$bold_knr\">" . $row->value . "</td>\n";
 							if ($row->c_country_id == 181 || $row->c_country_id == 50000) {
-								echo "\t\t<td align=\"center\"><img border=\"\" src=\"https://admin.cyberphoto.se/fi_mini.jpg\"></td>\n";
+								echo "\t\t<td align=\"center\"><img border=\"\" src=\"/fi_mini.jpg\"></td>\n";
 								$land = "fi";
 								$currency = "EUR";
 							} elseif ($row->c_country_id == 167) {
-								echo "\t\t<td align=\"center\"><img border=\"\" src=\"https://admin.cyberphoto.se/dk_mini.jpg\"></td>\n";
+								echo "\t\t<td align=\"center\"><img border=\"\" src=\"/dk_mini.jpg\"></td>\n";
 								$land = "se";
 								$currency = "SEK";
 							} elseif ($row->c_country_id == 269) {
-								echo "\t\t<td align=\"center\"><img border=\"\" src=\"https://admin.cyberphoto.se/no_mini.jpg\"></td>\n";
+								echo "\t\t<td align=\"center\"><img border=\"\" src=\"/no_mini.jpg\"></td>\n";
 								$land = "no";
 								$currency = "NOK";
 							} else {
-								echo "\t\t<td align=\"center\"><img border=\"\" src=\"https://admin.cyberphoto.se/sv_mini.jpg\"></td>\n";
+								echo "\t\t<td align=\"center\"><img border=\"\" src=\"/sv_mini.jpg\"></td>\n";
 								$land = "se";
 								$currency = "SEK";
 							}
 							echo "\t\t<td>" . $row->name . "</td>\n";
 							echo "\t\t<td align=\"center\">" . number_format($row->grandtotal, 0, ',', ' ') . " ". $currency . "</td>\n";
 							if ($row->c_country_id == 181 || $row->c_country_id == 50000) {
-								echo "\t\t<td align=\"center\"><img border=\"\" src=\"https://admin.cyberphoto.se/fi_mini.jpg\"></td>\n";
+								echo "\t\t<td align=\"center\"><img border=\"\" src=\"/fi_mini.jpg\"></td>\n";
 							} elseif ($row->c_country_id == 167) {
-								echo "\t\t<td align=\"center\"><img border=\"\" src=\"https://admin.cyberphoto.se/dk_mini.jpg\"></td>\n";
+								echo "\t\t<td align=\"center\"><img border=\"\" src=\"/dk_mini.jpg\"></td>\n";
 							} elseif ($row->c_country_id == 269) {
-								echo "\t\t<td align=\"center\"><img border=\"\" src=\"https://admin.cyberphoto.se/no_mini.jpg\"></td>\n";
+								echo "\t\t<td align=\"center\"><img border=\"\" src=\"/no_mini.jpg\"></td>\n";
 							} else {
-								echo "\t\t<td align=\"center\"><img border=\"\" src=\"https://admin.cyberphoto.se/sv_mini.jpg\"></td>\n";
+								echo "\t\t<td align=\"center\"><img border=\"\" src=\"/sv_mini.jpg\"></td>\n";
 							}
 							if ($row->order_url != "") {
 								// echo utf8_encode("\t\t<td align=\"center\"><a target=\"_blank\" href=\"https://www.cyberphoto." . $land . "/kundvagn/min-ordrestatus?orderref=" . $row->order_url . "&order_check=" . $row->documentno . "\">Kundlänk</a></td>\n");

@@ -13,7 +13,7 @@
 <html>
 
 <head>
-<link rel="shortcut icon" href="https://admin.cyberphoto.se/admin.ico">
+<link rel="shortcut icon" href="/admin.ico">
 <link rel="stylesheet" type="text/css" href="/css/pricelist.css" />
 <link rel="stylesheet" type="text/css" href="/css/suplier.css" />
 <meta http-equiv="Content-Language" content="sv">

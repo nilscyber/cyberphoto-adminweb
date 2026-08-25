@@ -226,7 +226,7 @@ include_once("header.php");
                 }
 
                 // Länk till drawer_details
-                $drawerUrl = 'https://admin.cyberphoto.se/search_dispatch.php?mode=product&q='
+                $drawerUrl = '/search_dispatch.php?mode=product&q='
                            . rawurlencode($r['article'])
                            . '&open=product&id=' . $pid;
 

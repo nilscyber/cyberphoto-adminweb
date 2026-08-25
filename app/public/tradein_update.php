@@ -54,7 +54,7 @@ if ($subm) {
 
 <head>
 <title>Uppdatera TradeIn value</title>
-<link rel="icon" type="image/png" href="https://admin.cyberphoto.se/favicon.png">
+<link rel="icon" type="image/png" href="/favicon.png">
 <link rel="stylesheet" type="text/css" href="/css/tradein.css?v=g<?php echo date("ynjGi"); ?>" />
 </head>
 

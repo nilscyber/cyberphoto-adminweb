@@ -285,11 +285,11 @@ if ($view === 'lines') {
             // TB = orderpris - (limitpris * qty)
             $tbLine = $orderpris - ($limitPris * $qty);
 
-            $prodUrl  = 'https://admin.cyberphoto.se/search_dispatch.php?mode=product&q='
+            $prodUrl  = '/search_dispatch.php?mode=product&q='
                         . rawurlencode($artnr)
                         . '&open=product&id=' . $pid;
 
-            $orderUrl = 'https://admin.cyberphoto.se/search_dispatch.php?mode=order&page=1&q='
+            $orderUrl = '/search_dispatch.php?mode=order&page=1&q='
                         . rawurlencode($ordno);
 
             echo '<tr>';
@@ -370,7 +370,7 @@ if ($view === 'lines') {
             $tb  = (float)$r['marginamt'];
             $tg  = (float)$r['margin'];
 
-            $orderUrl = 'https://admin.cyberphoto.se/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($ordno);
+            $orderUrl = '/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($ordno);
 
             $ext = trim((string)$r['external_reference']);
             $extUrl = ($ext !== '') ? ('https://www.cyberphoto.se/orderstatus?order=' . rawurlencode($ext)) : '';

@@ -1450,7 +1450,7 @@ Class CTradeIn {
 						echo "\t\t<td width=\"80\" class=\"mark_black\">$row->artnr</td>\n";
 						if ($sok) {
 							// echo "\t\t<td class=\"mark_black\"><a target=\"_blank\" href=\"https://cyberphoto.se/sok?q=$trimmaproduktenSearch\">NYA</a></td>\n";
-							echo "\t\t<td width=\"60\" class=\"mark_black\"><a href=\"javascript:winPopupCenter(900, 800, 'https://admin.cyberphoto.se/product_update.php?artnr=$row->artnr&m_product_id=$row->m_product_id');\">L�GG UT</a></td>\n";
+							echo "\t\t<td width=\"60\" class=\"mark_black\"><a href=\"javascript:winPopupCenter(900, 800, '/product_update.php?artnr=$row->artnr&m_product_id=$row->m_product_id');\">L�GG UT</a></td>\n";
 							echo "\t\t<td width=\"60\" class=\"mark_black\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/search?q=$trimmaproduktenSearch\">GAMLA</a></td>\n";
 						}
 						echo "\t\t<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row->artnr\">$trimmaprodukten</a></td>\n";
@@ -2133,7 +2133,7 @@ Class CTradeIn {
 				$wwwDot   = ($row->isselfservice == 'Y')
 					? '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a"></span>'
 					: '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#dc2626"></span>';
-				$editLink = '<a href="javascript:winPopupCenter(900,800,\'https://admin.cyberphoto.se/product_update.php?artnr=' . $row->artnr . '&m_product_id=' . $row->m_product_id . '\');" class="edit-btn" title="Redigera">'
+				$editLink = '<a href="javascript:winPopupCenter(900,800,\'/product_update.php?artnr=' . $row->artnr . '&m_product_id=' . $row->m_product_id . '\');" class="edit-btn" title="Redigera">'
 					. '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
 					. '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>'
 					. '</a>';

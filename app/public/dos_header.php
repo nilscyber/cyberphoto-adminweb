@@ -3,18 +3,18 @@
 	echo "<html>\n\n";
 	echo "<head>\n";
 	if (preg_match("/dos_product\.php/i", $_SERVER['PHP_SELF'])) {
-		echo "<link rel=\"icon\" type=\"image/png\" href=\"https://admin.cyberphoto.se/dos_favicon_p.png\">\n";
+		echo "<link rel=\"icon\" type=\"image/png\" href=\"/dos_favicon_p.png\">\n";
 	} elseif (preg_match("/dos_order\.php/i", $_SERVER['PHP_SELF'])) {
-		echo "<link rel=\"icon\" type=\"image/png\" href=\"https://admin.cyberphoto.se/dos_favicon_o.png\">\n";
+		echo "<link rel=\"icon\" type=\"image/png\" href=\"/dos_favicon_o.png\">\n";
 	} elseif (preg_match("/dos_customer\.php/i", $_SERVER['PHP_SELF'])) {
-		echo "<link rel=\"icon\" type=\"image/png\" href=\"https://admin.cyberphoto.se/dos_favicon_k.png\">\n";
+		echo "<link rel=\"icon\" type=\"image/png\" href=\"/dos_favicon_k.png\">\n";
 	} else {
-		echo "<link rel=\"icon\" type=\"image/png\" href=\"https://admin.cyberphoto.se/dos_favicon.png\">\n";
+		echo "<link rel=\"icon\" type=\"image/png\" href=\"/dos_favicon.png\">\n";
 	}
 	echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n";
 	$admin->displayPageTitle();
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/dos.css?ver=ad" . date("ynjGi") . "\">\n";
-	echo "<script type=\"text/javascript\" src=\"https://admin.cyberphoto.se/javascript/winpop.js\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"/javascript/winpop.js\"></script>\n";
 	echo "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js\"></script>\n";
 	echo "<script src=\"//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n";
 	echo "<script src=\"//cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js\"></script>\n";
@@ -23,47 +23,47 @@
 <script type="text/javascript">
 <?php if (preg_match("/dos_product\.php/i", $_SERVER['PHP_SELF'])) { ?>
     function pageRedirect() {
-        window.location.replace("https://admin.cyberphoto.se/p");
+        window.location.replace("/p");
     }
 <?php } elseif (preg_match("/dos_order\.php/i", $_SERVER['PHP_SELF'])) { ?>
     function pageRedirect() {
-        window.location.replace("https://admin.cyberphoto.se/o");
+        window.location.replace("/o");
     }
 <?php } else { ?>
     function pageRedirect() {
-        window.location.replace("https://admin.cyberphoto.se/k");
+        window.location.replace("/k");
     }
 <?php } ?>
     function pageRedirectActual() {
-        window.location.replace("https://admin.cyberphoto.se/p?q=<?php echo $beskrivning; ?>&sortera=tillverkare");
+        window.location.replace("/p?q=<?php echo $beskrivning; ?>&sortera=tillverkare");
     }
     function pageRedirectTradeIn() {
-        window.location.replace("https://admin.cyberphoto.se/p?q=<?php echo $beskrivning; ?>&sortera=old_tradein");
+        window.location.replace("/p?q=<?php echo $beskrivning; ?>&sortera=old_tradein");
     }
     function pageRedirectDiscontinued() {
-        window.location.replace("https://admin.cyberphoto.se/p?q=<?php echo $beskrivning; ?>&sortera=discontinued");
+        window.location.replace("/p?q=<?php echo $beskrivning; ?>&sortera=discontinued");
     }
 <?php if (preg_match("/dos_product\.php/i", $_SERVER['PHP_SELF'])) { ?>
     function pageRedirectNewSearch() {
-        window.location.replace("https://admin.cyberphoto.se/p?s=yes");
+        window.location.replace("/p?s=yes");
     }
 <?php } elseif (preg_match("/dos_order\.php/i", $_SERVER['PHP_SELF'])) { ?>
     function pageRedirectNewSearch() {
-        window.location.replace("https://admin.cyberphoto.se/o?s=yes");
+        window.location.replace("/o?s=yes");
     }
 <?php } else { ?>
     function pageRedirectNewSearch() {
-        window.location.replace("https://admin.cyberphoto.se/k?s=yes");
+        window.location.replace("/k?s=yes");
     }
 <?php } ?>
     function pageRedirectCustomer() {
-        window.location.replace("https://admin.cyberphoto.se/k?s=yes");
+        window.location.replace("/k?s=yes");
     }
     function pageRedirectProduct() {
-        window.location.replace("https://admin.cyberphoto.se/p?s=yes");
+        window.location.replace("/p?s=yes");
     }
     function pageRedirectOrder() {
-        window.location.replace("https://admin.cyberphoto.se/o?s=yes");
+        window.location.replace("/o?s=yes");
     }
 </script>
 
@@ -94,15 +94,15 @@ function search() {
 	 
 	<?php if (preg_match("/dos_product\.php/i", $_SERVER['PHP_SELF'])) { ?>
 			function my_function(){
-				window.location.replace("https://admin.cyberphoto.se/p");
+				window.location.replace("/p");
 			}
 	<?php } elseif (preg_match("/dos_product\.php/i", $_SERVER['PHP_SELF'])) { ?>
 			function my_function(){
-				window.location.replace("https://admin.cyberphoto.se/o");
+				window.location.replace("/o");
 			}
 	<?php } else { ?>
 			function my_function(){
-				window.location.replace("https://admin.cyberphoto.se/k");
+				window.location.replace("/k");
 			}
 	<?php } ?>
 	</script>

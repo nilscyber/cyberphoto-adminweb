@@ -6,7 +6,7 @@ $order = isset($_GET['order']) ? $_GET['order'] : '';
 <html>
 
 <head>
-<link rel="shortcut icon" href="https://admin.cyberphoto.se/admin.ico">
+<link rel="shortcut icon" href="/admin.ico">
 <link rel="stylesheet" type="text/css" href="/css/order_info.css" />
 <title>CyberPhoto - Uppgifter om säljorder <?php echo $order; ?></title>
 <STYLE>

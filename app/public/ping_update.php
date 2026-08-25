@@ -41,7 +41,7 @@ if ($subm) {
 
 <head>
 <title>Uppdatera KÖ nummer</title>
-<link rel="icon" type="image/png" href="https://admin.cyberphoto.se/ping_incomming.png">
+<link rel="icon" type="image/png" href="/ping_incomming.png">
 <style>
 .align_center { text-align: center }
 .align_right { text-align: right }

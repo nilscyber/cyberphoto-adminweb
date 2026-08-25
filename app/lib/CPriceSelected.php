@@ -186,10 +186,10 @@ Class CPriceSelected {
 			
 			if ($aterstar < 7) {
 				// echo "Prislistan upphör att visas om <font color=\"#CC0000\"><b>$aterstar</b></font> dagar.&nbsp;<a target=\"_blank\" href=\"/order/admin/pricelist.php?show=$ID\">&nbsp;Ändra</a>";
-				echo "Prislistan upphör att visas om <font color=\"#CC0000\"><b>$aterstar</b></font> dagar.&nbsp;<a target=\"_blank\" href=\"https://admin.cyberphoto.se/pricelist.php?show=$ID\">&nbsp;Ändra</a>";
+				echo "Prislistan upphör att visas om <font color=\"#CC0000\"><b>$aterstar</b></font> dagar.&nbsp;<a target=\"_blank\" href=\"/pricelist.php?show=$ID\">&nbsp;Ändra</a>";
 			} else {
 				// echo "Prislistan upphör att visas om <b>$aterstar</b> dagar.&nbsp;<a target=\"_blank\" href=\"/order/admin/pricelist.php?show=$ID\">&nbsp;Ändra</a>";
-				echo "Prislistan upphör att visas om <b>$aterstar</b> dagar.&nbsp;<a target=\"_blank\" href=\"https://admin.cyberphoto.se/pricelist.php?show=$ID\">&nbsp;Ändra</a>";
+				echo "Prislistan upphör att visas om <b>$aterstar</b> dagar.&nbsp;<a target=\"_blank\" href=\"/pricelist.php?show=$ID\">&nbsp;Ändra</a>";
 			}
 
 			}

@@ -5,7 +5,7 @@ $customer = new CBusinessPartner();
 <html>
 
 <head>
-<link rel="shortcut icon" href="https://admin.cyberphoto.se/admin.ico">
+<link rel="shortcut icon" href="/admin.ico">
 <title>Affärspartner <?php echo $knr; ?></title>
 <STYLE>
 body {

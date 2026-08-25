@@ -75,7 +75,7 @@ public function redirectLegacyInfoToAdmin()
 		);
 	}
 
-    $baseUrl  = 'https://admin.cyberphoto.se/search_dispatch.php';
+    $baseUrl  = '/search_dispatch.php';
     $location = $baseUrl . '?' . http_build_query($params, '', '&');
 
     header('Location: ' . $location);
@@ -1571,7 +1571,7 @@ public static function renderCustomerDetailsAD($bp_id){
 
         $leverantorHtml = $h($supName);
         if ($supCode !== '') {
-            $supLink = 'https://admin.cyberphoto.se/supplier.php?supID='.rawurlencode($supCode);
+            $supLink = '/supplier.php?supID='.rawurlencode($supCode);
             $leverantorHtml =
                 '<a href="'.$supLink.'" target="_blank">'.$h($supName).'</a> '
               . '<span class="copy-chip" data-copy="'.$supCode.'" title="Kopiera leverant&ouml;rens kundnummer">('
@@ -2396,7 +2396,7 @@ public static function renderOrderDetailsAD($orderNo)
 
 			$links = array();
 			if ($canMonitor) {
-				$monUrl = 'https://admin.cyberphoto.se/monitor_articles.php'
+				$monUrl = '/monitor_articles.php'
 						. '?add=yes'
 						. '&addArtnr=' . rawurlencode($article)
 						. '&addType=3'
@@ -2408,7 +2408,7 @@ public static function renderOrderDetailsAD($orderNo)
 				  . 'Bevaka</a>';
 			}
 			if ($canFeedback) {
-				$fbUrl = 'https://admin.cyberphoto.se/product_feedback.php'
+				$fbUrl = '/product_feedback.php'
 					   . '?popup=1'
 					   . '&artnr=' . rawurlencode($article)
 					   . '&ordernr=' . rawurlencode($order['documentno']);

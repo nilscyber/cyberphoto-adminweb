@@ -162,7 +162,7 @@ include_once("header.php");
                 elseif ($ageDays > 90)   { $ageClass = 'age-warn'; }
                 else                     { $ageClass = 'age-new'; }
 
-                $drawerUrl = 'https://admin.cyberphoto.se/search_dispatch.php?mode=product&q='
+                $drawerUrl = '/search_dispatch.php?mode=product&q='
                            . rawurlencode($r['article'])
                            . '&open=product&id=' . $pid;
 

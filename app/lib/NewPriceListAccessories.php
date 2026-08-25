@@ -18,41 +18,41 @@
 			echo "<p class=\"bold italic bottom5\">Följande alias finns kopplade till produkten:</span></p>\n";
 			// echo "<a target=\"_blank\" href=\"/order/admin/accessories.php?alias=yes&change=" . $passartill1 . "\">" . $passartill1 . "</a><br>";
 			// echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $passartill1 . "');\">" . $passartill1 . "</a><br>";
-			echo "<a  href=\"javascript:winPopupCenter(850, 1400, 'https://admin.cyberphoto.se/accessories_popup.php?alias=yes&change=" . $passartill1 . "');\">" . $passartill1 . "</a><br>";
+			echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/accessories_popup.php?alias=yes&change=" . $passartill1 . "');\">" . $passartill1 . "</a><br>";
 			if (strlen(passartill2) > 1) {
 				// echo "<a target=\"_blank\" href=\"/order/admin/accessories.php?alias=yes&change=" . $passartill2 . "\">" . $passartill2 . "</a><br>";
 				// echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $passartill2 . "');\">" . $passartill2 . "</a><br>";
-				echo "<a  href=\"javascript:winPopupCenter(850, 1400, 'https://admin.cyberphoto.se/accessories_popup.php?alias=yes&change=" . $passartill2 . "');\">" . $passartill2 . "</a><br>";
+				echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/accessories_popup.php?alias=yes&change=" . $passartill2 . "');\">" . $passartill2 . "</a><br>";
 			}
 			if (strlen($passartill3) > 1) {
 				// echo "<a target=\"_blank\" href=\"/order/admin/accessories.php?alias=yes&change=" . $passartill3 . "\">" . $passartill3 . "</a><br>";
 				// echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $passartill3 . "');\">" . $passartill3 . "</a><br>";
-				echo "<a  href=\"javascript:winPopupCenter(850, 1400, 'https://admin.cyberphoto.se/accessories_popup.php?alias=yes&change=" . $passartill3 . "');\">" . $passartill3 . "</a><br>";
+				echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/accessories_popup.php?alias=yes&change=" . $passartill3 . "');\">" . $passartill3 . "</a><br>";
 			}
 			if (strlen($passartill4) > 1) {
 				// echo "<a target=\"_blank\" href=\"/order/admin/accessories.php?alias=yes&change=" . $passartill4 . "\">" . $passartill4 . "</a><br>";
 				// echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $passartill4 . "');\">" . $passartill4 . "</a><br>";
-				echo "<a  href=\"javascript:winPopupCenter(850, 1400, 'https://admin.cyberphoto.se/accessories_popup.php?alias=yes&change=" . $passartill4 . "');\">" . $passartill4 . "</a><br>";
+				echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/accessories_popup.php?alias=yes&change=" . $passartill4 . "');\">" . $passartill4 . "</a><br>";
 			}
 			if (strlen($passartill5) > 1) {
 				// echo "<a target=\"_blank\" href=\"/order/admin/accessories.php?alias=yes&change=" . $passartill5 . "\">" . $passartill5 . "</a><br>";
 				// echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $passartill5 . "');\">" . $passartill5 . "</a><br>";
-				echo "<a  href=\"javascript:winPopupCenter(850, 1400, 'https://admin.cyberphoto.se/accessories_popup.php?alias=yes&change=" . $passartill5 . "');\">" . $passartill5 . "</a><br>";
+				echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/accessories_popup.php?alias=yes&change=" . $passartill5 . "');\">" . $passartill5 . "</a><br>";
 			}
 			if (strlen($passartill6) > 1) {
 				// echo "<a target=\"_blank\" href=\"/order/admin/accessories.php?alias=yes&change=" . $passartill6 . "\">" . $passartill6 . "</a><br>";
 				// echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $passartill6 . "');\">" . $passartill6 . "</a><br>";
-				echo "<a  href=\"javascript:winPopupCenter(850, 1400, 'https://admin.cyberphoto.se/accessories_popup.php?alias=yes&change=" . $passartill6 . "');\">" . $passartill6 . "</a><br>";
+				echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/accessories_popup.php?alias=yes&change=" . $passartill6 . "');\">" . $passartill6 . "</a><br>";
 			}
 			if (strlen($passartill7) > 1) {
 				// echo "<a target=\"_blank\" href=\"/order/admin/accessories.php?alias=yes&change=" . $passartill7 . "\">" . $passartill7 . "</a><br>";
 				// echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $passartill7 . "');\">" . $passartill7 . "</a><br>";
-				echo "<a  href=\"javascript:winPopupCenter(850, 1400, 'https://admin.cyberphoto.se/accessories_popup.php?alias=yes&change=" . $passartill7 . "');\">" . $passartill7 . "</a><br>";
+				echo "<a  href=\"javascript:winPopupCenter(850, 1400, '/accessories_popup.php?alias=yes&change=" . $passartill7 . "');\">" . $passartill7 . "</a><br>";
 			}
 			echo "</div>\n";
 			// echo "<div class=\"left5 top5\"><img border=\"0\" src=\"/pic/help.gif\">&nbsp;<a target=\"_blank\" href=\"/order/admin/accessories.php?alias=yes&change=" . $artnr . "&addart=yes\">Lägg till/ta bort tillbehör till denna produkt</a></div>\n";
 			// echo "<div class=\"left5 top5\"><img border=\"0\" src=\"/pic/help.gif\">&nbsp;<a href=\"javascript:winPopupCenter(850, 1400, '/order/admin/accessories_popup.php?alias=yes&change=" . $artnr . "&addart=yes');\">Lägg till/ta bort tillbehör till denna produkt</a></div>\n";
-			echo "<div class=\"left5 top5\"><img border=\"0\" src=\"/pic/help.gif\">&nbsp;<a href=\"javascript:winPopupCenter(850, 1400, 'https://admin.cyberphoto.se/accessories_popup.php?alias=yes&change=" . $artnr . "&addart=yes');\">Lägg till/ta bort tillbehör till denna produkt</a></div>\n";
+			echo "<div class=\"left5 top5\"><img border=\"0\" src=\"/pic/help.gif\">&nbsp;<a href=\"javascript:winPopupCenter(850, 1400, '/accessories_popup.php?alias=yes&change=" . $artnr . "&addart=yes');\">Lägg till/ta bort tillbehör till denna produkt</a></div>\n";
 		}
 	}
 	echo "<div id=\"price_container\">\n";

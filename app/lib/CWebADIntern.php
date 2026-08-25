@@ -86,7 +86,7 @@ Class CWebADIntern {
 
 			if ($row->queue < 0) {
 				// $showqueue = 0 - $row->queue;
-				echo "<a href=\"javascript:winPopupCenter(600, 1000, 'https://admin.cyberphoto.se/waitinglist.php?artnr=$artnr');\" style=\"text-decoration: none;  color: #009933;\">" . abs($row->queue) . "&nbsp;st</a>";
+				echo "<a href=\"javascript:winPopupCenter(600, 1000, '/waitinglist.php?artnr=$artnr');\" style=\"text-decoration: none;  color: #009933;\">" . abs($row->queue) . "&nbsp;st</a>";
 			} else {
 				echo "--";
 			}
@@ -135,16 +135,16 @@ Class CWebADIntern {
 			}
 			if ($row->available > 0 && $row->allocated > 0) {
 				if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-					echo "&nbsp;<a href=\"javascript:winPopupCenter(600, 1000, 'https://admin.cyberphoto.se/waitinglist.php?artnr=$artnr');\">(" . round($row->allocated,0) . "&nbsp;st)</a>";
+					echo "&nbsp;<a href=\"javascript:winPopupCenter(600, 1000, '/waitinglist.php?artnr=$artnr');\">(" . round($row->allocated,0) . "&nbsp;st)</a>";
 				} else {
-					echo "&nbsp;<a href=\"javascript:winPopupCenter(600, 1000, 'https://admin.cyberphoto.se/waitinglist.php?artnr=$artnr');\">(" . round($row->allocated,0) . "&nbsp;st)</a>";
+					echo "&nbsp;<a href=\"javascript:winPopupCenter(600, 1000, '/waitinglist.php?artnr=$artnr');\">(" . round($row->allocated,0) . "&nbsp;st)</a>";
 					// echo "&nbsp;(" . $row->allocated . "&nbsp;st)";
 				}
 			} else {
 				echo "&nbsp;";
 			}
 			if ($row->available < 1) {
-				echo "&nbsp;<a href=\"javascript:winPopupCenter(600, 1000, 'https://admin.cyberphoto.se/waitinglist.php?artnr=$artnr');\">(" . round($row->onhand,0) . "&nbsp;st)</a>";
+				echo "&nbsp;<a href=\"javascript:winPopupCenter(600, 1000, '/waitinglist.php?artnr=$artnr');\">(" . round($row->onhand,0) . "&nbsp;st)</a>";
 				// echo "&nbsp;(" . $row->onhand . "&nbsp;st)";
 			} else {
 				echo "&nbsp;";
@@ -732,7 +732,7 @@ JS;
 				
 				echo "\t\t<td>";
 				// echo "<a href=\"javascript:winPopupCenter(900, 800, '/order/product_update.php?edit=yes&artnr=$row->artnr&m_product_id=$row->m_product_id&ID=$row->m_product_update_id');\">";
-				echo "<a href=\"javascript:winPopupCenter(900, 800, 'https://admin.cyberphoto.se/product_update.php?edit=yes&artnr=$row->artnr&m_product_id=$row->m_product_id&ID=$row->m_product_update_id');\">";
+				echo "<a href=\"javascript:winPopupCenter(900, 800, '/product_update.php?edit=yes&artnr=$row->artnr&m_product_id=$row->m_product_id&ID=$row->m_product_update_id');\">";
 				
 				if ($row->m_pricelist_id == 1000018) {
 					// echo "<img border=\"0\" src=\"/order/admin/fi_mini.jpg\">";
@@ -742,7 +742,7 @@ JS;
 					echo "<img border=\"0\" src=\"no_mini.jpg\">";
 				} else {
 					// echo "<img border=\"0\" src=\"/order/admin/sv_mini.jpg\">";
-					echo "<img border=\"0\" src=\"https://admin.cyberphoto.se/sv_mini.jpg\">";
+					echo "<img border=\"0\" src=\"/sv_mini.jpg\">";
 				}
 				echo "</a></td>\n";
 				// echo "\t\t<td>" . $row->m_pricelist_id . "</td>\n";

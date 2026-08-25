@@ -92,7 +92,7 @@ $h_latin1 = function ($s) {
         $catLabel = $h_latin1($currentCat);
 
         if ($catValue !== '') {
-          $catUrl = 'https://admin.cyberphoto.se/lagerstatus.php?katID=' . urlencode($catValue);
+          $catUrl = '/lagerstatus.php?katID=' . urlencode($catValue);
           echo '<tr class="group-row"><td colspan="4">'
              . '<a class="cat-link" href="' . htmlspecialchars($catUrl, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">'
              . '<strong>' . $catLabel . '</strong>'

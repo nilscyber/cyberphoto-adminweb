@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<link rel="shortcut icon" href="https://admin.cyberphoto.se/ms-icon-144x144.png">
+<link rel="shortcut icon" href="/ms-icon-144x144.png">
 <title>Temperaturlogg</title>
 <STYLE>
 /* Useful */

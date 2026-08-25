@@ -36,8 +36,8 @@ if ($subm) {
 
 <head>
 <title>Inkommande Inbyte</title>
-<link rel="icon" type="image/png" href="https://admin.cyberphoto.se/ping_incomming.png">
-<script type="text/javascript" src="https://admin.cyberphoto.se/javascript/winpop.js"></script>
+<link rel="icon" type="image/png" href="/ping_incomming.png">
+<script type="text/javascript" src="/javascript/winpop.js"></script>
 <script type="text/javascript" src="/javascript/jquery/jquery.js"></script>
 <style>
 .kosystem_container {

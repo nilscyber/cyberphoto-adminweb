@@ -1142,7 +1142,7 @@ public function getReportForArticle($artnr)
             $ordCell = "";
         } else {
             $ord_h = (int)$ord;
-            $url   = 'https://admin.cyberphoto.se/search_dispatch.php'
+            $url   = '/search_dispatch.php'
                    . '?mode=order&page=1&q=' . urlencode($ord_h);
             $ordCell = '<a href="' . $url . '" target="_blank">' . $ord_h . '</a>';
         }

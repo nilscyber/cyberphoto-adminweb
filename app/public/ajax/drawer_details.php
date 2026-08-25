@@ -960,8 +960,8 @@ if ($type === 'customer') {
 
 	$artWait  = $h($row['article']);
 	$artValue = isset($row['article']) ? $row['article'] : '';
-	$waitUrl  = 'https://admin.cyberphoto.se/waitinglist.php?artnr='.$artWait;
-	$purchUrl = 'https://admin.cyberphoto.se/purchaselist.php?artnr='.$artWait;
+	$waitUrl  = '/waitinglist.php?artnr='.$artWait;
+	$purchUrl = '/purchaselist.php?artnr='.$artWait;
 
 	// === Kö-rader (inline i drawern) ===
 	$queueRows = array();
@@ -1338,7 +1338,7 @@ if ($type === 'customer') {
         pg_free_result($rsR);
     }
     $artParam = rawurlencode($row['article']);
-    $rmaUrl   = 'https://admin.cyberphoto.se/rma_summary.php?article='.$artParam;
+    $rmaUrl   = '/rma_summary.php?article='.$artParam;
 
     if ($rmaQty > 0) {
         echo '<div class="dw-card">';
@@ -1352,11 +1352,11 @@ if ($type === 'customer') {
     // ===== Snabbknappar =====
     $art     = $h($row['article']);
     $pidOut  = (int)$row['m_product_id'];
-    $suppUrl = 'https://admin.cyberphoto.se/suplier.php?artnr='.$art;
+    $suppUrl = '/suplier.php?artnr='.$art;
     $soldUrl = '/sold_article.php?product_id='.$pidOut;
-    $moniUrl = 'https://admin.cyberphoto.se/monitor_articles.php?add=yes&addArtnr='.$art;
-    $feedUrl = 'https://admin.cyberphoto.se/product_feedback.php?popup=1&artnr='.$art.'&ordernr=';
-    $editUrl = 'https://admin.cyberphoto.se/product_update.php?artnr='.$art.'&m_product_id='.$pidOut;
+    $moniUrl = '/monitor_articles.php?add=yes&addArtnr='.$art;
+    $feedUrl = '/product_feedback.php?popup=1&artnr='.$art.'&ordernr=';
+    $editUrl = '/product_update.php?artnr='.$art.'&m_product_id='.$pidOut;
 
 	$isBundle = $isBundleForStats;
 	if ($isBundle) {
@@ -1419,7 +1419,7 @@ if ($type === 'customer') {
             echo '<div class="kv-key">Leverantör:</div><div class="kv-val">';
             if ($sName !== '') {
                 if ($sCode !== '') {
-                    $supLink = 'https://admin.cyberphoto.se/supplier.php?supID='.rawurlencode($sCode);
+                    $supLink = '/supplier.php?supID='.rawurlencode($sCode);
                     echo '<a href="'.$supLink.'" target="_blank" rel="noopener">'.$sName.'</a> ';
                     echo '<span class="copy-chip" data-copy="'.$h($sCode).'" title="Kopiera kundnummer">('.$h($sCode).')</span>';
                 } else {
@@ -1509,7 +1509,7 @@ if ($type === 'customer') {
           echo '<div class="dw-pill dw-pill-none">Inga rapporter</div>';
       }
 
-	$feedDetailsUrl = 'https://admin.cyberphoto.se/product_feedback.php?artnr='.$art.'&details=1';
+	$feedDetailsUrl = '/product_feedback.php?artnr='.$art.'&details=1';
 	echo ' <a href="'.$feedDetailsUrl.'" class="dw-btn" target="_blank">Öppna rapporter</a>';
     echo '</div>';
 	

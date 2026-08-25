@@ -386,7 +386,7 @@
 			}
 			if ($olright) {
 				$tradein->doWishlistAdd($addProduct,$addNote,$addLinc,$addBy);
-				header("Location: https://admin.cyberphoto.se/inbyte_wishlist.php");
+				header("Location: /inbyte_wishlist.php");
 				exit;
 			}
 
@@ -410,7 +410,7 @@
 			}
 			if ($olright) {
 				$tradein->doWishlistChange($addID,$addActive,$addProduct,$addNote,$addLinc);
-				header("Location: https://admin.cyberphoto.se/inbyte_wishlist.php");
+				header("Location: /inbyte_wishlist.php");
 				exit;
 			}
 		}
@@ -481,7 +481,7 @@
 					$monitor->doMonitorAdd_v3($addArtnr,$addRecipient,$addMoreLess,$addStoreValue,$addComment,$addType);
 				}
 				if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-					header("Location: https://admin.cyberphoto.se/monitor_articles.php");
+					header("Location: /monitor_articles.php");
 				} else {
 					header("Location: https://www.cyberphoto.se/order/admin/monitor_articles.php");
 				}
@@ -542,7 +542,7 @@
 					$monitor->doMonitorChange_v3($addID,$addArtnr,$addRecipient,$addMoreLess,$addStoreValue,$addActive,$addComment,$addType);
 				}
 				if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-					header("Location: https://admin.cyberphoto.se/monitor_articles.php");
+					header("Location: /monitor_articles.php");
 				} else {
 					header("Location: https://www.cyberphoto.se/order/admin/monitor_articles.php");
 				}
@@ -555,7 +555,7 @@
 		if ($accept > 0) {
 			$blogg->AcceptComment($accept);
 			if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-				header("Location: https://admin.cyberphoto.se/blogg.php");
+				header("Location: /blogg.php");
 			} else {
 				header("Location: https://www.cyberphoto.se/order/admin/blogg.php");
 			}
@@ -564,7 +564,7 @@
 		if ($deny > 0) {
 			$blogg->DenyComment($deny);
 			if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-				header("Location: https://admin.cyberphoto.se/blogg.php");
+				header("Location: /blogg.php");
 			} else {
 				header("Location: https://www.cyberphoto.se/order/admin/blogg.php");
 			}
@@ -576,7 +576,7 @@
 		if ($delete > 0) {
 			$blogg->deleteBlogg($delete);
 			if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-				header("Location: https://admin.cyberphoto.se/kommande_bloggar.php");
+				header("Location: /kommande_bloggar.php");
 			} else {
 				header("Location: https://www.cyberphoto.se/order/admin/kommande_bloggar.php");
 			}
@@ -617,7 +617,7 @@
 			if ($olright) {
 				$blacklist->doBlacklistAdd($addIP,$addRecipient,$addComment);
 				if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-					header("Location: https://admin.cyberphoto.se/blacklist.php");
+					header("Location: /blacklist.php");
 				} else {
 					header("Location: https://www.cyberphoto.se/order/admin/blacklist.php");
 				}
@@ -649,7 +649,7 @@
 			if ($olright) {
 				$blacklist->doBlacklistChange($addID,$addIP,$addRecipient,$addActive,$addComment);
 				if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-					header("Location: https://admin.cyberphoto.se/blacklist.php");
+					header("Location: /blacklist.php");
 				} else {
 					header("Location: https://www.cyberphoto.se/order/admin/blacklist.php");
 				}
@@ -2180,7 +2180,7 @@
 			if ($olright) {
 				$cms->doCmsChange($headline,$department,$area,$addBy,$addactive,$addid,$area_backup);
 				if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-					header("Location: https://admin.cyberphoto.se/cms.php");
+					header("Location: /cms.php");
 				} else {
 					header("Location: https://www.cyberphoto.se/order/admin/cms.php");
 				}
@@ -2475,7 +2475,7 @@
 			header("Location: https://www.cyberphoto.no/order/admin/set_weekend.php");
 		} else {
 			if ($_SERVER['HTTP_HOST'] == "admin.cyberphoto.se") {
-				header("Location: https://admin.cyberphoto.se/set_weekend.php");
+				header("Location: /set_weekend.php");
 			} else {
 				header("Location: https://www.cyberphoto.se/order/admin/set_weekend.php");
 			}
@@ -2517,7 +2517,7 @@
 			}
 			if ($olright) {
 				$tradein->doIncommingChange($addID,$addActive,$addNumber,$addBy,$addNumberBuy);
-				header("Location: https://admin.cyberphoto.se/inbyte_incomming.php");
+				header("Location: /inbyte_incomming.php");
 				exit;
 			}
 		}

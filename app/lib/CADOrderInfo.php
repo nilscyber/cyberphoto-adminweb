@@ -205,7 +205,7 @@ Class CADOrderInfo {
 						if ($row[4] < $row[2] && ($row[5] < $row[2])
 							&& ($row[0] != "rab" && $row[0] != "invoicefee" && $row[0] != "friforsakring" && $row[0] != "" && substr($row[0], 0, 5) != "frakt")
 							) {
-							echo "\t\t<td><a target=\"_blank\" style=\"text-decoration: none;\" href=\"https://admin.cyberphoto.se/monitor_articles.php?add=yes&addArtnr=$row[0]&addType=3&addStoreValue=$order\">Bevaka</a></td>\n";
+							echo "\t\t<td><a target=\"_blank\" style=\"text-decoration: none;\" href=\"/monitor_articles.php?add=yes&addArtnr=$row[0]&addType=3&addStoreValue=$order\">Bevaka</a></td>\n";
 						} else {
 							echo "\t\t<td>&nbsp;</td>\n";
 						}
@@ -218,7 +218,7 @@ Class CADOrderInfo {
 						if (($row[5] < $row[2])
 							&& ($row[0] != "rab" && $row[0] != "invoicefee" && $row[0] != "friforsakring" && $row[0] != "" && substr($row[0], 0, 5) != "frakt")
 							) {
-							echo "\t\t<td><a href=\"#\" onclick=\"window.open('https://admin.cyberphoto.se/product_feedback.php?popup=1&artnr=$row[0]&ordernr=$ordernr', 'feedbackPopup', 'width=750,height=600'); return false;\">Rapportera</a></td>\n";
+							echo "\t\t<td><a href=\"#\" onclick=\"window.open('/product_feedback.php?popup=1&artnr=$row[0]&ordernr=$ordernr', 'feedbackPopup', 'width=750,height=600'); return false;\">Rapportera</a></td>\n";
 						} else {
 							echo "\t\t<td>&nbsp;</td>\n";
 						}

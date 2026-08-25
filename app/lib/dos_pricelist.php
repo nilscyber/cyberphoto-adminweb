@@ -200,7 +200,7 @@
 		echo "\t<tr>";
 		echo "\t\t<td width=\"140\" class=\"\">" . $article->artnr . "</a></td>\n";
 		if ($article->ej_med == -1) {
-			echo "\t\t<td width=\"11\" class=\"\"><img border=\"\" src=\"https://admin.cyberphoto.se/bunny.gif\"></a></td>\n";
+			echo "\t\t<td width=\"11\" class=\"\"><img border=\"\" src=\"/bunny.gif\"></a></td>\n";
 		} else {
 			echo "\t\t<td width=\"11\" class=\"\">&nbsp;</a></td>\n";
 		}
@@ -323,11 +323,11 @@
 			echo "<div id=\"internal_panel_pricelist\">\n";
 			echo "<div class=\"box_artnr\"><div>" . $article->artnr . "</div></div>";
 			// echo "<div class=\"box_update_product\"><a href=\"javascript:winPopupCenter(900, 800, '/order/product_update.php?artnr=$article->artnr&m_product_id=$article->m_product_id');\">Uppdatera</a></div>";
-			echo "<div class=\"box_update_product\"><a href=\"javascript:winPopupCenter(900, 800, 'https://admin.cyberphoto.se/product_update.php?artnr=$article->artnr&m_product_id=$article->m_product_id');\">Uppdatera</a></div>";
+			echo "<div class=\"box_update_product\"><a href=\"javascript:winPopupCenter(900, 800, '/product_update.php?artnr=$article->artnr&m_product_id=$article->m_product_id');\">Uppdatera</a></div>";
 			if ($_COOKIE['login_mail'] == 'sjabo@cyberphoto.nu' || $_COOKIE['login_mail'] == 'borje@cyberphoto.nu' || $_COOKIE['login_mail'] == 'oskar.wernersson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'jonas@cyberphoto.nu' || $_COOKIE['login_mail'] == 'albin.larsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'amanda.karlsson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'mikael@cyberphoto.nu' || $_COOKIE['login_mail'] == 'louise@cyberphoto.nu' || $_COOKIE['login_mail'] == 'johan.eriksson@cyberphoto.nu' || $_COOKIE['login_mail'] == 'robin@cyberphoto.nu') {
 				// echo "<div class=\"box_sold_articles\"><a href=\"javascript:winPopupCenter(900, 800, '/order/product_update.php?artnr=$article->artnr&m_product_id=$article->m_product_id&hcampaign=yes');\">HELG</a> -</div>";
 				// echo "<div class=\"box_sold_articles\"><a href=\"javascript:winPopupCenter(150, 400, '/order/admin/add_campaign_article.php?article=$article->artnr');\">KID</a> -</div>";
-				echo "<div class=\"box_sold_articles\"><a target=\"_blank\" href=\"https://admin.cyberphoto.se/monitor_articles.php?add=yes&addArtnr=$article->artnr\">Bevaka</a> -</div>";
+				echo "<div class=\"box_sold_articles\"><a target=\"_blank\" href=\"/monitor_articles.php?add=yes&addArtnr=$article->artnr\">Bevaka</a> -</div>";
 			}
 			if ($article->isSalesBundle == -1) {
 				echo "<div class=\"box_sold_articles\"><a href=\"javascript:winPopupCenter(600, 1000, '/order/antalsalda.php?artnr=$article->artnr&show_salesbundle=yes');\">Sålda</a> -</div>";
@@ -335,7 +335,7 @@
 				echo "<div class=\"box_sold_articles\"><a href=\"javascript:winPopupCenter(600, 1000, '/order/antalsalda.php?artnr=$article->artnr');\">Sålda</a> -</div>";
 			}
 			// echo "<div class=\"box_suplier_info\">- <a href=\"javascript:winPopupCenter(550, 500, '/order/suplier.php?artnr=$article->artnr');\">Leverantör</a> -</div>";
-			echo "<div class=\"box_suplier_info\"><a href=\"javascript:winPopupCenter(550, 500, 'https://admin.cyberphoto.se/suplier.php?artnr=$article->artnr');\">Leverantör</a> -</div>";
+			echo "<div class=\"box_suplier_info\"><a href=\"javascript:winPopupCenter(550, 500, '/suplier.php?artnr=$article->artnr');\">Leverantör</a> -</div>";
 			echo "<div class=\"extra_info_box\">&nbsp;\n";
 			// $product->getExtraComment($article->artnr,true); // visa extra kommentar
 			echo "</div>\n";
@@ -402,7 +402,7 @@
 					if ($count_on_queue > 0 ) {
 						// echo "<div class=\"box_margin\"><a href=\"javascript:winPopupCenter(600, 1000, '/order/antalsalda.php?artnr=" . $article->artnr . "');\" onMouseOver=\"this.T_WIDTH=300;this.T_BGCOLOR='#FFFF00';this.T_TEXTALIGN='center';return escape('<b>Sålda senaste 30 dagarna, klicka för mer detaljer</b>')\" style=\"text-decoration: none\">" . $adintern->displayOnQueuePricelist($article->artnr) . "</a></div>";
 						// echo "<div class=\"box_margin\">" . $adintern->displayOnQueuePricelist($article->artnr) . "</div>";
-						echo "<div class=\"box_margin\"><a class=\"mark_blue\" href=\"javascript:winPopupCenter(600, 1000, 'https://admin.cyberphoto.se/waitinglist.php?artnr=$article->artnr');\">K: " . $count_on_queue . "</a></div>";
+						echo "<div class=\"box_margin\"><a class=\"mark_blue\" href=\"javascript:winPopupCenter(600, 1000, '/waitinglist.php?artnr=$article->artnr');\">K: " . $count_on_queue . "</a></div>";
 					} else {
 						echo "<div class=\"box_margin\">&nbsp;</div>";
 					}

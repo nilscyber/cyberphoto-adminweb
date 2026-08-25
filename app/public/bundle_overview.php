@@ -183,7 +183,7 @@ foreach ($rows as $r) {
     if ($catId !== $lastCat) {
         $catTitle = ($catName !== '') ? $catName : 'Övrigt';
         if ($catVal !== '' && $catName !== '') {
-            $catUrl   = 'https://admin.cyberphoto.se/lagerstatus.php?katID=' . rawurlencode($catVal);
+            $catUrl   = '/lagerstatus.php?katID=' . rawurlencode($catVal);
             $catTitle = '<a href="'.$catUrl.'" target="_blank" rel="noopener">'.$catName.'</a>';
         }
         echo '<tr class="cat-head"><th colspan="5">'.$catTitle.'</th></tr>';

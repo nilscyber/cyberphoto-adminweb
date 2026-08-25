@@ -36,8 +36,8 @@ if ($subm) {
 
 <head>
 <title>KÖ hantering</title>
-<link rel="shortcut icon" href="https://admin.cyberphoto.se/kosystemet.ico">
-<script type="text/javascript" src="https://admin.cyberphoto.se/javascript/winpop.js"></script>
+<link rel="shortcut icon" href="/kosystemet.ico">
+<script type="text/javascript" src="/javascript/winpop.js"></script>
 <script type="text/javascript" src="/javascript/jquery/jquery.js"></script>
 <style>
 .kosystem_container {

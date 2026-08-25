@@ -985,7 +985,7 @@ foreach ($res['rows'] as $r) {
             $catTitle = 'Övrigt';
         } else {
             if ($catVal !== '') {
-                $url     = 'https://admin.cyberphoto.se/lagerstatus.php?katID=' . rawurlencode($catVal);
+                $url     = '/lagerstatus.php?katID=' . rawurlencode($catVal);
                 $catTitle = '<a href="'.$url.'" target="_blank" rel="noopener">'.$catName.'</a>';
             } else {
                 $catTitle = $catName;

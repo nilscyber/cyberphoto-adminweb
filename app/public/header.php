@@ -6,8 +6,8 @@
 		echo "<html>\n\n";
 	}
 	echo "<head>\n";
-	// echo "<link rel=\"shortcut icon\" href=\"https://admin.cyberphoto.se/admin.ico\">\n";
-	echo "<link rel=\"icon\" type=\"image/png\" href=\"https://admin.cyberphoto.se/favicon.png\">\n";
+	// echo "<link rel=\"shortcut icon\" href=\"/admin.ico\">\n";
+	echo "<link rel=\"icon\" type=\"image/png\" href=\"/favicon.png\">\n";
 	echo "<meta charset=\"utf-8\">\n";
 	echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n";
 	$admin->displayPageTitle();
@@ -618,7 +618,7 @@ h2 {
 
 	echo "<div id=\"admin-info\">\n";
 	echo "  <div class=\"ai-time\">" . $timeStr . "</div>\n";
-	echo "  <div class=\"ai-temp\">Temperatur Umeå: <a href=\"https://admin.cyberphoto.se/temp/\" target=\"_blank\" rel=\"noopener\" class=\"ai-temp-value\" style=\"color:" . $tempColor . "\">" . $tempRaw . " &#8451;</a></div>\n";
+	echo "  <div class=\"ai-temp\">Temperatur Umeå: <a href=\"/temp/\" target=\"_blank\" rel=\"noopener\" class=\"ai-temp-value\" style=\"color:" . $tempColor . "\">" . $tempRaw . " &#8451;</a></div>\n";
 
 	if ($_COOKIE['login_ok'] == "true") {
 		if ($_COOKIE['login_userid'] == 99) {
