@@ -508,6 +508,8 @@ if ($type === 'customer') {
 	  .dw-ph-chevron.open{ transform:rotate(180deg); }
 	  .dw-ph-box{ display:none; margin-top:10px; border-top:1px solid #e5e7eb; padding-top:10px; }
 	  .dw-ph-box.open{ display:block; }
+	  .dw-ph-subtitle{ font-weight:700; font-size:12px; color:#374151; margin:10px 0 4px 0; }
+	  .dw-ph-subtitle:first-child{ margin-top:0; }
 	  .dw-ph-table{ width:100%; border-collapse:collapse; font-size:12px; }
 	  .dw-ph-table th{ padding:4px 8px; background:#f3f4f6; font-weight:600; color:#374151; border-bottom:1px solid #e5e7eb; text-align:left; }
 	  .dw-ph-table td{ padding:4px 8px; border-bottom:1px solid #f3f4f6; }
@@ -658,6 +660,21 @@ if ($type === 'customer') {
         }
     }
 
+    // ===== Nettoprishistorik (inköpspris) från ADempiere (hst_price_changelog) =====
+    $netPriceHistory = array();
+    $sqlNetPH = "
+        SELECT h.created, h.pricelimit, u.name AS user_name
+        FROM hst_price_changelog h
+        LEFT JOIN ad_user u ON u.ad_user_id = h.createdby
+        WHERE h.m_product_id = $1
+          AND h.m_pricelist_version_id = 1000000
+        ORDER BY h.created DESC
+    ";
+    if ($rsNetPH = ($conn) ? @pg_query_params($conn, $sqlNetPH, array($pid)) : false) {
+        while ($rsNetPH && $rowNetPH = pg_fetch_assoc($rsNetPH)) $netPriceHistory[] = $rowNetPH;
+        if ($rsNetPH) pg_free_result($rsNetPH);
+    }
+
     // ===== Försäljningshistorik för begagnat/fyndvara (PostgreSQL) =====
     $salesHistory    = array();
     $isUsedProd      = isset($isUsedProd) ? $isUsedProd : false;
@@ -779,7 +796,7 @@ if ($type === 'customer') {
       $phOnclick = "var b=document.getElementById('dw-ph-box'),c=document.getElementById('dw-ph-chevron');if(b){b.classList.toggle('open');if(c)c.classList.toggle('open');}";
       echo '<h3>'
          . '<span class="dw-ph-toggle" onclick="' . $h($phOnclick) . '" title="Visa prishistorik">'
-         . 'Priser'
+         . 'Prishistorik'
          . '<svg id="dw-ph-chevron" class="dw-ph-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>'
          . '</span>'
          . '</h3>' . $prisjakHtml;
@@ -794,6 +811,8 @@ if ($type === 'customer') {
 
       // Prishistorik (kollapsad som standard)
       echo '<div id="dw-ph-box" class="dw-ph-box">';
+
+      echo '<div class="dw-ph-subtitle">Utpriser</div>';
       if (!empty($priceHistory)) {
           echo '<table class="dw-ph-table">';
           echo '<thead><tr><th>Datum</th><th style="text-align:right">Pris</th><th>Typ</th></tr></thead>';
@@ -814,6 +833,27 @@ if ($type === 'customer') {
       } else {
           echo '<div class="dw-ph-empty">Ingen prishistorik hittades.</div>';
       }
+
+      echo '<div class="dw-ph-subtitle">Nettopriser</div>';
+      if (!empty($netPriceHistory)) {
+          echo '<table class="dw-ph-table">';
+          echo '<thead><tr><th>Datum</th><th style="text-align:right">Pris</th><th>Av</th></tr></thead>';
+          echo '<tbody>';
+          foreach ($netPriceHistory as $nph) {
+              $dt   = $nph['created'] ? substr($nph['created'], 0, 16) : '-';
+              $pris = $fmtPH($nph['pricelimit']);
+              $vem  = !empty($nph['user_name']) ? $nph['user_name'] : '-';
+              echo '<tr>'
+                 . '<td style="white-space:nowrap">' . $h($dt) . '</td>'
+                 . '<td>' . $h($pris) . '</td>'
+                 . '<td>' . $h($vem) . '</td>'
+                 . '</tr>';
+          }
+          echo '</tbody></table>';
+      } else {
+          echo '<div class="dw-ph-empty">Ingen nettoprishistorik hittades.</div>';
+      }
+
       echo '</div>';
 
     echo '</div>';
