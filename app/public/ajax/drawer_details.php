@@ -563,19 +563,14 @@ if ($type === 'customer') {
 	// === Render: samma badges som i listan ===
 	echo '<div class="badges-wrap">'.CSearch::buildListBadges(array_merge($row, $flags)).'</div>';
 
-	// === Skick / kommentar (visas endast för begagnat/fyndvara) ===
+	// === Skick / kommentar samt extra fält (begagnat/fyndvara) renderas längre ned,
+	//     precis ovanför Metadata-boxen - se dit.
 	$desc = '';
 	if (!empty($row['description_text']))      $desc = (string)$row['description_text'];
 	elseif (!empty($row['description']))       $desc = (string)$row['description'];
 	elseif (!empty($row['p_description']))     $desc = (string)$row['p_description'];
 
 	$desc = trim($desc);
-
-	if ($desc !== '' && (!empty($flags['is_used']) || !empty($flags['is_deal']))) {
-		echo '<div class="dw-cond"><span class="dw-cond-label">Skick / kommentar:</span>'
-		   . nl2br($h($desc))
-		   . '</div>';
-	}
 
 	// Extra fält (bara om de har värde)
 	$extraFields = array();
@@ -591,10 +586,6 @@ if ($type === 'customer') {
 	}
 	if (!empty($row['usedcomment'])) {
 		$extraFields[] = '<span class="dw-cond-label">Begagnat notering:</span> ' . nl2br($h($row['usedcomment']));
-	}
-
-	if (!empty($extraFields)) {
-		echo '<div class="dw-cond">' . implode('<br>', $extraFields) . '</div>';
 	}
 
     // Nummerserie (kopierbara chips)
@@ -1772,6 +1763,17 @@ if ($type === 'customer') {
 
 	echo '</div>';
 	} // /if (!$isBundleForStats) - Leveranstid
+
+	// === Skick / kommentar (visas endast för begagnat/fyndvara) ===
+	if ($desc !== '' && (!empty($flags['is_used']) || !empty($flags['is_deal']))) {
+		echo '<div class="dw-cond"><span class="dw-cond-label">Skick / kommentar:</span>'
+		   . nl2br($h($desc))
+		   . '</div>';
+	}
+
+	if (!empty($extraFields)) {
+		echo '<div class="dw-cond">' . implode('<br>', $extraFields) . '</div>';
+	}
 
 	echo '<div class="dw-card dw-card-meta" style="margin-top:10px;">';
     echo '<h3>Metadata</h3>';
