@@ -1,5 +1,10 @@
 <?php
 	include_once("top.php");
+
+	if (!CCheckIP::hasPermission('manage_cron_mail')) {
+		exit;
+	}
+
 	include_once("header.php");
 	include_once(__DIR__ . "/../lib/CCronMailRecipients.php");
 

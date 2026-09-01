@@ -35,6 +35,9 @@
     <?php if (CCheckIP::checkIfCanManagePermissions()) { ?>
     <li><a href="permissions_admin.php" <?php if (preg_match("/permissions_admin\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Behörigheter</a></li>
     <?php } ?>
+    <?php if (CCheckIP::hasPermission('manage_cron_mail')) { ?>
+    <li><a href="cron_mail_settings.php" <?php if (preg_match("/cron_mail_settings\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Cronjobb-mail</a></li>
+    <?php } ?>
     <?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
 	<?php } ?>
 	</ul>

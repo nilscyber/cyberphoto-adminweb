@@ -42,7 +42,7 @@ $matrix = $permissionsModel->getPermissionMatrix();
 // i koden, så adminsidan varnar innan den kan tas bort av misstag.
 $keysUsedInCode = array(
     'trade_in', 'priority', 'purchase_valid', 'purchase_colleague',
-    'product_permissions', 'manage_permissions',
+    'product_permissions', 'manage_permissions', 'manage_cron_mail',
 );
 
 $h = function ($s) {
