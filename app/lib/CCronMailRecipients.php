@@ -3,7 +3,8 @@
  * CCronMailRecipients
  *
  * Central hantering av mottagare (To/Cc/Bcc) för cronjobbens mailutskick.
- * Mottagarna hämtas från tabellen cron_mail_recipients (MariaDB), så att de kan
+ * Mottagarna hämtas från tabellen cron_mail_recipients (MariaDB, databasen
+ * "cyberadmin"), så att de kan
  * ändras via admin-sidan cron_mail_settings.php utan att röra kod/deploy.
  *
  * Om tabellen saknar en rad för ett jobb (eller inte går att nå) faller
@@ -141,7 +142,7 @@ class CCronMailRecipients
         }
 
         $label = self::$jobs[$jobKey]['label'];
-        $conn  = Db::getConnection(true);
+        $conn  = Db::getConnectionDb('cyberadmin');
 
         $sql = "INSERT INTO cron_mail_recipients (job_key, job_label, to_emails, cc_emails, bcc_emails, updated_at, updated_by)
                 VALUES (?, ?, ?, ?, ?, NOW(), ?)
@@ -181,7 +182,7 @@ class CCronMailRecipients
     private static function fetchRow($jobKey)
     {
         try {
-            $conn = Db::getConnection(false);
+            $conn = Db::getConnectionDb('cyberadmin');
             $stmt = $conn->prepare("SELECT job_label, to_emails, cc_emails, bcc_emails FROM cron_mail_recipients WHERE job_key = ? LIMIT 1");
             if (!$stmt) {
                 return null;
