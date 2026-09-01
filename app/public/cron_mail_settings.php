@@ -119,7 +119,14 @@
 <?php foreach ($jobs as $job): ?>
 	<div class="cmr-card">
 		<div class="cmr-title"><?php echo htmlspecialchars($job['label']); ?></div>
-		<div class="cmr-file"><?php echo htmlspecialchars($job['file']); ?></div>
+		<div class="cmr-file">
+			<?php echo htmlspecialchars($job['file']); ?>
+			&nbsp;&middot;&nbsp;
+			<a href="cronjob/<?php echo htmlspecialchars($job['file']); ?>" target="_blank" rel="noopener"
+			   onclick="return confirm('Detta kör jobbet på riktigt och skickar mail till de sparade mottagarna ovan. Fortsätta?');">
+				Kör nu (skickar mail!)
+			</a>
+		</div>
 		<form method="post">
 			<input type="hidden" name="save_job_key" value="<?php echo htmlspecialchars($job['job_key']); ?>">
 
