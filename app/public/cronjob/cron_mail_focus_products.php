@@ -6,16 +6,10 @@ include_once("../top.php"); // cronjob ligger i /cronjob
 // Inställningar
 $days = 30;
 
-$recipients = array(
-  'stefan@cyberphoto.se',
-  'emil.lindberg@cyberphoto.se',
-  'jonas@cyberphoto.se',
-  'victoria@cyberphoto.se',
-  'boyd@cyberphoto.se',
-  'thomas@cyberphoto.se'
-);
-$to = implode(', ', $recipients);
-$cc = ''; // valfritt
+include_once(__DIR__ . "/../../lib/CCronMailRecipients.php");
+$rcpt = CCronMailRecipients::get('focus_products');
+$to   = $rcpt['to'];
+$cc   = $rcpt['cc'];
 
 // $to = 'stefan@cyberphoto.se'; // tillfällig override under testning
 

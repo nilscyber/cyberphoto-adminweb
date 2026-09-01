@@ -13,6 +13,7 @@
 include_once("Db.php");
 include_once("CDropship.php");
 include_once(__DIR__ . "/../../lib/SmtpMail.php");
+include_once(__DIR__ . "/../../lib/CCronMailRecipients.php");
 
 $u8 = function ($s) {
     return (string)$s;
@@ -94,7 +95,7 @@ $body .= "</body></html>";
 // --------------------
 // Mottagare (testa på dig själv)
 // --------------------
-$toMail = "stefan@cyberphoto.se, emil.lindberg@cyberphoto.se";
+$toMail = CCronMailRecipients::get('dropshipment_products')['to'];
 // $toMail = "stefan@cyberphoto.se";
 
 // --------------------

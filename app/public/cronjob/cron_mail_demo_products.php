@@ -4,11 +4,12 @@
 
 include_once("../top.php");
 
-$from          = 'no-reply@cyberphoto.se';
-$recipientsTO  = array('stefan@cyberphoto.se');
-$to            = implode(', ', $recipientsTO);
-$recipientsBCC = array('karoline.juliusson@cyberphoto.se','service@cyberphoto.se');
-$bcc           = implode(', ', $recipientsBCC);
+$from = 'no-reply@cyberphoto.se';
+
+include_once(__DIR__ . "/../../lib/CCronMailRecipients.php");
+$rcpt = CCronMailRecipients::get('demo_products');
+$to   = $rcpt['to'];
+$bcc  = $rcpt['bcc'];
 
 $rows = $tool->getOldProducts('demo', 90);
 

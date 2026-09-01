@@ -9,14 +9,10 @@ $missingSupplierCode = '1004141'; // "Saknar leverantör" enligt din query
 
 $from = 'no-reply@cyberphoto.se';
 
-$to = 'service@cyberphoto.se';
-
-$recipients = array(
-  'stefan@cyberphoto.se',
-  'karoline.juliusson@cyberphoto.se'
-);
-// Bygg BCC-strängen
-$bcc = implode(', ', $recipients);
+include_once(__DIR__ . "/../../lib/CCronMailRecipients.php");
+$rcpt = CCronMailRecipients::get('missing_supplier_demo');
+$to   = $rcpt['to'];
+$bcc  = $rcpt['bcc'];
 
 $rows = $sales->getDemoProductsMissingSupplier($missingSupplierCode, $warehouseId);
 

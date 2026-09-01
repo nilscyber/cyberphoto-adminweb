@@ -14,15 +14,10 @@ $daysBack  = 14; // ta även med nyligen lanserade produkter (fallback/historik)
 
 $from = 'no-reply@cyberphoto.se';
 
-$recipientsTO = array(
-  'grupp_inkop@cyberphoto.se'
-);
-$to = implode(', ', $recipientsTO);
-
-$recipientsBCC = array(
-  'stefan@cyberphoto.se'
-);
-$bcc = implode(', ', $recipientsBCC);
+include_once(__DIR__ . "/../../lib/CCronMailRecipients.php");
+$rcpt = CCronMailRecipients::get('new_products');
+$to   = $rcpt['to'];
+$bcc  = $rcpt['bcc'];
 
 $rows = $sales->getProductsForLaunchMail($daysAhead, $daysBack);
 
