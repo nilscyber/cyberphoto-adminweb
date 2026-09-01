@@ -103,11 +103,14 @@ class CCronMailRecipients
             return $defaults;
         }
 
+        // Raden finns (jobbet har sparats minst en gång) - använd dess värden
+        // som de är, även om ett fält har tömts avsiktligt. Standardvärdena
+        // ska bara användas innan jobbet någonsin sparats (se ovan).
         return array(
             'label' => ($row['job_label'] !== null && $row['job_label'] !== '') ? $row['job_label'] : $defaults['label'],
-            'to'    => self::normalize($row['to_emails'],  $defaults['to']),
-            'cc'    => self::normalize($row['cc_emails'],  $defaults['cc']),
-            'bcc'   => self::normalize($row['bcc_emails'], $defaults['bcc']),
+            'to'    => (string)$row['to_emails'],
+            'cc'    => (string)$row['cc_emails'],
+            'bcc'   => (string)$row['bcc_emails'],
         );
     }
 
@@ -198,16 +201,4 @@ class CCronMailRecipients
         }
     }
 
-    /** Tom sträng i DB -> använd default. Annars: trimmad, kommaseparerad sträng. */
-    private static function normalize($dbValue, $defaultCsv)
-    {
-        if ($dbValue === null) {
-            return $defaultCsv;
-        }
-        $dbValue = trim($dbValue);
-        if ($dbValue === '') {
-            return $defaultCsv;
-        }
-        return $dbValue;
-    }
 }
