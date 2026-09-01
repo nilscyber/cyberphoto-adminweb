@@ -237,8 +237,8 @@ public function getTopSoldDropshipArticlesHtml($daysBack = 14, $limit = 10)
         $qty   = (float)$r['qty_sold'];
         $sales = (float)$r['sales_sek'];
 
-        // Länk till produktsök med öppet produktläge
-        $prodUrl = '/search_dispatch.php?mode=product'
+        // Länk till produktsök med öppet produktläge (absolut URL, krävs i e-postutskick)
+        $prodUrl = 'https://admin.cyberphoto.se/search_dispatch.php?mode=product'
                  . '&q=' . rawurlencode($artnr)
                  . '&open=product'
                  . '&id=' . $pid;
@@ -349,7 +349,8 @@ public function getTopSoldDropshipDeliveredArticlesHtml($dateFrom, $dateTo, $lim
         $qty   = (float)$r['qty_sold'];
         $sales = (float)$r['sales_sek'];
 
-        $prodUrl = '/search_dispatch.php?mode=product'
+        // Absolut URL, krävs i e-postutskick
+        $prodUrl = 'https://admin.cyberphoto.se/search_dispatch.php?mode=product'
                  . '&q=' . rawurlencode($artnr)
                  . '&open=product'
                  . '&id=' . $pid;
