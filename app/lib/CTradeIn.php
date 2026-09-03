@@ -406,7 +406,7 @@ Class CTradeIn {
 
 		$sql = "
 			SELECT
-				o.updated                                       AS sold_at,
+				ship.movementdate                               AS sold_at,
 				o.documentno,
 				p.value                                         AS artnr,
 				p.m_product_id,
@@ -444,6 +444,18 @@ Class CTradeIn {
 			JOIN xc_manufacturer t ON t.xc_manufacturer_id = p.xc_manufacturer_id
 			JOIN c_bpartner bp   ON bp.c_bpartner_id   = po.c_bpartner_id
 			JOIN m_locator mloc  ON mloc.m_locator_id  = p.m_locator_id
+			-- Faktisk leverans (skickat-datum) för orderraden – senaste kompletta utleveransen
+			JOIN LATERAL (
+				SELECT mio.movementdate
+				FROM m_inoutline miol
+				JOIN m_inout mio ON mio.m_inout_id = miol.m_inout_id
+				WHERE miol.c_orderline_id = col.c_orderline_id
+				  AND mio.docstatus  = 'CO'
+				  AND mio.isSOTrx    = 'Y'
+				  AND mio.isActive   = 'Y'
+				ORDER BY mio.movementdate DESC
+				LIMIT 1
+			) ship ON true
 			LEFT JOIN c_tax ct   ON ct.c_tax_id        = col.c_tax_id
 			LEFT JOIN m_productprice pp
 				ON  pp.m_product_id          = p.m_product_id
@@ -456,10 +468,10 @@ Class CTradeIn {
 			  AND bp.value           = '5555'
 			  AND col.qtydelivered   > 0
 			  AND col.qtyordered     > 0
-			  AND o.updated          > CURRENT_TIMESTAMP - INTERVAL '7 days'
+			  AND ship.movementdate  > CURRENT_TIMESTAMP - INTERVAL '7 days'
 			  AND mloc.m_locator_id NOT IN (1004179)
 			  AND o.bill_bpartner_id NOT IN (1013455, 1013492)
-			ORDER BY o.updated DESC
+			ORDER BY ship.movementdate DESC
 		";
 
 		$res = @pg_query($pg, $sql);
@@ -507,7 +519,7 @@ Class CTradeIn {
 
 		echo '<table class="bns-table">';
 		echo '<thead><tr>';
-		echo '<th>Datum</th>';
+		echo '<th>Skickat</th>';
 		echo '<th>Order</th>';
 		echo '<th>Artnr</th>';
 		echo '<th>Produkt</th>';
@@ -519,7 +531,7 @@ Class CTradeIn {
 		echo '<tbody>';
 
 		foreach ($rows as $r) {
-			$datum    = $h(date('Y-m-d H:i', strtotime($r['sold_at'])));
+			$datum    = $h(date('Y-m-d', strtotime($r['sold_at'])));
 			$docno    = $h($r['documentno']);
 			$artnr    = $h($r['artnr']);
 			$produkt  = $h($r['tillverkare'] . ' ' . $r['beskrivning']);
