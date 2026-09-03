@@ -500,6 +500,7 @@ Class CTradeIn {
 		.bns-table tbody td{padding:7px 10px;border-bottom:1px solid #e5e7eb;vertical-align:middle}
 		.bns-table tbody td.num{text-align:right;white-space:nowrap;font-weight:700}
 		.bns-table tbody td.muted{color:#9ca3af;font-size:12px}
+		.bns-table tbody td.bns-date{white-space:nowrap;color:#374151}
 		.bns-diff-low{color:#991b1b;font-weight:800}
 		.bns-diff-ok{color:#065f46}
 		.bns-vmb{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:700;background:#fef3c7;border:1px solid #fde68a;color:#92400e;white-space:nowrap}
@@ -565,7 +566,7 @@ Class CTradeIn {
 			            . '&open=product&id=' . (int)$r['m_product_id'];
 
 			echo '<tr>';
-			echo '<td class="muted">' . $datum . '</td>';
+			echo '<td class="bns-date">' . $datum . '</td>';
 			echo '<td><a href="' . $h($orderUrl) . '" target="_blank" rel="noopener" class="bns-link">' . $docno . '</a></td>';
 			echo '<td class="bns-art">' . $artnr . '</td>';
 			echo '<td><a href="' . $h($produktUrl) . '" target="_blank" rel="noopener" class="bns-link">' . $produkt . '</a>';
