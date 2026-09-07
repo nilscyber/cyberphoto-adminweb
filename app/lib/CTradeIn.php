@@ -1217,96 +1217,123 @@ Class CTradeIn {
 	}
 
 	function getTradeInValue($change = false) {
-	
-		$todaydate = date("Y-m-d", time());
-		
+
 		$select  = "SELECT * ";
 		$select .= "FROM cyberadmin.tradeinvalue ";
 		$select .= "WHERE tiID = 1 ";
-		
-		// echo $select;
-		// exit;
-	
+
 		$res = @mysqli_query(Db::getConnection(false), $select);
 		$rows = mysqli_fetch_object($res);
-		
-		if ($change) {
-			echo "<a href=\"javascript:winPopupCenter(190, 800, '/tradein_update.php?edit=yes');\">";
-			echo "<div class=\"\">";
-		}
-		if ($rows->tiGREEN_TO != NULL) {
-			if ($rows->tiGREEN_TO == 0) {
-				echo "<span class=\"clock\">" . $rows->tiGREEN_TO . "</span>";
-			} else {
-				echo "<span class=\"mark_green clock\">" . $rows->tiGREEN_TO . "</span>";
-			}
-		}
-		if ($rows->tiRED_TO != NULL) {
-			echo "<span class=\"mark_red clock\">" . $rows->tiRED_TO . "</span>";
+
+		// Fältens betydelse (samma kolumner, ny innebörd):
+		//   tiGREEN_TO = TB (vänster tal), skrivs in manuellt
+		//   tiRED_TO   = 1 = tvinga TB röd (annars grönt)
+		//   tiGREEN_TG = täckningsgrad i % med två decimaler (t.ex. 25,12) -> höger tal
+		$tb         = ($rows && $rows->tiGREEN_TO !== null && $rows->tiGREEN_TO !== "") ? $rows->tiGREEN_TO : null;
+		$tbForceRed = ($rows && !empty($rows->tiRED_TO));
+		$tg         = ($rows && $rows->tiGREEN_TG !== null && $rows->tiGREEN_TG !== "") ? $rows->tiGREEN_TG : null;
+
+		// Vänster tal (TB): grönt om det inte tvingats röd
+		$tbGreen = !$tbForceRed;
+		// Höger tal (TG): grönt vid minst 25,00 % (24,99 och lägre = rött), sedan avrundas det vid visning
+		$tgGreen = ($tg !== null && (float)$tg >= 25);
+
+		echo "<div id=\"ti_wrap\">";
+		echo $change
+			? "<div id=\"ti_display\" class=\"span_link\" title=\"Klicka för att redigera\">"
+			: "<div id=\"ti_display\">";
+
+		if ($tb === null) {
+			echo "<span class=\"clock\">&ndash;</span>";
+		} else {
+			echo "<span class=\"" . ($tbGreen ? "mark_green" : "mark_red") . " clock\">" . htmlspecialchars((string)$tb) . "</span>";
 		}
 		echo "<span class=\"clock\"> / </span>";
-		if ($rows->tiGREEN_TG != NULL) {
-			if ($rows->tiGREEN_TG == 0) {
-				echo "<span class=\"clock\">" . round($rows->tiGREEN_TG,0) . "</span>";
-			} else {
-				echo "<span class=\"mark_green clock\">" . round($rows->tiGREEN_TG,0) . "</span>";
-			}
+		if ($tg === null) {
+			echo "<span class=\"clock\">&ndash;</span>";
+		} else {
+			echo "<span class=\"" . ($tgGreen ? "mark_green" : "mark_red") . " clock\">" . round($tg, 0) . "</span>";
 		}
-		if ($rows->tiRED_TG != NULL) {
-			echo "<span class=\"mark_red clock\">" . round($rows->tiRED_TG,0) . "</span>";
-		}
+		echo "</div>";
+
 		if ($change) {
-			echo "</div>";
-			echo "</a>";
+			$this->renderTradeInValueForm($tb, $tbForceRed, $tg);
 		}
-			
+
+		echo "</div>";
+
+	}
+
+	function renderTradeInValueForm($tb, $tbForceRed, $tg) {
+		$tb = htmlspecialchars((string)$tb);
+		$tg = htmlspecialchars((string)$tg);
+		?>
+		<div id="ti_edit" style="display:none;padding:6px 0;">
+			<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+				<label style="font-size:11px;">TB<br>
+					<input type="text" id="ti_tb" value="<?php echo $tb; ?>" style="width:90px;font-size:22px;text-align:center;"></label>
+				<label style="font-size:11px;">TG (%)<br>
+					<input type="text" id="ti_tg" value="<?php echo $tg; ?>" style="width:90px;font-size:22px;text-align:center;"></label>
+				<label style="font-size:11px;"><input type="checkbox" id="ti_forcered" <?php echo $tbForceRed ? 'checked' : ''; ?>> Tvinga TB röd</label>
+				<button type="button" id="ti_save" style="font-size:14px;">Spara</button>
+				<button type="button" id="ti_cancel" style="font-size:14px;">Avbryt</button>
+			</div>
+			<div id="ti_msg" style="color:#85000d;font-size:11px;padding-top:3px;"></div>
+		</div>
+		<script>
+		(function ($) {
+			$(function () {
+				$('#ti_display').off('click.ti').on('click.ti', function () {
+					$('#ti_display').hide();
+					$('#ti_edit').show();
+					$('#ti_tb').focus().select();
+				});
+				$('#ti_cancel').off('click.ti').on('click.ti', function () {
+					$('#ti_edit').hide();
+					$('#ti_msg').text('');
+					$('#ti_display').show();
+				});
+				$('#ti_save').off('click.ti').on('click.ti', function () {
+					var btn = $(this).prop('disabled', true);
+					$.post('/tradein_update.php', {
+						ajax:       1,
+						tiGREEN_TO: $('#ti_tb').val(),
+						tiRED_TO:   $('#ti_forcered').is(':checked') ? 1 : 0,
+						tiGREEN_TG: $('#ti_tg').val()
+					}).done(function (html) {
+						$('#ti_wrap').replaceWith(html);
+					}).fail(function () {
+						$('#ti_msg').text('Kunde inte spara, försök igen.');
+						btn.prop('disabled', false);
+					});
+				});
+			});
+		})(jQuery);
+		</script>
+		<?php
 	}
 
 	function updateTradeInValue() {
-		global $tiID, $tiGREEN_TO, $tiGREEN_TB, $tiGREEN_TG, $tiRED_TO, $tiRED_TB, $tiRED_TG, $addcreatedby;
-		
-		$tiGREEN_TG = str_replace(',', '.', $tiGREEN_TG);
-		$tiRED_TG = str_replace(',', '.', $tiRED_TG);
-	
-		$updt  = "UPDATE cyberadmin.tradeinvalue ";
-		$updt .= "SET ";
-		if ($tiGREEN_TO != "") {
-			$updt .= "tiGREEN_TO = $tiGREEN_TO, ";
-		} else {
-			$updt .= "tiGREEN_TO = NULL, ";
-		}
-		if ($tiGREEN_TB != "") {
-			$updt .= "tiGREEN_TB = $tiGREEN_TB, ";
-		} else {
-			$updt .= "tiGREEN_TB = NULL, ";
-		}
-		if ($tiGREEN_TG != "") {
-			$updt .= "tiGREEN_TG = '$tiGREEN_TG', ";
-		} else {
-			$updt .= "tiGREEN_TG = NULL, ";
-		}
-		if ($tiRED_TO != "") {
-			$updt .= "tiRED_TO = $tiRED_TO, ";
-		} else {
-			$updt .= "tiRED_TO = NULL, ";
-		}
-		if ($tiRED_TB != "") {
-			$updt .= "tiRED_TB = $tiRED_TB, ";
-		} else {
-			$updt .= "tiRED_TB = NULL, ";
-		}
-		if ($tiRED_TG != "") {
-			$updt .= "tiRED_TG = '$tiRED_TG' ";
-		} else {
-			$updt .= "tiRED_TG = NULL ";
-		}
-		$updt .= "WHERE tiID = 1 ";
-	
-		// echo $updt;
-		// exit;
-	
-		$res = mysqli_query(Db::getConnection(true), $updt);
-	
+		global $tiGREEN_TO, $tiRED_TO, $tiGREEN_TG, $tiRED_TG;
+
+		// Normalisera: ta bort tusenavgränsare/mellanslag, komma -> punkt
+		$norm = function ($v) {
+			return str_replace(array(' ', "\xC2\xA0", ','), array('', '', '.'), trim((string)$v));
+		};
+
+		$tb       = $norm($tiGREEN_TO ?? '');       // TB (vänster tal)
+		$tg       = $norm($tiGREEN_TG ?? '');       // täckningsgrad i %
+		$forcered = !empty($tiRED_TO) ? 1 : 0;      // tvinga TB röd
+
+		$set   = array();
+		$set[] = "tiGREEN_TO = " . (is_numeric($tb) ? "'" . $tb . "'" : "NULL");
+		$set[] = "tiRED_TO = "   . $forcered;
+		$set[] = "tiGREEN_TG = " . (is_numeric($tg) ? "'" . $tg . "'" : "NULL");
+		$set[] = "tiRED_TG = NULL";
+
+		$updt = "UPDATE cyberadmin.tradeinvalue SET " . implode(', ', $set) . " WHERE tiID = 1 ";
+
+		mysqli_query(Db::getConnection(true), $updt);
 	}
 
 	function findDoubleTradeInBooking() {
