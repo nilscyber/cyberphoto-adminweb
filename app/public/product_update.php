@@ -86,6 +86,7 @@ function getSundayTime()
 if (!isset($campaign_time)) { $campaign_time = ""; }
 if (!isset($addfrom))       { $addfrom       = ""; }
 if (!isset($addprice))      { $addprice      = ""; }
+if (!isset($allow_below_cost)) { $allow_below_cost = ""; }
 
 if ($is_hcampaign) {
     if ($campaign_time == "") {
@@ -148,9 +149,8 @@ if ($edit == "yes") {
 
         if ($rows->isupdtpricelist == "Y") {
             $check_addprice = "yes";
-            $addprice       = $rows->pricelist;
-            // Sverige: 25 % moms
-            $addprice = round($addprice * 1.25, 2);
+            // Prislistpris; räknas om till kundpris när produktens momsfaktor är känd (nedan)
+            $addprice_net   = $rows->pricelist;
         }
 
         if ($rows->isupdtname == "Y") {
@@ -173,9 +173,6 @@ if ($edit == "yes") {
             $check_utgangen = "yes";
             $utgangen       = ($rows->discontinued == "Y") ? "yes" : "";
         }
-        if ($rows->isTradeIn == -1) {
-            $check_addprice = "";
-        }
     }
 }
 
@@ -183,8 +180,26 @@ if ($edit == "yes") {
  * Hämta produktdata
  */
 $rows = $product->getArticleInfo($artnr);
-if ($rows->isTradeIn == -1) {
+
+// Inbyte (isTradeIn) och VMB-inbyte (tax category "Ingen moms"): för VMB är prislistpriset
+// kundpriset – ingen moms på produktpriset, momsen (25 %) ligger på marginalen i ADempiere.
+$is_tradein = ($rows && $rows->isTradeIn == -1);
+$is_vmb     = ($rows && !empty($rows->isVMB));
+$vmb_moms   = 0.25;
+if ($is_tradein) {
     $checktradein = "yes";
+}
+
+// Faktor kundpris -> prislistpris: 1 för VMB, annars 1 + produktens momssats (25 % som säkerhetsnät)
+if ($is_vmb) {
+    $moms_faktor = 1.0;
+} else {
+    $moms_faktor = ($rows && (float)$rows->momssats > 0) ? 1 + (float)$rows->momssats : 1.25;
+}
+
+// Edit-läge: prislistpriset från uppdraget visas som kundpris
+if (isset($addprice_net) && $addprice_net !== null && $addprice_net !== "") {
+    $addprice = round((float)$addprice_net * $moms_faktor, 2);
 }
 
 /*
@@ -201,15 +216,28 @@ $beskrivning = str_replace('`', '"', $rows->beskrivning);
 
 if (!$subm && !$submC) {
     // Nettopriser och utpriser Sverige
-    $netto_se         = $rows->art_id;
-    $netto_moms       = $netto_se + $netto_se * $rows->momssats;
+    $netto_se         = (float)$rows->art_id;
 
-    $utpris_se        = $rows->utpris;
-    $utpris_moms_se   = $rows->utpris + $rows->utpris * $rows->momssats;
+    if ($is_vmb) {
+        // VMB: inköp från privatperson utan moms; kundpris = inköpspris + marginal exkl. moms * 1,25.
+        // Marginal (TG) räknas på försäljning exkl. moms, dvs inköpspris + marginal exkl. moms.
+        $netto_moms          = $netto_se;
+        $utpris_moms_se      = (float)$rows->utpris;                        // kundpris
+        $marginal_tb_moms_se = $utpris_moms_se - $netto_se;                 // marginal inkl. moms
+        // marginal exkl. moms (VMB-raden); under inköpspris finns ingen moms att dra av
+        $marginal_tb_se      = $marginal_tb_moms_se > 0 ? $marginal_tb_moms_se / (1 + $vmb_moms) : $marginal_tb_moms_se;
+        $utpris_se           = $netto_se + $marginal_tb_se;                 // försäljning exkl. moms
+        $marginal_se         = $utpris_se != 0 ? ($marginal_tb_se / $utpris_se) * 100 : 0;
+    } else {
+        $netto_moms       = $netto_se + $netto_se * $rows->momssats;
 
-    $marginal_se      = $rows->utpris != 0 ? (($rows->utpris - $rows->art_id) / $rows->utpris) * 100 : 0;
-    $marginal_tb_se   = $utpris_se - $netto_se;
-    $marginal_tb_moms_se = $marginal_tb_se + ($marginal_tb_se * $rows->momssats);
+        $utpris_se        = $rows->utpris;
+        $utpris_moms_se   = $rows->utpris + $rows->utpris * $rows->momssats;
+
+        $marginal_se      = $rows->utpris != 0 ? (($rows->utpris - $rows->art_id) / $rows->utpris) * 100 : 0;
+        $marginal_tb_se   = $utpris_se - $netto_se;
+        $marginal_tb_moms_se = $marginal_tb_se + ($marginal_tb_se * $rows->momssats);
+    }
 
     // Förvalt prislista: alltid Sverige
     if (!isset($add_country) || $add_country == "") {
@@ -294,7 +322,7 @@ if ($subm) {
         $wrongmess .= "<p class=\"wrongmess\">- Du måste välja någon händelse. Sorry ;)</p>";
     }
 
-    if ($check_addprice == "yes" && $rows->isTradeIn != -1) {
+    if ($check_addprice == "yes") {
         if ($addprice == 0) {
             $olright    = false;
             $wrongmess .= "<p class=\"wrongmess\">- Det är INTE tillåtet att sätta 0 (noll) kronor via det automatiska systemet. Gå in på produkten i affärssystemet.</p>";
@@ -302,7 +330,14 @@ if ($subm) {
 
         if ($addprice > 0) {
             // Sverige  25 % moms
-            $addprice_VAT = round($addprice / 1.25, 2);
+            // Kundpris -> prislistpris. VMB-inbyte: faktor 1 (ingen moms på produktpriset).
+            $addprice_VAT = round($addprice / $moms_faktor, 2);
+        }
+
+        // Inbyte: stoppa pris under inköpspriset om det inte uttryckligen tillåts
+        if ($is_tradein && $addprice > 0 && (float)$rows->art_id > 0 && $addprice_VAT < (float)$rows->art_id && $allow_below_cost != "yes") {
+            $olright    = false;
+            $wrongmess .= "<p class=\"wrongmess\">- Priset " . number_format($addprice_VAT, 0, ',', ' ') . " kr är lägre än inköpspriset " . number_format((float)$rows->art_id, 0, ',', ' ') . " kr. Bocka i \"Tillåt pris under inköpspris\" om det är avsiktligt.</p>";
         }
     }
 
@@ -330,7 +365,7 @@ if ($subm) {
         }
 
         if ($addprice_campaign > 0) {
-            $addprice_campaign_VAT = round($addprice_campaign / 1.25, 2);
+            $addprice_campaign_VAT = round($addprice_campaign / $moms_faktor, 2);
         }
     }
 
@@ -475,7 +510,7 @@ if ($submC) {
 		}
 	}
 
-    if ($addprice <> $init_price && $checktradein != "yes") {
+    if ($addprice <> $init_price) {
         $check_addprice = "yes";
     }
 
@@ -497,7 +532,12 @@ if ($submC) {
         }
 
         if ($addprice > 0) {
-            $addprice_VAT = round($addprice / 1.25, 2);
+            $addprice_VAT = round($addprice / $moms_faktor, 2);
+        }
+
+        if ($is_tradein && $addprice > 0 && (float)$rows->art_id > 0 && $addprice_VAT < (float)$rows->art_id && $allow_below_cost != "yes") {
+            $olright    = false;
+            $wrongmess .= "<p class=\"wrongmess\">- Priset " . number_format($addprice_VAT, 0, ',', ' ') . " kr är lägre än inköpspriset " . number_format((float)$rows->art_id, 0, ',', ' ') . " kr. Bocka i \"Tillåt pris under inköpspris\" om det är avsiktligt.</p>";
         }
     }
 
@@ -575,10 +615,25 @@ if ($calc) {
         // Omvandling till float
         $netto   = $haveNetto  ? (float)$calcnetto_raw  : null;
         $margin  = $haveMargin ? (float)$calcmargin_raw : null; // %
-        $price   = $havePrice  ? (float)$calcprice_raw  : null; // inkl moms
-        $moms    = 0.25;
+        $price   = $havePrice  ? (float)$calcprice_raw  : null; // inkl moms (VMB: kundpris)
+        $moms    = $is_vmb ? $vmb_moms : 0.25;
 
-        if ($haveNetto && $haveMargin && !$havePrice) {
+        if ($is_vmb) {
+            // VMB: kundpris = netto + TB * (1 + moms), där TB = marginal exkl. moms och
+            // marginal % = TB / (netto + TB)
+            if ($haveNetto && $haveMargin && !$havePrice) {
+                $margin_dec = $margin / 100.0;
+                $tb         = ($margin_dec < 1) ? $netto * $margin_dec / (1 - $margin_dec) : 0;
+                $price      = round($netto + $tb * (1 + $moms), 0);
+            } elseif ($haveNetto && !$haveMargin && $havePrice) {
+                $tb       = ($price - $netto) / (1 + $moms);
+                $sales_ex = $netto + $tb;
+                $margin   = ($sales_ex > 0) ? round(($tb / $sales_ex) * 100, 2) : 0;
+            } elseif (!$haveNetto && $haveMargin && $havePrice) {
+                $margin_dec = $margin / 100.0;
+                $netto      = ($margin_dec < 1) ? $price / (1 + (1 + $moms) * $margin_dec / (1 - $margin_dec)) : 0;
+            }
+        } elseif ($haveNetto && $haveMargin && !$havePrice) {
             // Netto + marginal -> pris
             $margin_dec   = $margin / 100.0;
             $price_ex_moms = $netto / (1 - $margin_dec);
@@ -854,16 +909,23 @@ if ($calc) {
             </td>
           </tr>
 
-          <?php if ($rows->isTradeIn == -1) { ?>
-              <tr><td colspan="3"><hr class="hr_grey"></td></tr>
+          <?php
+          // Etikett på prisfältet: VMB-inbyte anges som kundpris (ingen moms på produktpriset)
+          $prislabel = $is_vmb ? "(kundpris, ingen moms läggs på)" : "(inkl. moms)";
+          ?>
+          <?php if ($is_tradein) { ?>
               <tr>
                 <td colspan="3">
-                    <span class="bold">*****</span>
-                    <span class="italic bold wrongmess">Detta är en inbytesprodukt och prissättning måste göras i Adempiere</span>
-                    <span class="bold">*****</span>
+                    <?php if ($is_vmb) { ?>
+                        <span class="pill">Inbyte / VMB</span>
+                        <span class="small-muted">Ange <b>kundpriset</b>. Ingen moms läggs på produktpriset – momsen (25 %) ligger på marginalen och sköts av ADempiere. Inköpspris: <?php echo number_format((float)$rows->art_id, 0, ',', ' '); ?> kr.</span>
+                    <?php } else { ?>
+                        <span class="pill">Inbyte (25 % moms)</span>
+                        <span class="small-muted">Inköpspris: <?php echo number_format((float)$rows->art_id, 0, ',', ' '); ?> kr.</span>
+                    <?php } ?>
                 </td>
               </tr>
-          <?php } else { ?>
+          <?php } ?>
               <?php if ($is_hcampaign) { ?>
                   <tr>
                     <td colspan="2">
@@ -874,7 +936,7 @@ if ($calc) {
                     </td>
                     <td>
                         <input onclick="this.select()" class="textbox_white" type="text" name="addprice_campaign" size="7" value="<?php echo $addprice_campaign; ?>">
-                        &nbsp;(inkl. moms)
+                        &nbsp;<?php echo $prislabel; ?>
                     </td>
                   </tr>
                   <tr>
@@ -886,7 +948,7 @@ if ($calc) {
                     </td>
                     <td>
                         <input onclick="this.select()" class="textbox_white" type="text" name="addprice" size="7" value="<?php echo $addprice; ?>">
-                        &nbsp;(inkl. moms)
+                        &nbsp;<?php echo $prislabel; ?>
                     </td>
                   </tr>
               <?php } else { ?>
@@ -899,7 +961,7 @@ if ($calc) {
                     </td>
                     <td>
                         <input onclick="this.select()" class="textbox_white" type="text" name="addprice" size="7" value="<?php echo $addprice; ?>">
-                        &nbsp;(inkl. moms)
+                        &nbsp;<?php echo $prislabel; ?>
                     </td>
                   </tr>
 				  <tr>
@@ -917,6 +979,16 @@ if ($calc) {
 					</td>
 				  </tr>
               <?php } ?>
+          <?php if ($is_tradein) { ?>
+              <tr>
+                <td colspan="2">
+                    <label>
+                        <input type="checkbox" name="allow_below_cost" value="yes" <?php if ($allow_below_cost == "yes") { ?>checked<?php } ?>>
+                        Tillåt pris under inköpspris ------->
+                    </label>
+                </td>
+                <td class="small-muted">Annars stoppas ett pris som är lägre än inköpspriset.</td>
+              </tr>
           <?php } ?>
 
           <?php if ($pac_exist) { ?>
@@ -1026,7 +1098,9 @@ if ($calc) {
         <td align="right" class="<?php echo $fontcolor_se; ?>">&nbsp;(<?php echo number_format(round($marginal_tb_moms_se), 0, ',', ' '); ?>)&nbsp; SEK</td>
       </tr>
       <tr>
-        <td colspan="11" class="small-muted">Priser inom parentes anger inkl. moms.</td>
+        <td colspan="11" class="small-muted"><?php echo $is_vmb
+            ? "Inbyte / VMB: inköpspriset saknar moms, utpriset inom parentes är kundpriset. Utpris och marginal exkl. moms = inköpspris + marginal exkl. moms (momsen 25 % ligger på marginalen)."
+            : "Priser inom parentes anger inkl. moms."; ?></td>
       </tr>
     </table>
 </div>
@@ -1049,7 +1123,7 @@ if ($calc) {
                 <input class="textbox_white tcenter" type="text" id="calcmargin" name="calcmargin" size="7" value="<?php echo $calcmargin; ?>">
             </div>
             <div>
-                <label for="calcprice">Utpris inkl. moms</label><br>
+                <label for="calcprice"><?php echo $is_vmb ? "Kundpris (VMB)" : "Utpris inkl. moms"; ?></label><br>
                 <input class="textbox_white tcenter" type="text" id="calcprice" name="calcprice" size="7" value="<?php echo $calcprice; ?>">
             </div>
             <div style="margin-top:14px;">

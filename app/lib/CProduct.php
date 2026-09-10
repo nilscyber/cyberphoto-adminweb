@@ -265,10 +265,27 @@ Class CProduct {
 				p.upc,
 				p.isselfservice,
 				p.discontinued       AS utgangen,
-				CASE WHEN p.istradein = 'Y' THEN -1 ELSE 0 END AS isTradeIn,
+				-- Citerade alias: PostgreSQL gör annars om isTradeIn till istradein och
+				-- sidorna som läser \$rows->isTradeIn får null (buggen bakom felprissatta inbyten).
+				CASE WHEN p.istradein = 'Y' THEN -1 ELSE 0 END AS \"isTradeIn\",
+				-- Inbyte under vinstmarginalbeskattning (VMB): prislistpriset är kundpriset,
+				-- ingen moms på produktpriset (momsen ligger på marginalen, kategori 'Ingen moms').
+				CASE WHEN p.istradein = 'Y' AND p.c_taxcategory_id = 1000000 THEN 1 ELSE 0 END AS \"isVMB\",
+				p.c_taxcategory_id,
 				''                   AS bild,
 				COALESCE(pp.pricestd, 0)                                    AS utpris,
-				COALESCE(pp.pricelimit, COALESCE(c.currentcostprice, 0))    AS art_id,
+				-- Inköpspris. Inbyte: det som faktiskt betalades enligt senaste färdiga inköpsorder
+				-- (prislistans PriceLimit är ofta inaktuell för inbyten); annars PriceLimit / kostnad.
+				COALESCE(
+					CASE WHEN p.istradein = 'Y' THEN (
+						SELECT po.priceactual
+						  FROM c_orderline po
+						  JOIN c_order oo ON oo.c_order_id = po.c_order_id
+						 WHERE po.m_product_id = p.m_product_id
+						   AND oo.issotrx = 'N' AND oo.docstatus IN ('CO','CL')
+						 ORDER BY oo.dateordered DESC
+						 LIMIT 1) END,
+					pp.pricelimit, c.currentcostprice, 0)                       AS art_id,
 				COALESCE((
 					SELECT t.rate / 100.0
 					  FROM c_tax t

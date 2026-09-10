@@ -79,6 +79,10 @@ All current pages use the shared design system. No known migration debt.
 - **PostgreSQL / ADempiere** (`$ad_r`) – products (`m_product`), stock (`m_product_cache`), orders (`c_order`)
 
 ### Product queries (PostgreSQL)
+PostgreSQL folds unquoted aliases to lowercase: `AS isTradeIn` comes back as `istradein`, and `$rows->isTradeIn` is silently null (this broke trade-in pricing in `product_update.php` for months). Quote camelCase aliases (`AS "isTradeIn"`) or use lowercase property names.
+
+Trade-in products (`m_product.istradein = 'Y'`) with tax category 1000000 ("Ingen moms") are sold under the margin scheme (VMB): their price-list price **is** the customer price, VAT applies only to the margin and is handled by ADempiere. Never divide or multiply their prices by 1.25. Their purchase price is the latest completed purchase-order line, not the price list's `pricelimit` (often stale).
+
 Always include manufacturer name by joining `xc_manufacturer`:
 ```sql
 SELECT p.value AS artnr,

@@ -688,7 +688,9 @@ JS;
 		global $fi, $no;
 	
 		$select  = "SELECT pl.name, pl.m_pricelist_id, u.value, pu.updatetime, pu.pricestd, pu.isupdtselfservice, pu.isselfservice, pu.isupdtpricestd, pu.isupdtdiscontinued, pu.discontinued, ";
-		$select .= "pu.isupdtname, pu.isupdtdescription, pu.m_product_update_id, p.value AS artnr, pu.m_product_id ";
+		$select .= "pu.isupdtname, pu.isupdtdescription, pu.m_product_update_id, p.value AS artnr, pu.m_product_id, ";
+		// VMB-inbyte: prislistpriset är redan kundpriset, ingen moms skall läggas på vid visning
+		$select .= "CASE WHEN p.istradein = 'Y' AND p.c_taxcategory_id = 1000000 THEN 1 ELSE 0 END AS isvmb ";
 		$select .= "FROM m_product_update pu ";
 		$select .= "JOIN m_product p ON p.m_product_id = pu.m_product_id ";
 		$select .= "JOIN m_pricelist pl ON pl.m_pricelist_id = pu.m_pricelist_id ";
@@ -724,7 +726,7 @@ JS;
 					$utpris_moms = $row->pricestd * 1.25;
 					$valuta = "NOK";
 				} else {
-					$utpris_moms = $row->pricestd * 1.25;
+					$utpris_moms = $row->pricestd * (!empty($row->isvmb) ? 1 : 1.25);
 					$valuta = "SEK";
 				}
 	
