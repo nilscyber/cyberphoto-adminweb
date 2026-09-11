@@ -2327,11 +2327,11 @@ Class CWebADInternSuplier {
 		echo "\t<thead>\n";
 		echo "\t<tr>\n";
 		echo "\t\t<th>Leverantör</th>\n";
-		echo "\t\t<th>Antal</th>\n";
+		echo "\t\t<th class=\"c\">Antal</th>\n";
 		if ($economy == "yes") {
-			echo "\t\t<th>Nettosumma</th>\n";
+			echo "\t\t<th class=\"r\">Nettosumma</th>\n";
 		}
-		echo "\t\t<th>Nettovikt</th>\n";
+		echo "\t\t<th class=\"c\">Nettovikt</th>\n";
 		echo "\t\t<th>Inköpare</th>\n";
 		echo "\t</tr>\n";
 		echo "\t</thead>\n";
@@ -2409,12 +2409,12 @@ Class CWebADInternSuplier {
 
 						echo "\t<tr>\n";
 						echo "\t\t<td><a href=\"#\" onclick=\"document.sampleform.supID.value='$row[3]'; document.sampleform.submit();\">$row[0]</a></td>\n";
-						echo "\t\t<td align=\"center\">" . round($row[1],0) . "</td>\n";
+						echo "\t\t<td class=\"c\">" . round($row[1],0) . "</td>\n";
 						if ($economy == "yes") {
-							echo "\t\t<td align=\"right\">" . number_format($row[5], 0, ',', ' ') . " SEK</td>\n";
+							echo "\t\t<td class=\"r\">" . number_format($row[5], 0, ',', ' ') . " SEK</td>\n";
 						}
-						echo "\t\t<td align=\"center\">" . round($row[2],2) . "</td>\n";
-						echo "\t\t<td align=\"center\">$row[4]</td>\n";
+						echo "\t\t<td class=\"c\">" . round($row[2],2) . "</td>\n";
+						echo "\t\t<td>$row[4]</td>\n";
 						echo "\t</tr>\n";
 
 						$countrow++;
@@ -2436,11 +2436,11 @@ Class CWebADInternSuplier {
 		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
 		echo "\t\t<td><b>Totalt</b></td>\n";
-		echo "\t\t<td align=\"center\"><b>$antaltotal st</b></td>\n";
+		echo "\t\t<td class=\"c\"><b>$antaltotal st</b></td>\n";
 		if ($economy == "yes") {
-			echo "\t\t<td align=\"right\"><b>" . number_format($totsumma, 0, ',', ' ') . " SEK</b></td>\n";
+			echo "\t\t<td class=\"r\"><b>" . number_format($totsumma, 0, ',', ' ') . " SEK</b></td>\n";
 		}
-		echo "\t\t<td align=\"center\"><b>" . round($totalvikt,2) . " kg</b></td>\n";
+		echo "\t\t<td class=\"c\"><b>" . round($totalvikt,2) . " kg</b></td>\n";
 		echo "\t\t<td></td>\n";
 		echo "\t</tr>\n";
 		echo "\t</tfoot>\n";
@@ -2466,9 +2466,9 @@ Class CWebADInternSuplier {
 		echo "\t\t<th>Leverantör</th>\n";
 		echo "\t\t<th>Artikel</th>\n";
 		echo "\t\t<th>Produkt</th>\n";
-		echo "\t\t<th>Antal</th>\n";
-		echo "\t\t<th>Nettovikt</th>\n";
-		echo "\t\t<th>Ordernr</th>\n";
+		echo "\t\t<th class=\"c\">Antal</th>\n";
+		echo "\t\t<th class=\"c\">Nettovikt</th>\n";
+		echo "\t\t<th class=\"c\">Ordernr</th>\n";
 		echo "\t\t<th>&nbsp;</th>\n";
 		echo "\t</tr>\n";
 		echo "\t</thead>\n";
@@ -2538,9 +2538,9 @@ Class CWebADInternSuplier {
 						echo "\t\t<td>$row[0]</td>\n";
 						echo "\t\t<td><span class=\"copy-art\" data-article=\"$row[1]\" title=\"Kopiera artikelnummer\">$row[1]</span></td>\n";
 						echo "\t\t<td><a href=\"$editUrl\" target=\"_blank\">$produktnamn</a></td>\n";
-						echo "\t\t<td align=\"center\">" . $antalin . "</td>\n";
-						echo "\t\t<td align=\"center\">" . $nettototal . "</td>\n";
-						echo "\t\t<td align=\"center\">$row[5]</td>\n";
+						echo "\t\t<td class=\"c\">" . $antalin . "</td>\n";
+						echo "\t\t<td class=\"c\">" . $nettototal . "</td>\n";
+						echo "\t\t<td class=\"c\">$row[5]</td>\n";
 						echo "\t\t<td bgcolor=\"$statuscolor\"></td>\n";
 						echo "\t</tr>\n";
 
@@ -2562,8 +2562,8 @@ Class CWebADInternSuplier {
 		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
 		echo "\t\t<td colspan=\"3\"><b>Totalt</b></td>\n";
-		echo "\t\t<td align=\"center\"><b>$antaltotal st</b></td>\n";
-		echo "\t\t<td align=\"center\"><b>$totalvikt kg</b></td>\n";
+		echo "\t\t<td class=\"c\"><b>$antaltotal st</b></td>\n";
+		echo "\t\t<td class=\"c\"><b>$totalvikt kg</b></td>\n";
 		echo "\t\t<td colspan=\"2\"></td>\n";
 		echo "\t</tr>\n";
 		echo "\t</tfoot>\n";
@@ -2581,8 +2581,8 @@ Class CWebADInternSuplier {
 		echo "\t<thead>\n";
 		echo "\t<tr>\n";
 		echo "\t\t<th>Leverantör</th>\n";
-		echo "\t\t<th>Antal</th>\n";
-		echo "\t\t<th>Nettovikt</th>\n";
+		echo "\t\t<th class=\"c\">Antal</th>\n";
+		echo "\t\t<th class=\"c\">Nettovikt</th>\n";
 		echo "\t</tr>\n";
 		echo "\t</thead>\n";
 		echo "\t<tbody>\n";
@@ -2619,8 +2619,8 @@ Class CWebADInternSuplier {
 
 						echo "\t<tr>\n";
 						echo "\t\t<td><a href=\"" . $_SERVER['PHP_SELF'] . "?supID=$row[3]\">$row[0]</a></td>\n";
-						echo "\t\t<td align=\"center\">" . round($row[1],0) . "</td>\n";
-						echo "\t\t<td align=\"center\">" . round($row[2],2) . "</td>\n";
+						echo "\t\t<td class=\"c\">" . round($row[1],0) . "</td>\n";
+						echo "\t\t<td class=\"c\">" . round($row[2],2) . "</td>\n";
 						echo "\t</tr>\n";
 
 						$countrow++;
@@ -2641,8 +2641,8 @@ Class CWebADInternSuplier {
 		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
 		echo "\t\t<td><b>Totalt</b></td>\n";
-		echo "\t\t<td align=\"center\"><b>$antaltotal st</b></td>\n";
-		echo "\t\t<td align=\"center\"><b>" . round($totalvikt,2) . " kg</b></td>\n";
+		echo "\t\t<td class=\"c\"><b>$antaltotal st</b></td>\n";
+		echo "\t\t<td class=\"c\"><b>" . round($totalvikt,2) . " kg</b></td>\n";
 		echo "\t</tr>\n";
 		echo "\t</tfoot>\n";
 		echo "</table>\n";
@@ -2663,9 +2663,9 @@ Class CWebADInternSuplier {
 		echo "\t\t<th>Lev artikel nr</th>\n";
 		echo "\t\t<th>Vårt artikel nr</th>\n";
 		echo "\t\t<th>Produkt</th>\n";
-		echo "\t\t<th>Antal</th>\n";
-		echo "\t\t<th>Nettovikt</th>\n";
-		echo "\t\t<th>Ordernr</th>\n";
+		echo "\t\t<th class=\"c\">Antal</th>\n";
+		echo "\t\t<th class=\"c\">Nettovikt</th>\n";
+		echo "\t\t<th class=\"c\">Ordernr</th>\n";
 		echo "\t\t<th>&nbsp;</th>\n";
 		echo "\t</tr>\n";
 		echo "\t</thead>\n";
@@ -2705,9 +2705,9 @@ Class CWebADInternSuplier {
 						echo "\t\t<td><span class=\"copy-art\" data-article=\"$row[8]\" title=\"Kopiera lev. artikelnummer\">$row[8]</span></td>\n";
 						echo "\t\t<td><span class=\"copy-art\" data-article=\"$row[1]\" title=\"Kopiera vårt artikelnummer\">$row[1]</span></td>\n";
 						echo "\t\t<td><a href=\"$editUrl\" target=\"_blank\">$produktnamn</a></td>\n";
-						echo "\t\t<td align=\"center\">" . $antalin . "</td>\n";
-						echo "\t\t<td align=\"center\">" . $nettototal . "</td>\n";
-						echo "\t\t<td align=\"center\">$row[5]</td>\n";
+						echo "\t\t<td class=\"c\">" . $antalin . "</td>\n";
+						echo "\t\t<td class=\"c\">" . $nettototal . "</td>\n";
+						echo "\t\t<td class=\"c\">$row[5]</td>\n";
 						echo "\t\t<td bgcolor=\"$statuscolor\"></td>\n";
 						echo "\t</tr>\n";
 
@@ -2729,8 +2729,8 @@ Class CWebADInternSuplier {
 		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
 		echo "\t\t<td colspan=\"4\"><b>Totalt</b></td>\n";
-		echo "\t\t<td align=\"center\"><b>$antaltotal st</b></td>\n";
-		echo "\t\t<td align=\"center\"><b>$totalvikt kg</b></td>\n";
+		echo "\t\t<td class=\"c\"><b>$antaltotal st</b></td>\n";
+		echo "\t\t<td class=\"c\"><b>$totalvikt kg</b></td>\n";
 		echo "\t\t<td colspan=\"2\"></td>\n";
 		echo "\t</tr>\n";
 		echo "\t</tfoot>\n";
@@ -2750,7 +2750,7 @@ Class CWebADInternSuplier {
 		echo "\t\t<th>Artikel nr</th>\n";
 		echo "\t\t<th>Leverantör</th>\n";
 		echo "\t\t<th>Produkt</th>\n";
-		echo "\t\t<th>Kostnad</th>\n";
+		echo "\t\t<th class=\"r\">Kostnad</th>\n";
 		echo "\t</tr>\n";
 		echo "\t</thead>\n";
 		echo "\t<tbody>\n";
@@ -2796,7 +2796,7 @@ Class CWebADInternSuplier {
 						echo "\t\t<td>$row->artnr</td>\n";
 						echo "\t\t<td>$row->leverantor</td>\n";
 						echo "\t\t<td><a href=\"$editUrl\" target=\"_blank\">$row->tillverkare $row->beskrivning</a></td>\n";
-						echo "\t\t<td align=\"right\">" . number_format($row->productprice, 0, ',', ' ') . " SEK</td>\n";
+						echo "\t\t<td class=\"r\">" . number_format($row->productprice, 0, ',', ' ') . " SEK</td>\n";
 						echo "\t</tr>\n";
 
 						$countrow++;
