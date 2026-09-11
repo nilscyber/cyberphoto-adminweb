@@ -2601,16 +2601,17 @@ Class CWebADInternSuplier {
 		$totalvikt = 0;
 		$antaltotal = 0;
 		
-		echo "<table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
+		echo "<table class=\"table-list\">\n";
+		echo "\t<thead>\n";
 		echo "\t<tr>\n";
-		echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"200\"><b>Leverantör</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Antal</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Nettovikt</b></td>\n";
-		// echo "\t\t<td width=\"75\" align=\"center\"><b>Inköpare</b></td>\n";
+		echo "\t\t<th>Leverantör</th>\n";
+		echo "\t\t<th>Antal</th>\n";
+		echo "\t\t<th>Nettovikt</th>\n";
 		echo "\t</tr>\n";
-			
-			$select = "SELECT bp.name, SUM(col.qtyordered - col.qtydelivered) AS totantal, SUM((col.qtyordered - col.qtydelivered) * p.weight_net) AS totvikt, bp.value, au.value ";
+		echo "\t</thead>\n";
+		echo "\t<tbody>\n";
+
+			$select = "SELECT bp.name, SUM(col.qtyordered - col.qtydelivered) AS totantal, SUM((col.qtyordered - col.qtydelivered) * p.weight_net) AS totvikt, bp.value, au.name ";
 			$select .= "FROM c_orderline col ";
 			$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
 			$select .= "JOIN c_order o ON col.c_order_id = o.c_order_id ";
@@ -2619,8 +2620,8 @@ Class CWebADInternSuplier {
 			$select .= "WHERE o.c_doctype_id = 1000016 AND NOT o.docstatus IN ('VO') AND col.qtyordered > col.qtydelivered ";
 			$select .= "AND col.datepromised < '$dagensdatum 23:59:59' ";
 			$select .= "AND NOT col.datepromisedprecision = 'U' ";
-			$select .= "GROUP BY bp.name, bp.value, au.value ";
-			$select .= "ORDER BY au.value ";
+			$select .= "GROUP BY bp.name, bp.value, au.name ";
+			$select .= "ORDER BY au.name ASC, bp.name ASC ";
 			if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
 				echo $select;
 				exit;
@@ -2630,63 +2631,44 @@ Class CWebADInternSuplier {
 			// $row = pg_fetch_object($res);
 
 				if ($res && pg_num_rows($res) > 0) {
-				
+
 					while ($res && $row = pg_fetch_row($res)) {
 
 						if ($row[4] != $current_purchace) {
-							if ($countrow > 1) {
-								echo "<tr>\n";
-								echo "<td colspan=\"5\" align=\"left\" class=\"dateheadline\"></td>\n";
-								echo "</tr>\n";
-							}
-						echo "<tr>\n";
-						echo "<td colspan=\"5\" align=\"left\" class=\"dateheadline\">Inköpare: " . strtoupper($row[4]) . "</td>\n";
-						echo "</tr>\n";
+							echo "<tr>\n";
+							echo "<td colspan=\"3\" class=\"dateheadline\">Inköpare: " . $row[4] . "</td>\n";
+							echo "</tr>\n";
 						}
 						$current_purchace = $row[4];
-						
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-				
-						echo "\t<tr>";
-						echo "\t\t<td class=\"$backcolor\">$countrow</td>\n";
-						echo "\t\t<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?supID=$row[3]\">$row[0]</a></td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . round($row[1],0) . "</td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . round($row[2],2) . "</td>\n";
-						// echo "\t\t<td class=\"$backcolor\" align=\"center\">" . strtoupper($row[4]) . "</td>\n";
+
+						echo "\t<tr>\n";
+						echo "\t\t<td><a href=\"" . $_SERVER['PHP_SELF'] . "?supID=$row[3]\">$row[0]</a></td>\n";
+						echo "\t\t<td align=\"center\">" . round($row[1],0) . "</td>\n";
+						echo "\t\t<td align=\"center\">" . round($row[2],2) . "</td>\n";
 						echo "\t</tr>\n";
-						
+
 						$countrow++;
 						$totalvikt = $totalvikt + $row[2];
 						$antaltotal = $antaltotal + $row[1];
-						
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
 
 					}
-					
+
 				} else {
-				
+
 						echo "\t<tr>\n";
-						echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-						echo "\t\t<td colspan=\"4\"><i>Ingen kö på denna produkt</i></td>\n";
+						echo "\t\t<td colspan=\"3\"><i>Ingen kö på denna produkt</i></td>\n";
 						echo "\t</tr>\n";
-				
+
 				}
-			
+
+		echo "\t</tbody>\n";
+		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
-		echo "\t\t<td colspan=\"2\">&nbsp;</td>\n";
-		echo "\t\t<td align=\"center\"><b>$antaltotal st</td>\n";
-		echo "\t\t<td align=\"center\"><b>" . round($totalvikt,2) . " kg</td>\n";
+		echo "\t\t<td><b>Totalt</b></td>\n";
+		echo "\t\t<td align=\"center\"><b>$antaltotal st</b></td>\n";
+		echo "\t\t<td align=\"center\"><b>" . round($totalvikt,2) . " kg</b></td>\n";
 		echo "\t</tr>\n";
+		echo "\t</tfoot>\n";
 		echo "</table>\n";
 	}
 
@@ -2698,24 +2680,28 @@ Class CWebADInternSuplier {
 		$totalvikt = 0;
 		$antaltotal = 0;
 		
-		echo "<table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
+		echo "<table class=\"table-list\">\n";
+		echo "\t<thead>\n";
 		echo "\t<tr>\n";
-		echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"200\"><b>Leverantör</b></td>\n";
-		echo "\t\t<td width=\"150\"><b>Lev artikel nr</b></td>\n";
-		echo "\t\t<td width=\"150\"><b>Vårt artikel nr</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Antal</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Nettovikt</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Ordernr</b></td>\n";
-		echo "\t\t<td width=\"25\" align=\"center\"><b>&nbsp;</b></td>\n";
+		echo "\t\t<th>Leverantör</th>\n";
+		echo "\t\t<th>Lev artikel nr</th>\n";
+		echo "\t\t<th>Vårt artikel nr</th>\n";
+		echo "\t\t<th>Produkt</th>\n";
+		echo "\t\t<th>Antal</th>\n";
+		echo "\t\t<th>Nettovikt</th>\n";
+		echo "\t\t<th>Ordernr</th>\n";
+		echo "\t\t<th>&nbsp;</th>\n";
 		echo "\t</tr>\n";
-			
-			$select = "SELECT bp.name, p.value, col.qtyordered, col.qtydelivered, p.weight_net, o.documentno, col.datepromised, col.datepromisedprecision, ppo.vendorproductno ";
+		echo "\t</thead>\n";
+		echo "\t<tbody>\n";
+
+			$select = "SELECT bp.name, p.value, col.qtyordered, col.qtydelivered, p.weight_net, o.documentno, col.datepromised, col.datepromisedprecision, ppo.vendorproductno, p.m_product_id, p.name AS beskrivning, manu.name AS tillverkare ";
 			$select .= "FROM c_orderline col ";
 			$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
 			$select .= "JOIN c_order o ON col.c_order_id = o.c_order_id ";
 			$select .= "JOIN m_product p ON col.m_product_id = p.m_product_id ";
 			$select .= "JOIN m_product_po ppo ON p.m_product_id = ppo.m_product_id ";
+			$select .= "LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id ";
 			$select .= "WHERE o.c_doctype_id = 1000016 AND NOT o.docstatus IN ('VO') AND col.qtyordered > col.qtydelivered ";
 			$select .= "AND col.datepromised < '$dagensdatum 23:59:59' ";
 			$select .= "AND NOT col.datepromisedprecision = 'U' AND ppo.iscurrentvendor = 'Y' AND bp.value = '$supID' ";
@@ -2729,67 +2715,49 @@ Class CWebADInternSuplier {
 			// $row = pg_fetch_object($res);
 
 				if ($res && pg_num_rows($res) > 0) {
-				
+
 					while ($res && $row = pg_fetch_row($res)) {
 
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-					
 						$antalin = $row[2] - $row[3];
 						$nettototal = $antalin * round($row[4],2);
 						$statuscolor = "#F26F0D";
-						
-						echo "\t<tr>";
-						echo "\t\t<td class=\"$backcolor\">$countrow</td>\n";
-						// echo "\t\t<td>" . date("Y-m-d H:i",strtotime($row[0])) . "</td>\n";
-						// echo "\t\t<td>" . date("Y-m-d",strtotime($row[0])) . "</td>\n";
-						echo "\t\t<td class=\"$backcolor\">$row[0]</td>\n";
-						echo "\t\t<td class=\"$backcolor\">$row[8]</td>\n";
-						echo "\t\t<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[1]\">$row[1]</a></td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . $antalin . "</td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . $nettototal . "</td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">$row[5]</td>\n";
-						if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") {
-							// echo "\t\t<td align=\"left\">" . $this->showDeliveryDate($row[6], $row[7], false, true) . "</td>\n";
-							echo "\t\t<td bgcolor=\"$statuscolor\"></td>\n";
-						} else {
-							// echo "\t\t<td align=\"left\">" . $this->showDeliveryDate($row[6], $row[7], false, true) . "</td>\n";
-							// echo "\t\t<td align=\"center\">$row[5]</td>\n";
-							echo "\t\t<td bgcolor=\"$statuscolor\"></td>\n";
-						}
+						$editUrl = "/search_dispatch.php?mode=product&q=" . urlencode($row[1]) . "&open=product&id=" . urlencode($row[9]);
+						$produktnamn = trim($row[11] . " " . $row[10]);
+
+						echo "\t<tr>\n";
+						echo "\t\t<td>$row[0]</td>\n";
+						echo "\t\t<td><span class=\"copy-art\" data-article=\"$row[8]\" title=\"Kopiera lev. artikelnummer\">$row[8]</span></td>\n";
+						echo "\t\t<td><span class=\"copy-art\" data-article=\"$row[1]\" title=\"Kopiera vårt artikelnummer\">$row[1]</span></td>\n";
+						echo "\t\t<td><a href=\"$editUrl\" target=\"_blank\">$produktnamn</a></td>\n";
+						echo "\t\t<td align=\"center\">" . $antalin . "</td>\n";
+						echo "\t\t<td align=\"center\">" . $nettototal . "</td>\n";
+						echo "\t\t<td align=\"center\">$row[5]</td>\n";
+						echo "\t\t<td bgcolor=\"$statuscolor\"></td>\n";
 						echo "\t</tr>\n";
-						
+
 						$countrow++;
 						$totalvikt = $totalvikt + $nettototal;
 						$antaltotal = $antaltotal + $antalin;
 
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
-						
 					}
-					
+
 				} else {
-				
+
 						echo "\t<tr>\n";
-						echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-						echo "\t\t<td colspan=\"4\"><i>Ingen kö på denna produkt</i></td>\n";
+						echo "\t\t<td colspan=\"8\"><i>Ingen kö på denna produkt</i></td>\n";
 						echo "\t</tr>\n";
-				
+
 				}
-			
+
+		echo "\t</tbody>\n";
+		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
-		echo "\t\t<td colspan=\"4\">&nbsp;</td>\n";
-		echo "\t\t<td align=\"center\"><b>$antaltotal st</td>\n";
-		echo "\t\t<td align=\"center\"><b>$totalvikt kg</td>\n";
+		echo "\t\t<td colspan=\"4\"><b>Totalt</b></td>\n";
+		echo "\t\t<td align=\"center\"><b>$antaltotal st</b></td>\n";
+		echo "\t\t<td align=\"center\"><b>$totalvikt kg</b></td>\n";
+		echo "\t\t<td colspan=\"2\"></td>\n";
 		echo "\t</tr>\n";
+		echo "\t</tfoot>\n";
 		echo "</table>\n";
 	}
 
