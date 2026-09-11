@@ -2323,17 +2323,19 @@ Class CWebADInternSuplier {
 		$antaltotal = 0;
 		$totsumma = 0;
 
-		echo "<table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
+		echo "<table class=\"table-list\">\n";
+		echo "\t<thead>\n";
 		echo "\t<tr>\n";
-		echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"200\"><b>Leverantör</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Antal</b></td>\n";
+		echo "\t\t<th>Leverantör</th>\n";
+		echo "\t\t<th>Antal</th>\n";
 		if ($economy == "yes") {
-			echo "\t\t<td width=\"75\" align=\"center\"><b>Nettosumma</b></td>\n";
+			echo "\t\t<th>Nettosumma</th>\n";
 		}
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Nettovikt</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Inköpare</b></td>\n";
+		echo "\t\t<th>Nettovikt</th>\n";
+		echo "\t\t<th>Inköpare</th>\n";
 		echo "\t</tr>\n";
+		echo "\t</thead>\n";
+		echo "\t<tbody>\n";
 			/*
 			$select = "SELECT bp.name, SUM(col.qtyordered - col.qtydelivered) AS totantal, SUM((col.qtyordered - col.qtydelivered) * p.weight_net) AS totvikt, bp.value, au.value ";
 			$select .= "FROM c_orderline col ";
@@ -2350,7 +2352,7 @@ Class CWebADInternSuplier {
 			$select .= "ORDER BY bp.name ";
 			*/
 			if ($economy == "yes") {
-				$select = "SELECT bp.name, SUM(col.qtyordered - col.qtydelivered) AS totantal, SUM((col.qtyordered - col.qtydelivered) * p.weight_net) AS totvikt, bp.value, au.value ";
+				$select = "SELECT bp.name, SUM(col.qtyordered - col.qtydelivered) AS totantal, SUM((col.qtyordered - col.qtydelivered) * p.weight_net) AS totvikt, bp.value, au.name ";
 				$select .= ", SUM((col.qtyordered - col.qtydelivered) * po.currentcostprice) AS totsumma ";
 				$select .= "FROM c_orderline col ";
 				$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
@@ -2370,10 +2372,10 @@ Class CWebADInternSuplier {
 				}
 				$select .= "AND NOT col.datepromisedprecision = 'U' ";
 				$select .= "AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.isactive = 'Y' ";
-				$select .= "GROUP BY bp.name, bp.value, au.value ";
+				$select .= "GROUP BY bp.name, bp.value, au.name ";
 				$select .= "ORDER BY bp.name ";
 			} else {
-				$select = "SELECT bp.name, SUM(col.qtyordered - col.qtydelivered) AS totantal, SUM((col.qtyordered - col.qtydelivered) * p.weight_net) AS totvikt, bp.value, au.value ";
+				$select = "SELECT bp.name, SUM(col.qtyordered - col.qtydelivered) AS totantal, SUM((col.qtyordered - col.qtydelivered) * p.weight_net) AS totvikt, bp.value, au.name ";
 				$select .= "FROM c_orderline col ";
 				$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
 				$select .= "JOIN c_order o ON col.c_order_id = o.c_order_id ";
@@ -2390,7 +2392,7 @@ Class CWebADInternSuplier {
 					$select .= "AND col.datepromised = '$dagensdatum' AND col.datepromisedprecision = 'D' ";
 				}
 				$select .= "AND NOT col.datepromisedprecision = 'U' ";
-				$select .= "GROUP BY bp.name, bp.value, au.value ";
+				$select .= "GROUP BY bp.name, bp.value, au.name ";
 				$select .= "ORDER BY bp.name ";
 			}
 			if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
@@ -2402,59 +2404,46 @@ Class CWebADInternSuplier {
 			// $row = pg_fetch_object($res);
 
 				if ($res && pg_num_rows($res) > 0) {
-				
+
 					while ($res && $row = pg_fetch_row($res)) {
 
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-				
-						echo "\t<tr>";
-						echo "\t\t<td class=\"$backcolor\">$countrow</td>\n";
-						// echo "\t\t<td class=\"$backcolor\"><a href=\"" . $_SERVER['PHP_SELF'] . "?supID=$row[3]&firstinput=$firstinput&only_today=$only_today\">$row[0]</a></td>\n";
-						echo "\t\t<td class=\"$backcolor\"><a href=\"#\" onclick=\"document.sampleform.supID.value='$row[3]'; document.sampleform.submit();\">$row[0]</a></td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . round($row[1],0) . "</td>\n";
+						echo "\t<tr>\n";
+						echo "\t\t<td><a href=\"#\" onclick=\"document.sampleform.supID.value='$row[3]'; document.sampleform.submit();\">$row[0]</a></td>\n";
+						echo "\t\t<td align=\"center\">" . round($row[1],0) . "</td>\n";
 						if ($economy == "yes") {
-							echo "\t\t<td class=\"$backcolor\" align=\"right\">" . number_format($row[5], 0, ',', ' ') . " SEK</td>\n";
+							echo "\t\t<td align=\"right\">" . number_format($row[5], 0, ',', ' ') . " SEK</td>\n";
 						}
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . round($row[2],2) . "</td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . strtoupper($row[4]) . "</td>\n";
+						echo "\t\t<td align=\"center\">" . round($row[2],2) . "</td>\n";
+						echo "\t\t<td align=\"center\">$row[4]</td>\n";
 						echo "\t</tr>\n";
-						
+
 						$countrow++;
 						$totalvikt = $totalvikt + $row[2];
 						$antaltotal = $antaltotal + $row[1];
 						$totsumma = $totsumma + $row[5];
-						
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
 
 					}
-					
+
 				} else {
-				
+
 						echo "\t<tr>\n";
-						echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-						echo "\t\t<td colspan=\"4\"><i>Inga produkter beräknas in denna dag (period)</i></td>\n";
+						echo "\t\t<td colspan=\"5\"><i>Inga produkter beräknas in denna dag (period)</i></td>\n";
 						echo "\t</tr>\n";
-				
+
 				}
-			
+
+		echo "\t</tbody>\n";
+		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
-		echo "\t\t<td colspan=\"2\">&nbsp;</td>\n";
-		echo "\t\t<td align=\"center\"><b>$antaltotal st</td>\n";
+		echo "\t\t<td><b>Totalt</b></td>\n";
+		echo "\t\t<td align=\"center\"><b>$antaltotal st</b></td>\n";
 		if ($economy == "yes") {
-			echo "\t\t<td align=\"right\"><b>" . number_format($totsumma, 0, ',', ' ') . " SEK</td>\n";
+			echo "\t\t<td align=\"right\"><b>" . number_format($totsumma, 0, ',', ' ') . " SEK</b></td>\n";
 		}
-		echo "\t\t<td align=\"center\"><b>" . round($totalvikt,2) . " kg</td>\n";
+		echo "\t\t<td align=\"center\"><b>" . round($totalvikt,2) . " kg</b></td>\n";
+		echo "\t\t<td></td>\n";
 		echo "\t</tr>\n";
+		echo "\t</tfoot>\n";
 		echo "</table>\n";
 	}
 
@@ -2471,17 +2460,20 @@ Class CWebADInternSuplier {
 		$totalvikt = 0;
 		$antaltotal = 0;
 		
-		echo "<table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
+		echo "<table class=\"table-list\">\n";
+		echo "\t<thead>\n";
 		echo "\t<tr>\n";
-		echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"200\"><b>Leverantör</b></td>\n";
-		echo "\t\t<td width=\"150\"><b>Artikel</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Antal</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Nettovikt</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Ordernr</b></td>\n";
-		echo "\t\t<td width=\"25\" align=\"center\"><b>&nbsp;</b></td>\n";
+		echo "\t\t<th>Leverantör</th>\n";
+		echo "\t\t<th>Artikel</th>\n";
+		echo "\t\t<th>Produkt</th>\n";
+		echo "\t\t<th>Antal</th>\n";
+		echo "\t\t<th>Nettovikt</th>\n";
+		echo "\t\t<th>Ordernr</th>\n";
+		echo "\t\t<th>&nbsp;</th>\n";
 		echo "\t</tr>\n";
-			
+		echo "\t</thead>\n";
+		echo "\t<tbody>\n";
+
 			/*
 			$select = "SELECT bp.name, p.value, col.qtyordered, col.qtydelivered, p.weight_net, o.documentno, col.datepromised, col.datepromisedprecision ";
 			$select .= "FROM c_orderline col ";
@@ -2495,12 +2487,13 @@ Class CWebADInternSuplier {
 			$select .= "AND NOT col.datepromisedprecision = 'U' AND bp.value = '$supID' ";
 			$select .= "ORDER BY bp.name ASC ";
 			*/
-			
-			$select = "SELECT bp.name, p.value, col.qtyordered, col.qtydelivered, p.weight_net, o.documentno, col.datepromised, col.datepromisedprecision ";
+
+			$select = "SELECT bp.name, p.value, col.qtyordered, col.qtydelivered, p.weight_net, o.documentno, col.datepromised, col.datepromisedprecision, p.m_product_id, p.name AS beskrivning, manu.name AS tillverkare ";
 			$select .= "FROM c_orderline col ";
 			$select .= "JOIN c_bpartner bp ON col.c_bpartner_id = bp.c_bpartner_id ";
 			$select .= "JOIN c_order o ON col.c_order_id = o.c_order_id ";
 			$select .= "JOIN m_product p ON col.m_product_id = p.m_product_id ";
+			$select .= "LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id ";
 			$select .= "WHERE o.c_doctype_id = 1000016 AND NOT o.docstatus IN ('VO') AND col.qtyordered > col.qtydelivered ";
 			if ($not_only_today == "yes") {
 				$select .= "AND ( ";
@@ -2522,18 +2515,12 @@ Class CWebADInternSuplier {
 			// $row = pg_fetch_object($res);
 
 				if ($res && pg_num_rows($res) > 0) {
-				
+
 					while ($res && $row = pg_fetch_row($res)) {
 
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-					
 						$antalin = $row[2] - $row[3];
 						$nettototal = $antalin * round($row[4],2);
-						
+
 						if ($row[7] == 'M') {
 							$statuscolor = "#F26F0D";
 						} elseif ($row[7] == 'P') {
@@ -2543,54 +2530,43 @@ Class CWebADInternSuplier {
 						} else {
 							$statuscolor = "#00FF00";
 						}
-						
-						echo "\t<tr>";
-						echo "\t\t<td class=\"$backcolor\">$countrow</td>\n";
-						// echo "\t\t<td>" . date("Y-m-d H:i",strtotime($row[0])) . "</td>\n";
-						// echo "\t\t<td>" . date("Y-m-d",strtotime($row[0])) . "</td>\n";
-						echo "\t\t<td class=\"$backcolor\">$row[0]</td>\n";
-						echo "\t\t<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=$row[1]\">$row[1]</a></td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . $antalin . "</td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">" . $nettototal . "</td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"center\">$row[5]</td>\n";
-						if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89") {
-							// echo "\t\t<td align=\"left\">" . $this->showDeliveryDate($row[6], $row[7], false, true) . "</td>\n";
-							echo "\t\t<td bgcolor=\"$statuscolor\"></td>\n";
-						} else {
-							// echo "\t\t<td align=\"left\">" . $this->showDeliveryDate($row[6], $row[7], false, true) . "</td>\n";
-							// echo "\t\t<td align=\"center\">$row[5]</td>\n";
-							echo "\t\t<td bgcolor=\"$statuscolor\"></td>\n";
-						}
+
+						$editUrl = "/search_dispatch.php?mode=product&q=" . urlencode($row[1]) . "&open=product&id=" . urlencode($row[8]);
+						$produktnamn = trim($row[10] . " " . $row[9]);
+
+						echo "\t<tr>\n";
+						echo "\t\t<td>$row[0]</td>\n";
+						echo "\t\t<td><span class=\"copy-art\" data-article=\"$row[1]\" title=\"Kopiera artikelnummer\">$row[1]</span></td>\n";
+						echo "\t\t<td><a href=\"$editUrl\" target=\"_blank\">$produktnamn</a></td>\n";
+						echo "\t\t<td align=\"center\">" . $antalin . "</td>\n";
+						echo "\t\t<td align=\"center\">" . $nettototal . "</td>\n";
+						echo "\t\t<td align=\"center\">$row[5]</td>\n";
+						echo "\t\t<td bgcolor=\"$statuscolor\"></td>\n";
 						echo "\t</tr>\n";
-						
+
 						$countrow++;
 						$totalvikt = $totalvikt + $nettototal;
 						$antaltotal = $antaltotal + $antalin;
 
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
-						
 					}
-					
+
 				} else {
-				
+
 						echo "\t<tr>\n";
-						echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-						echo "\t\t<td colspan=\"4\"><i>Ingen kö på denna produkt</i></td>\n";
+						echo "\t\t<td colspan=\"7\"><i>Ingen kö på denna produkt</i></td>\n";
 						echo "\t</tr>\n";
-				
+
 				}
-			
+
+		echo "\t</tbody>\n";
+		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
-		echo "\t\t<td colspan=\"3\">&nbsp;</td>\n";
-		echo "\t\t<td align=\"center\"><b>$antaltotal st</td>\n";
-		echo "\t\t<td align=\"center\"><b>$totalvikt kg</td>\n";
+		echo "\t\t<td colspan=\"3\"><b>Totalt</b></td>\n";
+		echo "\t\t<td align=\"center\"><b>$antaltotal st</b></td>\n";
+		echo "\t\t<td align=\"center\"><b>$totalvikt kg</b></td>\n";
+		echo "\t\t<td colspan=\"2\"></td>\n";
 		echo "\t</tr>\n";
+		echo "\t</tfoot>\n";
 		echo "</table>\n";
 	}
 
