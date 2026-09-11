@@ -2799,18 +2799,20 @@ Class CWebADInternSuplier {
 		$dagensdatum = date("Y-m-d", strtotime('yesterday'));
 		$totalvikt = 0;
 		$antaltotal = 0;
-		
-		echo "<table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
+
+		echo "<table class=\"table-list\">\n";
+		echo "\t<thead>\n";
 		echo "\t<tr>\n";
-		// echo "\t\t<td width=\"25\">&nbsp;</td>\n";
-		echo "\t\t<td width=\"120\"><b>Artikel nr</b></td>\n";
-		echo "\t\t<td width=\"150\"><b>Leverantör</b></td>\n";
-		echo "\t\t<td width=\"500\"><b>Produkt</b></td>\n";
-		echo "\t\t<td width=\"75\" align=\"center\"><b>Kostnad</b></td>\n";
+		echo "\t\t<th>Artikel nr</th>\n";
+		echo "\t\t<th>Leverantör</th>\n";
+		echo "\t\t<th>Produkt</th>\n";
+		echo "\t\t<th>Kostnad</th>\n";
 		echo "\t</tr>\n";
-			
+		echo "\t</thead>\n";
+		echo "\t<tbody>\n";
+
 			// $select = "SELECT prod.value AS artnr, manu.name AS tillverkare, cbp.name AS leverantor, au.value as inkopare, prod.name AS beskrivning, po.currentcostprice AS productprice ";
-			$select = "SELECT prod.value AS artnr, manu.name AS tillverkare, cbp.name AS leverantor, au.value as inkopare, prod.name AS beskrivning, price.pricelimit AS productprice ";
+			$select = "SELECT prod.value AS artnr, prod.m_product_id AS m_product_id, manu.name AS tillverkare, cbp.name AS leverantor, au.name as inkopare, prod.name AS beskrivning, price.pricelimit AS productprice ";
 			$select .= "FROM m_product_cache pstock ";
 			$select .= "JOIN m_product prod ON prod.m_product_id = pstock.m_product_id ";
 			$select .= "JOIN m_cost po ON po.m_product_id = pstock.m_product_id ";
@@ -2825,7 +2827,7 @@ Class CWebADInternSuplier {
 			$select .= "AND pstock.qtyordered > pstock.qtyreserved ";
 			$select .= "AND m_pricelist_version_id = 1000000 ";
 			// $select .= "AND (pstock.qtyordered+pstock.qtyonhand) > pstock.qtyreserved AND pstock.qtyreserved > 0 ";
-			$select .= "ORDER BY au.value ASC, cbp.name ASC ";
+			$select .= "ORDER BY au.name ASC, price.pricelimit DESC, prod.value ASC ";
 			if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
 				echo $select;
 				exit;
@@ -2838,58 +2840,39 @@ Class CWebADInternSuplier {
 					while ($res && $row = pg_fetch_object($res)) {
 
 						if ($row->inkopare != $current_purchace) {
-							if ($countrow > 1) {
-								echo "<tr>\n";
-								echo "<td colspan=\"5\" align=\"left\" class=\"dateheadline\"></td>\n";
-								echo "</tr>\n";
-							}
-						echo "<tr>\n";
-						echo "<td colspan=\"5\" align=\"left\" class=\"dateheadline\">Inköpare: " . strtoupper($row->inkopare) . "</td>\n";
-						echo "</tr>\n";
+							echo "<tr>\n";
+							echo "<td colspan=\"4\" class=\"dateheadline\">Inköpare: " . $row->inkopare . "</td>\n";
+							echo "</tr>\n";
 						}
 						$current_purchace = $row->inkopare;
-						
-						if ($rowcolor == true) {
-							$backcolor = "firstrow";
-						} else {
-							$backcolor = "secondrow";
-						}
-				
-						echo "\t<tr>";
-						// echo "\t\t<td class=\"$backcolor\">$countrow</td>\n";
-						echo "\t\t<td class=\"$backcolor\">$row->artnr</td>\n";
-						echo "\t\t<td class=\"$backcolor\">$row->leverantor</td>\n";
-						echo "\t\t<td class=\"$backcolor\"><a target=\"_blank\" href=\"https://www2.cyberphoto.se/info.php?article=" . $row->artnr . "\">$row->tillverkare $row->beskrivning</a></td>\n";
-						echo "\t\t<td class=\"$backcolor\" align=\"right\">" . number_format($row->productprice, 0, ',', ' ') . " SEK</td>\n";
+
+						$editUrl = "/search_dispatch.php?mode=product&q=" . urlencode($row->artnr) . "&open=product&id=" . urlencode($row->m_product_id);
+
+						echo "\t<tr>\n";
+						echo "\t\t<td>$row->artnr</td>\n";
+						echo "\t\t<td>$row->leverantor</td>\n";
+						echo "\t\t<td><a href=\"$editUrl\" target=\"_blank\">$row->tillverkare $row->beskrivning</a></td>\n";
+						echo "\t\t<td align=\"right\">" . number_format($row->productprice, 0, ',', ' ') . " SEK</td>\n";
 						echo "\t</tr>\n";
-						
+
 						$countrow++;
-						
-						if ($rowcolor == true) {
-							$row = true;
-							$rowcolor = false;
-						} else {
-							$row = false;
-							$rowcolor = true;
-						}
 
 					}
-					
+
 				} else {
-				
+
 						echo "\t<tr>\n";
-						echo "\t\t<td width=\"25\">&nbsp;</td>\n";
 						echo "\t\t<td colspan=\"4\"><i>Ingen produkter som är överbeställda, klockrent!</i></td>\n";
 						echo "\t</tr>\n";
-				
+
 				}
-			
+
+		echo "\t</tbody>\n";
+		echo "\t<tfoot>\n";
 		echo "\t<tr>\n";
-		// echo "\t\t<td colspan=\"2\">&nbsp;</td>\n";
-		echo "\t\t<td align=\"left\"><b>Totalt: $countrow st</td>\n";
-		echo "\t\t<td align=\"center\">&nbsp;</td>\n";
-		echo "\t\t<td align=\"center\">&nbsp;</td>\n";
+		echo "\t\t<td colspan=\"4\"><b>Totalt: " . ($countrow - 1) . " st</b></td>\n";
 		echo "\t</tr>\n";
+		echo "\t</tfoot>\n";
 		echo "</table>\n";
 	}
 
