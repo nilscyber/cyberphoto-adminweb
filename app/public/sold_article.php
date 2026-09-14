@@ -19,6 +19,15 @@ $showBundle = isset($_GET['show_salesbundle']) && $_GET['show_salesbundle'] === 
 $page       = isset($_GET['page'])             ? (int)$_GET['page']                          : 1;
 if ($page < 1) $page = 1;
 
+// --- Datumfilter (from/till) ---
+$isValidDate = function($s){
+    if (!is_string($s) || $s === '') return false;
+    $d = DateTime::createFromFormat('Y-m-d', $s);
+    return $d && $d->format('Y-m-d') === $s;
+};
+$dateFrom = (isset($_GET['date_from']) && $isValidDate($_GET['date_from'])) ? $_GET['date_from'] : '';
+$dateTo   = (isset($_GET['date_to'])   && $isValidDate($_GET['date_to']))   ? $_GET['date_to']   : '';
+
 $limit  = 2000;
 $offset = ($page - 1) * $limit;
 
@@ -61,6 +70,11 @@ if ($product_id > 0) {
 // ============================================================
 if ($showBundle && $artikelNr !== '') {
 
+    $paramsC = array($artikelNr);
+    $dateSqlC = '';
+    if ($dateFrom !== '') { $paramsC[] = $dateFrom; $dateSqlC .= " AND o.created::date >= $" . count($paramsC); }
+    if ($dateTo   !== '') { $paramsC[] = $dateTo;   $dateSqlC .= " AND o.created::date <= $" . count($paramsC); }
+
     $sqlCount = "
         SELECT COUNT(DISTINCT ol.c_order_id) AS n
         FROM c_orderline ol
@@ -70,8 +84,9 @@ if ($showBundle && $artikelNr !== '') {
           AND o.docstatus       = 'CO'
           AND ol.qtyordered     = ol.qtydelivered
           AND ol.qtyordered     > 0
+          $dateSqlC
     ";
-    $rsC = ($pg) ? @pg_query_params($pg, $sqlCount, array($artikelNr)) : false;
+    $rsC = ($pg) ? @pg_query_params($pg, $sqlCount, $paramsC) : false;
     $total = 0;
     if ($rsC) {
         $rc    = $rsC ? pg_fetch_assoc($rsC) : null;
@@ -79,6 +94,11 @@ if ($showBundle && $artikelNr !== '') {
         pg_free_result($rsC);
     }
     $totalSkickat = $total;
+
+    $paramsD = array($artikelNr);
+    $dateSqlD = '';
+    if ($dateFrom !== '') { $paramsD[] = $dateFrom; $dateSqlD .= " AND o.created::date >= $" . count($paramsD); }
+    if ($dateTo   !== '') { $paramsD[] = $dateTo;   $dateSqlD .= " AND o.created::date <= $" . count($paramsD); }
 
     $sqlData = "
         SELECT
@@ -99,10 +119,11 @@ if ($showBundle && $artikelNr !== '') {
         INNER JOIN c_bpartner bp ON bp.c_bpartner_id = o.c_bpartner_id
         WHERE o.c_doctype_id = 1000030
           AND o.docstatus    = 'CO'
+          $dateSqlD
         ORDER BY o.created DESC
         LIMIT " . (int)$limit . " OFFSET " . (int)$offset . "
     ";
-    $rsD = ($pg) ? @pg_query_params($pg, $sqlData, array($artikelNr)) : false;
+    $rsD = ($pg) ? @pg_query_params($pg, $sqlData, $paramsD) : false;
 
     $rowsHtml = '';
     if ($rsD) {
@@ -133,6 +154,11 @@ if ($showBundle && $artikelNr !== '') {
 // ============================================================
 } else {
 
+    $paramsC = array($product_id);
+    $dateSqlC = '';
+    if ($dateFrom !== '') { $paramsC[] = $dateFrom; $dateSqlC .= " AND ol.created::date >= $" . count($paramsC); }
+    if ($dateTo   !== '') { $paramsC[] = $dateTo;   $dateSqlC .= " AND ol.created::date <= $" . count($paramsC); }
+
     $sqlCount = "
         SELECT
             COUNT(*)                          AS n,
@@ -144,8 +170,9 @@ if ($showBundle && $artikelNr !== '') {
           AND o.docstatus NOT IN ('VO','RE')
           AND o.c_doctypetarget_id NOT IN (1000027, 1000026)
           AND ol.qtydelivered > 0
+          $dateSqlC
     ";
-    $rsC = ($pg) ? @pg_query_params($pg, $sqlCount, array($product_id)) : false;
+    $rsC = ($pg) ? @pg_query_params($pg, $sqlCount, $paramsC) : false;
     $total        = 0;
     $totalSkickat = 0;
     if ($rsC) {
@@ -154,6 +181,11 @@ if ($showBundle && $artikelNr !== '') {
         $totalSkickat = (int)$rc['tot_skickat'];
         pg_free_result($rsC);
     }
+
+    $paramsD = array($product_id);
+    $dateSqlD = '';
+    if ($dateFrom !== '') { $paramsD[] = $dateFrom; $dateSqlD .= " AND ol.created::date >= $" . count($paramsD); }
+    if ($dateTo   !== '') { $paramsD[] = $dateTo;   $dateSqlD .= " AND ol.created::date <= $" . count($paramsD); }
 
     $sqlData = "
         SELECT
@@ -198,10 +230,11 @@ if ($showBundle && $artikelNr !== '') {
           AND o.docstatus NOT IN ('VO','RE')
           AND o.c_doctypetarget_id NOT IN (1000027, 1000026)
           AND ol.qtydelivered > 0
+          $dateSqlD
         ORDER BY ol.created DESC, ol.c_orderline_id DESC
         LIMIT " . (int)$limit . " OFFSET " . (int)$offset . "
     ";
-    $rsD = ($pg) ? @pg_query_params($pg, $sqlData, array($product_id)) : false;
+    $rsD = ($pg) ? @pg_query_params($pg, $sqlData, $paramsD) : false;
 
     $fmtPrice = fn($v) => number_format((float)$v, 0, ',', ' ') . ' kr';
 
@@ -257,7 +290,10 @@ if ($showBundle && $artikelNr !== '') {
 $pages = ($limit > 0) ? (int)ceil($total / $limit) : 1;
 if ($pages < 1) $pages = 1;
 
-$baseUrl = '/sold_article.php?product_id=' . (int)$product_id . ($showBundle ? '&show_salesbundle=yes' : '');
+$baseUrl = '/sold_article.php?product_id=' . (int)$product_id
+         . ($showBundle ? '&show_salesbundle=yes' : '')
+         . ($dateFrom !== '' ? '&date_from=' . rawurlencode($dateFrom) : '')
+         . ($dateTo   !== '' ? '&date_to=' . rawurlencode($dateTo)     : '');
 $mkUrl = function($p) use ($baseUrl){ return $baseUrl . '&page=' . (int)$p; };
 
 $pagerHtml = '';
@@ -284,12 +320,30 @@ echo '<style>
 .so-sub  { color: #6b7280; margin: 0 0 14px; font-size: 14px; }
 .sa-diff-low { color: #991b1b; font-weight: 800; white-space: nowrap; }
 .sa-diff-ok  { color: #065f46; font-weight: 700; white-space: nowrap; }
+.so-filter   { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin:0 0 14px; }
+.so-filter label { display:block; font-size:12px; color:#6b7280; margin-bottom:3px; }
+.so-filter input[type=date] { border:1px solid #d1d5db; border-radius:4px; padding:5px 8px; font-size:13px; }
+.so-filter .btn-primary { background:#0d9488; color:#fff; border:1px solid #0d9488; }
+.so-filter .btn-primary:hover { background:#0f766e; }
 </style>';
 
 echo '<div class="so-wrap">';
 
 $visaNamn = $produktNamn !== '' ? $produktNamn : ('Produkt #' . (int)$product_id);
 echo '<h1>S&aring;lda: ' . $h($visaNamn) . '</h1>';
+
+echo '<form class="so-filter" method="get" action="/sold_article.php">'
+   . '<input type="hidden" name="product_id" value="' . (int)$product_id . '">'
+   . ($showBundle ? '<input type="hidden" name="show_salesbundle" value="yes">' : '')
+   . '<div><label for="date_from">Fr&aring;n datum</label>'
+   . '<input type="date" id="date_from" name="date_from" value="' . $h($dateFrom) . '"></div>'
+   . '<div><label for="date_to">Till datum</label>'
+   . '<input type="date" id="date_to" name="date_to" value="' . $h($dateTo) . '"></div>'
+   . '<div><button type="submit" class="btn-filter btn-primary">Filtrera</button></div>'
+   . (($dateFrom !== '' || $dateTo !== '')
+        ? '<div><a class="btn-filter" href="/sold_article.php?product_id=' . (int)$product_id . ($showBundle ? '&show_salesbundle=yes' : '') . '">Rensa datum</a></div>'
+        : '')
+   . '</form>';
 
 if ($showBundle) {
     echo '<div class="so-sub">' . (int)$total . ' ordrar s&aring;lda med v&auml;rdepaket</div>';
