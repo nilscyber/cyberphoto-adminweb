@@ -1029,112 +1029,171 @@ Class CTradeIn {
 	}
 	
 	function tradeInValue($showweb,$onlysum) {
-		global $dagensdatum;
-		
-		// $dagensdatum = "2018-11-05";
 
-		$countrow = 0;
-
-		if ($dagensdatum == "") {
-			$dagensdatum = date("Y-m-d", time());
+		$select = "SELECT cat.name AS catname, manu.name AS manuname, prod.m_product_id AS productid, prod.value AS artnr, ";
+		$select .= "CASE WHEN manu.name IS NOT NULL AND manu.name <> '' THEN manu.name || ' ' || prod.name ELSE prod.name END AS prodname, ";
+		$select .= "pstock.qtyonhand AS antal, (pstock.qtyonhand*po.currentcostprice) AS storevalue ";
+		$select .= "FROM m_product_cache pstock ";
+		$select .= "JOIN m_product prod ON prod.m_product_id = pstock.m_product_id ";
+		$select .= "JOIN m_product_category cat ON cat.m_product_category_id = prod.m_product_category_id ";
+		$select .= "JOIN m_cost po ON po.m_product_id = pstock.m_product_id ";
+		$select .= "JOIN m_product_po prod_po ON pstock.m_product_id = prod_po.m_product_id ";
+		$select .= "JOIN c_bpartner cbp ON cbp.c_bpartner_id = prod_po.c_bpartner_id ";
+		$select .= "JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = prod.xc_manufacturer_id ";
+		$select .= "WHERE pstock.m_warehouse_id = 1000000 AND pstock.qtyonhand > 0 AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.isactive = 'Y' ";
+		$select .= "AND cbp.value = '5555' AND prod_po.iscurrentvendor = 'Y' ";
+		$select .= "AND NOT cat.m_product_category_id=1000000 ";
+		if ($showweb == true) {
+			$select .= "AND prod.IsSelfService = 'Y' AND pstock.qtyavailable > 0 ";
 		}
-		// $dagensdatum = date("Y-m-d", time());
-		$look_forward = date('Y-m-d', strtotime("$dagensdatum +3 day"));
-		$look_backward = date('Y-m-d', strtotime("$dagensdatum -3 day"));
-		
-			
-			$select = "SELECT cat.name, SUM(pstock.qtyonhand) AS antallager, SUM(pstock.qtyonhand*po.currentcostprice) AS storevalue ";
-			$select .= "FROM m_product_cache pstock ";
-			$select .= "JOIN m_product prod ON prod.m_product_id = pstock.m_product_id ";
-			$select .= "JOIN m_product_category cat ON cat.m_product_category_id = prod.m_product_category_id ";
-			$select .= "JOIN m_cost po ON po.m_product_id = pstock.m_product_id ";
-			$select .= "JOIN m_product_po prod_po ON pstock.m_product_id = prod_po.m_product_id ";
-			$select .= "JOIN c_bpartner cbp ON cbp.c_bpartner_id = prod_po.c_bpartner_id ";
-			$select .= "JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = prod.xc_manufacturer_id ";
-			$select .= "WHERE pstock.m_warehouse_id = 1000000 AND pstock.qtyonhand > 0 AND po.m_costelement_id=1000005 AND po.m_costtype_id=1000000 AND po.ad_client_id=1000000 AND po.isactive = 'Y' ";
-			$select .= "AND cbp.value = '5555' AND prod_po.iscurrentvendor = 'Y' ";
-			$select .= "AND NOT cat.m_product_category_id=1000000 ";
-			if ($showweb == true) {
-				$select .= "AND prod.IsSelfService = 'Y' AND pstock.qtyavailable > 0 ";
-			}
-			$select .= "GROUP BY cat.name, pstock.qtyonhand ";
-			$select .= "ORDER BY storevalue DESC ";
+		$select .= "ORDER BY cat.name, storevalue DESC ";
 
-			if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-				echo $select;
-				exit;
-			}
+		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
+			echo $select;
+			exit;
+		}
 
-			$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
-			if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
-				echo ($res ? pg_num_rows($res) : 0);
-				// exit;
-			}
-			
-			
-				if ($res && pg_num_rows($res) > 0) {
-					if (!$onlysum) {
-						if ($showweb == true) {
-							echo "<div class=\"count_data bold italic\">Begagnade produkter ute p� webben just nu</div>\n";
-							// echo "<table id=\"begg_nu\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-							echo "<table id=\"begg_tot\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-						} else {
-							echo "<div class=\"count_data bold italic\">Begagnade produkter i lager totalt</div>\n";
-							echo "<table id=\"begg_tot\" width=\"95%\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
-						}
-					}
-				
-					while ($res && $row = pg_fetch_object($res)) {
+		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), $select) : false;
+		if ($_SERVER['REMOTE_ADDR'] == "192.168.1.89x") {
+			echo ($res ? pg_num_rows($res) : 0);
+		}
 
-						$trimmaprodukten = $row->name;
-						
-						if (strlen($trimmaprodukten) >= 50)
-							$trimmaprodukten = substr ($trimmaprodukten, 0, 50) . "...";
-						
-						$totalvarde += $row->storevalue;
-						$totalantal += $row->antallager;
-						$summalager = number_format($row->storevalue, 0, ',', ' ');
-						
-						if (!$onlysum) {
-							echo "\t<tr>";
-							echo "\t\t<td class=\"$backcolor\">$trimmaprodukten</td>\n";
-							echo "\t\t<td width=\"40\" class=\"align_center\">$row->antallager</td>\n";
-							echo "\t\t<td width=\"130\" class=\"align_right\">$summalager SEK</td>\n";
-							echo "\t</tr>\n";
-						}
-						
-						$countrow++;
-						
-						
-					}
-					
-					if (!$onlysum) {
-						echo "\t<tr>";
-						echo "\t\t<td class=\"$backcolor\">&nbsp;</td>\n";
-						echo "\t\t<td width=\"40\" class=\"align_center bold\">$totalantal</td>\n";
-						echo "\t\t<td width=\"130\" class=\"align_right bold\">" . number_format($totalvarde, 0, ',', ' ') . " SEK</td>\n";
-						echo "\t</tr>\n";
-						echo "</table>\n";
-					} else {
+		if ($res && pg_num_rows($res) > 0) {
 
-						echo "<div class=\"\">";
+			// Bygg upp kategori -> tillverkare -> produkter
+			$categories = array();
+			$totalvarde = 0;
+			$totalantal = 0;
 
-						echo "<span class=\"clock\">" . $totalantal . "</span>";
-						echo "<span class=\"clock\"> / </span>";
-						// echo "<span class=\"clock\">" . number_format($totalvarde, 0, ',', ' ') . " SEK</span>";
-						if ($totalvarde > 3000000) {
-							echo "<span class=\"clock mark_green\">" . round(($totalvarde / 1000), 0) . "</span>";
-						} else {
-							echo "<span class=\"clock\">" . round(($totalvarde / 1000), 0) . "</span>";
-						}
-						echo "</div>";
+			while ($row = pg_fetch_object($res)) {
 
+				$cat = $row->catname;
+				$manu = ($row->manuname != "") ? $row->manuname : "Okänt märke";
 
-							
-					}
-				
+				if (!isset($categories[$cat])) {
+					$categories[$cat] = array("antal" => 0, "varde" => 0, "manus" => array());
 				}
-			
+				if (!isset($categories[$cat]["manus"][$manu])) {
+					$categories[$cat]["manus"][$manu] = array("antal" => 0, "varde" => 0, "produkter" => array());
+				}
+
+				$categories[$cat]["antal"] += $row->antal;
+				$categories[$cat]["varde"] += $row->storevalue;
+				$categories[$cat]["manus"][$manu]["antal"] += $row->antal;
+				$categories[$cat]["manus"][$manu]["varde"] += $row->storevalue;
+				$categories[$cat]["manus"][$manu]["produkter"][] = $row;
+
+				$totalvarde += $row->storevalue;
+				$totalantal += $row->antal;
+			}
+
+			if (!$onlysum) {
+
+				uasort($categories, function($a, $b) { return $b["varde"] <=> $a["varde"]; });
+
+				echo "<style>\n";
+				echo ".tradein-summary{display:flex;gap:1.5rem;align-items:center;background:#f8fafc;border:1px solid var(--tbl-border);border-radius:8px;padding:0.75rem 1.25rem;margin-bottom:1rem;font-size:13px;}\n";
+				echo ".tradein-summary b{font-size:15px;}\n";
+				echo ".tradein-report{display:flex;flex-direction:column;gap:10px;}\n";
+				echo ".tradein-cat{border:1px solid var(--tbl-border);border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.04);overflow:hidden;}\n";
+				echo ".tradein-cat>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.75rem;padding:10px 14px;background:var(--tbl-head-bg);font-weight:700;}\n";
+				echo ".tradein-cat>summary::-webkit-details-marker{display:none;}\n";
+				echo ".tradein-cat>summary::before{content:'\\25B8';display:inline-block;transition:transform 0.15s ease;}\n";
+				echo ".tradein-cat[open]>summary::before{transform:rotate(90deg);}\n";
+				echo ".tradein-cat-name{flex:1;}\n";
+				echo ".tradein-cat-count,.tradein-cat-value{color:#374151;font-weight:700;white-space:nowrap;}\n";
+				echo ".tradein-manu-list{padding:6px 14px 10px;}\n";
+				echo ".tradein-manu{border-top:1px solid var(--tbl-border);}\n";
+				echo ".tradein-manu:first-child{border-top:none;}\n";
+				echo ".tradein-manu>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.6rem;padding:8px 4px;}\n";
+				echo ".tradein-manu>summary::-webkit-details-marker{display:none;}\n";
+				echo ".tradein-manu>summary::before{content:'\\25B8';display:inline-block;font-size:11px;color:#6b7280;transition:transform 0.15s ease;}\n";
+				echo ".tradein-manu[open]>summary::before{transform:rotate(90deg);}\n";
+				echo ".tradein-manu-name{width:180px;flex-shrink:0;font-weight:600;}\n";
+				echo ".tradein-bar-track{flex:1;display:inline-block;height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden;}\n";
+				echo ".tradein-bar-fill{display:block;height:100%;background:#0d9488;border-radius:999px;}\n";
+				echo ".tradein-manu-pct{width:44px;text-align:right;color:#6b7280;font-size:12px;}\n";
+				echo ".tradein-manu-value{width:100px;text-align:right;font-weight:700;white-space:nowrap;}\n";
+				echo ".tradein-manu-count{width:50px;text-align:right;color:#6b7280;font-size:12px;}\n";
+				echo ".tradein-products{margin:0 0 8px;}\n";
+				echo "</style>\n";
+
+				echo "<div class=\"tradein-summary\">";
+				echo ($showweb == true) ? "Begagnade produkter ute på webben just nu" : "Begagnade produkter i lager totalt";
+				echo "&nbsp;&mdash;&nbsp;<b>" . $totalantal . "</b>&nbsp;st&nbsp;&mdash;&nbsp;<b>" . number_format($totalvarde, 0, ',', ' ') . " SEK</b>";
+				echo "</div>\n";
+
+				echo "<div class=\"tradein-report\">\n";
+
+				foreach ($categories as $catname => $catdata) {
+
+					uasort($catdata["manus"], function($a, $b) { return $b["varde"] <=> $a["varde"]; });
+
+					echo "<details class=\"tradein-cat\">\n";
+					echo "<summary>";
+					echo "<span class=\"tradein-cat-name\">" . htmlspecialchars($catname) . "</span>";
+					echo "<span class=\"tradein-cat-count\">" . $catdata["antal"] . " st</span>";
+					echo "<span class=\"tradein-cat-value\">" . number_format($catdata["varde"], 0, ',', ' ') . " SEK</span>";
+					echo "</summary>\n";
+					echo "<div class=\"tradein-manu-list\">\n";
+
+					foreach ($catdata["manus"] as $manuname => $manudata) {
+
+						$pct = ($catdata["varde"] > 0) ? round(($manudata["varde"] / $catdata["varde"]) * 100, 1) : 0;
+						$produkter = $manudata["produkter"];
+						usort($produkter, function($a, $b) { return $b->storevalue <=> $a->storevalue; });
+
+						echo "<details class=\"tradein-manu\">\n";
+						echo "<summary>";
+						echo "<span class=\"tradein-manu-name\">" . htmlspecialchars($manuname) . "</span>";
+						echo "<span class=\"tradein-bar-track\"><span class=\"tradein-bar-fill\" style=\"width:" . $pct . "%\"></span></span>";
+						echo "<span class=\"tradein-manu-pct\">" . number_format($pct, 1, ',', ' ') . "%</span>";
+						echo "<span class=\"tradein-manu-value\">" . number_format($manudata["varde"], 0, ',', ' ') . " SEK</span>";
+						echo "<span class=\"tradein-manu-count\">" . $manudata["antal"] . " st</span>";
+						echo "</summary>\n";
+
+						echo "<table class=\"table-list tradein-products\">\n";
+						echo "<thead><tr><th>Produkt</th><th class=\"num\">Antal</th><th class=\"num\">Värde</th></tr></thead>\n";
+						echo "<tbody>\n";
+						foreach ($produkter as $prow) {
+							$prodnamn = $prow->prodname;
+							if (strlen($prodnamn) >= 60) {
+								$prodnamn = substr($prodnamn, 0, 60) . "...";
+							}
+							$prodUrl = "/search_dispatch.php?mode=product&q=" . rawurlencode($prow->artnr) . "&open=product&id=" . (int)$prow->productid;
+							echo "<tr>";
+							echo "<td><a href=\"" . htmlspecialchars($prodUrl) . "\" target=\"_blank\" rel=\"noopener\">" . htmlspecialchars($prodnamn) . "</a> <span class=\"muted\">(" . htmlspecialchars($prow->artnr) . ")</span></td>";
+							echo "<td class=\"num\">" . $prow->antal . "</td>";
+							echo "<td class=\"num\">" . number_format($prow->storevalue, 0, ',', ' ') . " SEK</td>";
+							echo "</tr>\n";
+						}
+						echo "</tbody>\n";
+						echo "</table>\n";
+						echo "</details>\n";
+					}
+
+					echo "</div>\n";
+					echo "</details>\n";
+				}
+
+				echo "</div>\n";
+
+			} else {
+
+				echo "<div class=\"\">";
+				echo "<span class=\"clock\">" . $totalantal . "</span>";
+				echo "<span class=\"clock\"> / </span>";
+				if ($totalvarde > 3000000) {
+					echo "<span class=\"clock mark_green\">" . round(($totalvarde / 1000), 0) . "</span>";
+				} else {
+					echo "<span class=\"clock\">" . round(($totalvarde / 1000), 0) . "</span>";
+				}
+				echo "</div>";
+
+			}
+
+		}
+
 	}
 
 	function getPlingButiksdorren() {
