@@ -1062,6 +1062,7 @@ Class CTradeIn {
 
 			// Bygg upp kategori -> tillverkare -> produkter
 			$categories = array();
+			$totalmanus = array();
 			$totalvarde = 0;
 			$totalantal = 0;
 
@@ -1076,12 +1077,18 @@ Class CTradeIn {
 				if (!isset($categories[$cat]["manus"][$manu])) {
 					$categories[$cat]["manus"][$manu] = array("antal" => 0, "varde" => 0, "produkter" => array());
 				}
+				if (!isset($totalmanus[$manu])) {
+					$totalmanus[$manu] = array("antal" => 0, "varde" => 0);
+				}
 
 				$categories[$cat]["antal"] += $row->antal;
 				$categories[$cat]["varde"] += $row->storevalue;
 				$categories[$cat]["manus"][$manu]["antal"] += $row->antal;
 				$categories[$cat]["manus"][$manu]["varde"] += $row->storevalue;
 				$categories[$cat]["manus"][$manu]["produkter"][] = $row;
+
+				$totalmanus[$manu]["antal"] += $row->antal;
+				$totalmanus[$manu]["varde"] += $row->storevalue;
 
 				$totalvarde += $row->storevalue;
 				$totalantal += $row->antal;
@@ -1116,11 +1123,32 @@ Class CTradeIn {
 				echo ".tradein-manu-value{width:100px;text-align:right;font-weight:700;white-space:nowrap;}\n";
 				echo ".tradein-manu-count{width:50px;text-align:right;color:#6b7280;font-size:12px;}\n";
 				echo ".tradein-products{margin:0 0 8px;}\n";
+				echo ".tradein-total-manu{border:1px solid var(--tbl-border);border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.04);padding:6px 14px 10px;margin-bottom:1rem;}\n";
+				echo ".tradein-total-manu-title{font-weight:700;padding:8px 4px 2px;}\n";
+				echo ".tradein-total-manu .tradein-manu-name{width:180px;flex-shrink:0;font-weight:600;}\n";
+				echo ".tradein-total-manu-row{display:flex;align-items:center;gap:0.6rem;padding:8px 4px;border-top:1px solid var(--tbl-border);}\n";
+				echo ".tradein-total-manu-row:first-of-type{border-top:none;}\n";
 				echo "</style>\n";
 
 				echo "<div class=\"tradein-summary\">";
 				echo ($showweb == true) ? "Begagnade produkter ute på webben just nu" : "Begagnade produkter i lager totalt";
 				echo "&nbsp;&mdash;&nbsp;<b>" . $totalantal . "</b>&nbsp;st&nbsp;&mdash;&nbsp;<b>" . number_format($totalvarde, 0, ',', ' ') . " SEK</b>";
+				echo "</div>\n";
+
+				uasort($totalmanus, function($a, $b) { return $b["varde"] <=> $a["varde"]; });
+
+				echo "<div class=\"tradein-total-manu\">\n";
+				echo "<div class=\"tradein-total-manu-title\">Fördelning per tillverkare (totalt)</div>\n";
+				foreach ($totalmanus as $manuname => $manudata) {
+					$pct = ($totalvarde > 0) ? round(($manudata["varde"] / $totalvarde) * 100, 1) : 0;
+					echo "<div class=\"tradein-total-manu-row\">";
+					echo "<span class=\"tradein-manu-name\">" . htmlspecialchars($manuname) . "</span>";
+					echo "<span class=\"tradein-bar-track\"><span class=\"tradein-bar-fill\" style=\"width:" . $pct . "%\"></span></span>";
+					echo "<span class=\"tradein-manu-pct\">" . number_format($pct, 1, ',', ' ') . "%</span>";
+					echo "<span class=\"tradein-manu-value\">" . number_format($manudata["varde"], 0, ',', ' ') . " SEK</span>";
+					echo "<span class=\"tradein-manu-count\">" . $manudata["antal"] . " st</span>";
+					echo "</div>\n";
+				}
 				echo "</div>\n";
 
 				echo "<div class=\"tradein-report\">\n";
