@@ -1069,7 +1069,7 @@ Class CTradeIn {
 			while ($row = pg_fetch_object($res)) {
 
 				$cat = $row->catname;
-				$manu = ($row->manuname != "") ? $row->manuname : "Okänt märke";
+				$manu = (!empty($row->manuname)) ? $row->manuname : "Okänt märke";
 
 				if (!isset($categories[$cat])) {
 					$categories[$cat] = array("antal" => 0, "varde" => 0, "manus" => array());
@@ -1128,6 +1128,10 @@ Class CTradeIn {
 				echo ".tradein-total-manu .tradein-manu-name{width:180px;flex-shrink:0;font-weight:600;}\n";
 				echo ".tradein-total-manu-row{display:flex;align-items:center;gap:0.6rem;padding:8px 4px;border-top:1px solid var(--tbl-border);}\n";
 				echo ".tradein-total-manu-row:first-of-type{border-top:none;}\n";
+				echo ".tradein-manu-rest{border-top:1px solid var(--tbl-border);}\n";
+				echo ".tradein-manu-rest>summary{cursor:pointer;list-style:none;padding:8px 4px;color:#2563eb;font-size:12px;}\n";
+				echo ".tradein-manu-rest>summary::-webkit-details-marker{display:none;}\n";
+				echo ".tradein-manu-rest .tradein-total-manu-row:first-of-type{border-top:1px solid var(--tbl-border);}\n";
 				echo "</style>\n";
 
 				echo "<div class=\"tradein-summary\">";
@@ -1137,9 +1141,11 @@ Class CTradeIn {
 
 				uasort($totalmanus, function($a, $b) { return $b["varde"] <=> $a["varde"]; });
 
-				echo "<div class=\"tradein-total-manu\">\n";
-				echo "<div class=\"tradein-total-manu-title\">Fördelning per tillverkare (totalt)</div>\n";
-				foreach ($totalmanus as $manuname => $manudata) {
+				$manuTopN = 10;
+				$manuTop = array_slice($totalmanus, 0, $manuTopN, true);
+				$manuRest = array_slice($totalmanus, $manuTopN, null, true);
+
+				$renderTotalManuRow = function($manuname, $manudata) use ($totalvarde) {
 					$pct = ($totalvarde > 0) ? round(($manudata["varde"] / $totalvarde) * 100, 1) : 0;
 					echo "<div class=\"tradein-total-manu-row\">";
 					echo "<span class=\"tradein-manu-name\">" . htmlspecialchars($manuname) . "</span>";
@@ -1148,6 +1154,20 @@ Class CTradeIn {
 					echo "<span class=\"tradein-manu-value\">" . number_format($manudata["varde"], 0, ',', ' ') . " SEK</span>";
 					echo "<span class=\"tradein-manu-count\">" . $manudata["antal"] . " st</span>";
 					echo "</div>\n";
+				};
+
+				echo "<div class=\"tradein-total-manu\">\n";
+				echo "<div class=\"tradein-total-manu-title\">Fördelning per tillverkare (totalt)</div>\n";
+				foreach ($manuTop as $manuname => $manudata) {
+					$renderTotalManuRow($manuname, $manudata);
+				}
+				if (!empty($manuRest)) {
+					echo "<details class=\"tradein-manu-rest\">\n";
+					echo "<summary>Visa " . count($manuRest) . " fler tillverkare</summary>\n";
+					foreach ($manuRest as $manuname => $manudata) {
+						$renderTotalManuRow($manuname, $manudata);
+					}
+					echo "</details>\n";
 				}
 				echo "</div>\n";
 
