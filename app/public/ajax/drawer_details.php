@@ -1368,7 +1368,7 @@ if ($type === 'customer') {
       echo '<a href="'.$soldUrl.'" class="dw-btn" target="_blank" rel="noopener">S&aring;lda</a>';
       echo '<a href="#" class="dw-btn" onclick="window.open(\''.$moniUrl.'\',\'monitor_'.$pidOut.'\',\'width=720,height=700,menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1\');return false;">Bevaka</a>';
       echo '<a href="#" class="dw-btn" onclick="window.open(\''.$feedUrl.'\',\'report_'.$pidOut.'\',\'width=900,height=800,menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1\');return false;">Rapportera</a>';
-      echo '<a href="#" class="dw-btn" onclick="window.open(\''.$editUrl.'\',\'product_update_'.$pidOut.'\',\'width=800,height=900,menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1\');return false;">Editera</a>';
+      echo '<a href="#" class="dw-btn" onclick="window.open(\''.$editUrl.'\',\'product_update_'.$pidOut.'\',\'width=960,height=900,menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1\');return false;">Editera</a>';
     echo '</div>';
 
     // ===== Aktuell leverantör (döljs för egna paket - har ingen egen leverantör) =====

@@ -827,6 +827,19 @@ if ($calc) {
             max-height: 140px;
             border-radius: 4px;
         }
+        .update-table-wrap {
+            overflow-x: auto;
+        }
+        .update-table {
+            min-width: 640px;
+        }
+        .update-table label {
+            white-space: nowrap;
+        }
+        .update-table input[type="text"]:not(.textbox_green) {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
@@ -890,7 +903,8 @@ if ($calc) {
         <input type="hidden" value="<?php echo $pac_addprice; ?>" name="pac_init_price">
     <?php } ?>
 
-        <table border="0" cellpadding="4" cellspacing="0" width="100%">
+        <div class="update-table-wrap">
+        <table class="update-table" border="0" cellpadding="4" cellspacing="0" width="100%">
           <?php if ($is_hcampaign) { ?>
               <tr>
                 <td colspan="3">
@@ -1092,6 +1106,7 @@ if ($calc) {
               </tr>
           <?php } ?>
         </table>
+        </div>
 
         <div style="margin-top:12px;">
             <?php if ($is_logged_in) { ?>

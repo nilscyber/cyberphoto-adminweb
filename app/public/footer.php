@@ -270,6 +270,8 @@ document.addEventListener('click', function(e){
   var w = 800, h = 900;
   // orderlänkar: 1000x600
   if (a.classList.contains('order-link')) { w = 1000; h = 600; }
+  // produktredigering: bredare så etiketterna inte radbryts
+  if (a.classList.contains('edit-btn')) { w = 960; h = 900; }
 
   var feat = 'width='+w+',height='+h+',menubar=0,toolbar=0,location=0,status=0,resizable=1,scrollbars=1';
   var win = window.open(url, name, feat);
