@@ -97,6 +97,9 @@ if ($is_hcampaign) {
     }
 }
 
+// Inloggningsstatus - styr både varningsbanner och om sparande tillåts
+$is_logged_in = ((($_COOKIE['login_ok'] ?? '') === 'true') && (($_COOKIE['login_userid'] ?? '') != 99));
+
 $blogg    = new CBlogg();
 $product  = new CProduct();
 $adintern = new CWebADIntern();
@@ -277,6 +280,11 @@ if ($is_hcampaign && $extra_info == "" && !$subm) {
 /**
  * NYTT UPPDRAG
  */
+if ($subm && !$is_logged_in) {
+    $subm       = false;
+    $wrongmess .= "<p class=\"wrongmess\">- Du måste vara inloggad för att kunna spara ändringar.</p>";
+}
+
 if ($subm) {
 
     $olright = true;
@@ -493,6 +501,11 @@ if ($subm) {
 /**
  * ÄNDRA BEFINTLIGT UPPDRAG (edit-läge)
  */
+if ($submC && !$is_logged_in) {
+    $submC      = false;
+    $wrongmess .= "<p class=\"wrongmess\">- Du måste vara inloggad för att kunna spara ändringar.</p>";
+}
+
 if ($submC) {
 
     $olright = true;
@@ -729,6 +742,18 @@ if ($calc) {
         .tbtgcolorgreen { color:#16a34a; font-weight:bold }
         .tbtgcolorred   { color:#dc2626; font-weight:bold }
         .wrongmess      { color:#dc2626; font-weight:bold }
+        .alert-banner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            font-weight: bold;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+        }
         .hr_grey {
             border: 0;
             background-color: #e5e7eb;
@@ -816,6 +841,10 @@ if ($calc) {
 <?php } ?>
 
 <div class="page-wrap">
+
+<?php if (!$is_logged_in) { ?>
+    <div class="alert-banner">&#9888; Du måste vara inloggad för att editera produkten. Uppgifterna nedan visas enbart, de kan inte sparas.</div>
+<?php } ?>
 
 <?php if ($bild != "") { ?>
     <div class="product-image floatright top20">
@@ -1065,7 +1094,11 @@ if ($calc) {
         </table>
 
         <div style="margin-top:12px;">
-            <input type="submit" class="btn-primary" value="Spara" onclick="this.disabled=true;this.value='Behandlas...'; this.form.submit();">
+            <?php if ($is_logged_in) { ?>
+                <input type="submit" class="btn-primary" value="Spara" onclick="this.disabled=true;this.value='Behandlas...'; this.form.submit();">
+            <?php } else { ?>
+                <input type="submit" class="btn-primary" value="Spara" disabled title="Du måste vara inloggad för att spara">
+            <?php } ?>
         </div>
     </form>
     <?php } ?>

@@ -4,6 +4,23 @@ include_once 'Db.php';
 
 Class CProduct {
 
+	/**
+	 * Skriver ut en enkelt formaterad varningssida och avslutar.
+	 * Skyddsnät för anrop som (felaktigt) når hit utan att ha stoppats
+	 * av inloggningskontrollen tidigare i flödet.
+	 */
+	private function denyAccess($message) {
+		echo "<!DOCTYPE html><html><head><meta charset=\"utf-8\">";
+		echo "<style>body{font-family:Verdana,Arial,sans-serif;background:#f4f5f7;margin:0;padding:40px}";
+		echo ".box{max-width:480px;margin:60px auto;background:#fff;border-radius:8px;";
+		echo "box-shadow:0 1px 3px rgba(15,23,42,.15);padding:24px 28px;text-align:center}";
+		echo ".box h2{color:#dc2626;font-size:16px;margin:0 0 10px}";
+		echo ".box p{color:#374151;font-size:13px;margin:0}</style></head><body>";
+		echo "<div class=\"box\"><h2>&#9888; Åtkomst nekad</h2><p>" . htmlspecialchars($message) . "</p></div>";
+		echo "</body></html>";
+		exit;
+	}
+
 	function getArticleName($artnr) {
 		global $sv, $fi, $no;
 		
@@ -72,15 +89,13 @@ Class CProduct {
 		}
 		
 		if ($_COOKIE['login_ok'] != "true") {
-			echo "Du är inte längre inloggad och därför ej behörig att utföra denna åtgärd...";
-			exit;
+			$this->denyAccess("Du är inte längre inloggad och därför ej behörig att utföra denna åtgärd.");
 		} elseif ($_COOKIE['login_userid'] == 99) {
-			echo "Du har inte behörighet att utföra denna åtgärd...";
-			exit;
+			$this->denyAccess("Du har inte behörighet att utföra denna åtgärd.");
 		} else {
 			$salesrep_id = $_COOKIE['login_userid'];
 		}
-		
+
 		$inserttime = date("Y-m-d H:i:s", time());
 		
 		if ($check_utgangen == "yes") {
@@ -149,11 +164,9 @@ Class CProduct {
 		// global $m_product_update_id,$m_product_id,$addfrom,$add_country,$check_addprice,$addprice_VAT,$check_showweb,$showweb,$check_utgangen,$utgangen,$check_name,$addname,$check_comment,$addcomment;
 	
 		if ($_COOKIE['login_ok'] != "true") {
-			echo "Du är inte längre inloggad och därför ej behörig att utföra denna åtgärd...";
-			exit;
+			$this->denyAccess("Du är inte längre inloggad och därför ej behörig att utföra denna åtgärd.");
 		} elseif ($_COOKIE['login_userid'] == 99) {
-			echo "Du har inte behörighet att utföra denna åtgärd...";
-			exit;
+			$this->denyAccess("Du har inte behörighet att utföra denna åtgärd.");
 		} else {
 			$salesrep_id = $_COOKIE['login_userid'];
 		}
