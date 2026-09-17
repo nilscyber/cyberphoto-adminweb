@@ -71,7 +71,7 @@ Class CProduct {
 			return false;
 		}
 		
-		if ($_COOKIE['login_ok'] != "true" && false) {
+		if ($_COOKIE['login_ok'] != "true") {
 			echo "Du är inte längre inloggad och därför ej behörig att utföra denna åtgärd...";
 			exit;
 		} elseif ($_COOKIE['login_userid'] == 99) {
