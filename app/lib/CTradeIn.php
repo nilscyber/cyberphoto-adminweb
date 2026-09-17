@@ -2813,18 +2813,13 @@ public function getMarination() {
         } catch (Exception $e) { return $ymd; }
     };
 
-    // Skriv modern, men stilla, tabell-CSS (eng�ngs)
+    // Skriv modern, men stilla, tabell-CSS (eng�ngs) - komplement till admin_core.css
     static $cssPrinted = false;
     if (!$cssPrinted) {
         echo '<style>
-        .marination-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px;font-size:14px}
-        .marination-table thead th{background:#f9fafb;border-bottom:2px solid #e5e7eb;padding:8px;text-align:left}
-        .marination-table td{border-bottom:1px solid #eee;padding:8px}
-        .marination-group{background:#e5e7eb;font-weight:700}
+        .marination-group{background:var(--tbl-head-bg,#d1f2f0);font-weight:700}
         .marination-meta{color:#6b7280;font-size:12px}
         .nowrap{white-space:nowrap}
-        .marination-table tbody tr.data-row:nth-child(even){background:#f9fafb}
-        .marination-table tbody tr.data-row:hover{background:#eef2ff}
         </style>';
         $cssPrinted = true;
     }
@@ -2877,7 +2872,7 @@ ORDER BY DATE(prod.salestart) ASC, manu.name ASC, prod.name ASC
     }
 
     // Render � ENDAST: Artikel | Produkt | Plats
-    echo '<table class="marination-table">';
+    echo '<table class="table-list">';
     echo '<thead><tr>
             <th>Artikel</th>
             <th>Produkt</th>
@@ -2897,9 +2892,10 @@ ORDER BY DATE(prod.salestart) ASC, manu.name ASC, prod.name ASC
 
         foreach ($rows as $r) {
             $fullName = trim($r['tillverkare'].' '.$r['product_name']);
-            echo '<tr class="data-row">';
-            echo '<td class="nowrap">'.$h($r['artnr']).'</td>';
-            echo '<td>'.$h($fullName).'</td>';
+            $productUrl = '/search_dispatch.php?mode=product&q=' . urlencode($r['artnr']) . '&open=product&id=' . urlencode($r['m_product_id']) . '#';
+            echo '<tr>';
+            echo '<td class="nowrap"><span class="copy-art" data-article="'.$h($r['artnr']).'" title="Kopiera artikelnummer">'.$h($r['artnr']).'</span></td>';
+            echo '<td><a target="_blank" rel="noopener" href="'.$h($productUrl).'">'.$h($fullName).'</a></td>';
             echo '<td>'.$h($r['locator_value']).'</td>';
             echo '</tr>';
         }
