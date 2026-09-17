@@ -59,6 +59,7 @@ $html .= '<th align="left">Leverant&ouml;r</th>';
 $html .= '<th align="left">Ink&ouml;pare</th>';
 $html .= '<th align="right">Min</th>';
 $html .= '<th align="right">Max</th>';
+$html .= '<th align="left">Leverans</th>';
 $html .= '<th align="left">Status</th>';
 $html .= '</tr>';
 
@@ -87,6 +88,7 @@ foreach ($rows as $r) {
 
     $min = (int)$r['min_stock'];
     $max = (int)$r['max_stock'];
+    $isDropShip = !empty($r['is_dropship']);
 
     // Status: röd "NDA X dagar" om launchdate inte passerats, annars grön.
     $launchTs = strtotime((string)$r['launch_date']);
@@ -109,6 +111,11 @@ foreach ($rows as $r) {
     $html .= '<td>' . $buyOut . '</td>';
     $html .= '<td align="right">' . $min . '</td>';
     $html .= '<td align="right">' . $max . '</td>';
+    if ($isDropShip) {
+        $html .= '<td align="center" style="background:#cfe8fb; font-weight:bold; white-space:nowrap;">Dropship</td>';
+    } else {
+        $html .= '<td>&nbsp;</td>';
+    }
     $html .= '<td align="center" style="' . $statusStyle . ' font-weight:bold; white-space:nowrap;">' . $statusOut . '</td>';
     $html .= '</tr>';
 }

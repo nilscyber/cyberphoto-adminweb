@@ -1280,6 +1280,7 @@ public function getProductsForLaunchMail($daysAhead = 14, $daysBack = 14)
             p.name  AS description,
             COALESCE(mf.name, '') AS manufacturer,
             p.launchdate AS launch_ts,
+            COALESCE(p.isdropship, 'N') AS is_dropship,
 
             COALESCE(bp.name, '')       AS supplier_name,
             COALESCE(rep.level_min, 0)  AS min_level,
@@ -1298,8 +1299,16 @@ public function getProductsForLaunchMail($daysAhead = 14, $daysBack = 14)
         LEFT JOIN c_bpartner bp
                ON bp.c_bpartner_id = mpo.c_bpartner_id
 
-        LEFT JOIN m_replenish rep
-               ON rep.m_product_id = mpo.m_product_id
+        -- Ett produkt/leverantör-par kan ha flera m_replenish-rader (t.ex. en för
+        -- eget lager och en för dropship-lagret), vilket ger dubblettrader i mailet.
+        -- LATERAL + LIMIT 1 plockar bara en rad per produkt.
+        LEFT JOIN LATERAL (
+            SELECT r.level_min, r.level_max
+            FROM m_replenish r
+            WHERE r.m_product_id = mpo.m_product_id
+            ORDER BY r.level_max DESC NULLS LAST, r.level_min DESC NULLS LAST
+            LIMIT 1
+        ) rep ON true
 
         LEFT JOIN ad_user au_buyer
                ON au_buyer.ad_user_id = bp.salesrep_id
@@ -1339,6 +1348,7 @@ public function getProductsForLaunchMail($daysAhead = 14, $daysBack = 14)
             'buyer'         => (string)$r['buyer_name'],
             'min_stock'     => (int)$r['min_level'],
             'max_stock'     => (int)$r['max_level'],
+            'is_dropship'   => (strtoupper((string)$r['is_dropship']) === 'Y'),
         );
     }
 
