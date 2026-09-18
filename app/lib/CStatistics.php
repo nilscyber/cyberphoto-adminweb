@@ -642,7 +642,117 @@ CROSS JOIN dist d;
     return $row;
 }
 
+/**
+ * Slår upp en enskild order (via documentno) och räknar units enligt samma
+ * regler som getUnitsPerOrderBasic (exkluderade kategorier, web/manual-tagg).
+ * Returnerar null om ordernumret inte hittas, annars en array med både
+ * KPI-fälten (orders, units, avg_units_per_order, orders_1_item, ...)
+ * och lite kontext (c_order_id, documentno, created, docstatus, is_web, is_sales_order).
+ */
+public function getUnitsPerOrderByDocumentNo($documentNo, $webId = null, array $excludedCategoryIds = array(1000362,1000441))
+{
+    $conn = Db::getConnectionAD(false); // pg resource
 
+    if ($conn) { @pg_set_client_encoding($conn, 'UTF8'); }
+
+    $documentNo = trim((string)$documentNo);
+    if ($documentNo === '') {
+        return null;
+    }
+
+    $webIdArr = ($webId === null) ? '{}' : '{'.(int)$webId.'}';
+    $exclArr  = '{'.implode(',', array_map('intval', $excludedCategoryIds)).'}';
+
+    $sql = "
+WITH
+params AS (
+  SELECT
+    $1::text  AS docno,
+    $2::int[] AS web_ids,
+    $3::int[] AS excl_cats,
+    TIMESTAMP '2018-10-31 00:00:00' AS cutoff_ts,
+    1000121::int AS legacy_web_id
+),
+ord AS (
+  SELECT o.c_order_id, o.documentno, o.created, o.dateordered,
+         o.docstatus, o.c_doctype_id, o.salesrep_id
+  FROM c_order o
+  CROSS JOIN params p
+  WHERE o.documentno = p.docno
+  LIMIT 1
+),
+tagged AS (
+  SELECT
+    ord.*,
+    CASE
+      WHEN ord.created <  (SELECT cutoff_ts FROM params)
+           AND ord.salesrep_id IS NOT NULL
+           AND ord.salesrep_id::int = (SELECT legacy_web_id FROM params)
+        THEN TRUE
+      WHEN ord.created >= (SELECT cutoff_ts FROM params)
+           AND ord.salesrep_id IS NOT NULL
+           AND ord.salesrep_id::int = ANY((SELECT web_ids FROM params)::int[])
+        THEN TRUE
+      ELSE FALSE
+    END AS is_web
+  FROM ord
+),
+units AS (
+  SELECT ol.c_order_id, SUM(ol.qtyordered)::numeric AS units
+  FROM c_orderline ol
+  JOIN tagged t     ON t.c_order_id = ol.c_order_id
+  JOIN m_product pr ON pr.m_product_id = ol.m_product_id
+  WHERE NOT (
+    COALESCE(pr.m_product_category_id::int, -1)
+    = ANY ((SELECT excl_cats FROM params)::int[])
+  )
+  GROUP BY ol.c_order_id
+)
+SELECT
+  t.c_order_id,
+  t.documentno,
+  t.created,
+  t.dateordered,
+  t.docstatus,
+  t.c_doctype_id,
+  t.is_web,
+  COALESCE(u.units, 0) AS units
+FROM tagged t
+LEFT JOIN units u ON u.c_order_id = t.c_order_id;
+";
+
+    $params = array($documentNo, $webIdArr, $exclArr);
+
+    $res = ($conn) ? @pg_query_params($conn, $sql, $params) : false;
+    if ($res === false) {
+        error_log('getUnitsPerOrderByDocumentNo: '.pg_last_error($conn));
+        return null;
+    }
+
+    $row = $res ? pg_fetch_assoc($res) : null;
+    pg_free_result($res);
+    if (!$row) {
+        return null; // ordernumret hittades inte
+    }
+
+    $units = (float)$row['units'];
+
+    return array(
+        'c_order_id'          => $row['c_order_id'],
+        'documentno'          => $row['documentno'],
+        'created'             => $row['created'],
+        'dateordered'         => $row['dateordered'],
+        'docstatus'           => $row['docstatus'],
+        'is_sales_order'      => ((int)$row['c_doctype_id'] === 1000030),
+        'is_web'              => ($row['is_web'] === 't' || $row['is_web'] === true),
+        'orders'              => 1,
+        'units'               => $units,
+        'avg_units_per_order' => number_format($units, 2, '.', ''),
+        'orders_1_item'       => ($units == 1) ? 1 : 0,
+        'orders_2_items'      => ($units == 2) ? 1 : 0,
+        'orders_3plus_items'  => ($units >= 3) ? 1 : 0,
+    );
+}
 
 /**
  * Hämtar KPI per säljare för valfritt datumintervall (inklusive båda ändar).

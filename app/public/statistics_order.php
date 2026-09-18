@@ -62,6 +62,17 @@ $active7       = isActiveRange($df,$dt,$sv_7_from,$sv_to_yday);
 $active30      = isActiveRange($df,$dt,$sv_30_from,$sv_to_yday);
 $activePrevW   = isActiveRange($df,$dt,$isoMondayPrevWeek,$isoSundayPrevWeek);
 $activePrevMon = isActiveRange($df,$dt,$firstOfPrevMonth,$lastOfPrevMonth);
+
+/* ===== Sökning på enskilt ordernummer (stickprov) ===== */
+$orderNo     = isset($_GET['orderno']) ? trim($_GET['orderno']) : '';
+$orderResult = null;
+$orderNotFound = false;
+if ($orderNo !== '') {
+    $orderResult = $statistics->getUnitsPerOrderByDocumentNo($orderNo, $webId, $excl);
+    if ($orderResult === null) {
+        $orderNotFound = true;
+    }
+}
 ?>
 <style>
 .formwrap{margin:12px 0;padding:12px;border:1px solid #eee;border-radius:8px}
@@ -101,11 +112,35 @@ $activePrevMon = isActiveRange($df,$dt,$firstOfPrevMonth,$lastOfPrevMonth);
   </div>
 </form>
 
-<h2>Resultat för perioden <?php echo $h($df); ?>  <?php echo $h($dt); ?></h2>
+<h2>Resultat för perioden <?php echo $h($df); ?> &ndash; <?php echo $h($dt); ?></h2>
 
 <?php
 renderKpiTable('Alla ordrar totalt',   $all,    $nf, $h);
 renderKpiTable('Webbordrar',           $web,    $nf, $h);
 renderKpiTable('Manuella ordrar',      $manual, $nf, $h);
+?>
+
+<h2 style="margin-top:32px">Slå upp enskild order (stickprov)</h2>
+
+<form method="get" action="" class="formwrap">
+  <input type="hidden" name="from" value="<?php echo $h($df); ?>">
+  <input type="hidden" name="to" value="<?php echo $h($dt); ?>">
+  <div class="formline">
+    <label>Ordernummer:&nbsp;<input type="text" name="orderno" value="<?php echo $h($orderNo); ?>" placeholder="t.ex. 123456"></label>
+    &nbsp;&nbsp;
+    <button type="submit" class="btn-primary">Slå upp</button>
+  </div>
+</form>
+
+<?php
+if ($orderNotFound) {
+    echo '<p style="color:#b42318">Hittade ingen order med ordernummer "'.$h($orderNo).'".</p>';
+} elseif ($orderResult !== null) {
+    if (!$orderResult['is_sales_order']) {
+        echo '<p style="color:#b45309">Observera: detta är inte en säljorder, siffrorna nedan kan vara missvisande.</p>';
+    }
+    echo '<p>Order <strong>'.$h($orderResult['documentno']).'</strong> &middot; skapad '.$h($orderResult['created']).' &middot; status '.$h($orderResult['docstatus']).' &middot; '.($orderResult['is_web'] ? 'Webborder' : 'Manuell order').'</p>';
+    renderKpiTable('Order '.$orderResult['documentno'], $orderResult, $nf, $h);
+}
 
 include_once("footer.php");
