@@ -734,7 +734,7 @@ JS;
 				
 				echo "\t\t<td>";
 				// echo "<a href=\"javascript:winPopupCenter(900, 800, '/order/product_update.php?edit=yes&artnr=$row->artnr&m_product_id=$row->m_product_id&ID=$row->m_product_update_id');\">";
-				echo "<a href=\"javascript:winPopupCenter(900, 800, '/product_update.php?edit=yes&artnr=$row->artnr&m_product_id=$row->m_product_id&ID=$row->m_product_update_id');\">";
+				echo "<a href=\"javascript:winPopupCenter(760, 800, '/product_update.php?edit=yes&artnr=$row->artnr&m_product_id=$row->m_product_id&ID=$row->m_product_update_id');\">";
 				
 				if ($row->m_pricelist_id == 1000018) {
 					// echo "<img border=\"0\" src=\"/order/admin/fi_mini.jpg\">";

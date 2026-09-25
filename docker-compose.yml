@@ -16,6 +16,9 @@ services:
       - ./docker/cert:/etc/ssl/app:ro
     env_file:
       - .env
+    # ERP-webbtjänstens WSDL anger kortnamnet "cyber-erp" som endpoint, som inte går att slå upp i containern
+    extra_hosts:
+      - "cyber-erp:192.168.1.54"
     environment:
       TZ: Europe/Stockholm
 

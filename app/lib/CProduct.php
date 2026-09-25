@@ -184,9 +184,12 @@ Class CProduct {
 			$updt .= "pricelist = '" . $addprice_VAT . "', ";
 			$updt .= "pricestd = '" . $addprice_VAT . "', ";
 		}
+		// Namn/kommentar som inte längre skiljer sig från produkten plockas bort ur uppdraget
 		if ($check_name == "yes") {
 			$updt .= "isupdtname = 'Y', ";
-			$updt .= "name = '" . $addname . "', ";
+			$updt .= "name = '" . pg_escape_string(Db::getConnectionAD(true), $addname) . "', ";
+		} else {
+			$updt .= "isupdtname = 'N', ";
 		}
 		if ($check_comment == "yes") {
 			if ($addcomment == "") {
@@ -194,8 +197,10 @@ Class CProduct {
 				$updt .= "description = NULL, ";
 			} else {
 				$updt .= "isupdtdescription = 'Y', ";
-				$updt .= "description = '" . $addcomment . "', ";
+				$updt .= "description = '" . pg_escape_string(Db::getConnectionAD(true), $addcomment) . "', ";
 			}
+		} else {
+			$updt .= "isupdtdescription = 'N', ";
 		}
 		if ($check_showweb == "yes") {
 			if ($showweb == "yes") {
@@ -278,6 +283,7 @@ Class CProduct {
 				p.upc,
 				p.isselfservice,
 				p.discontinued       AS utgangen,
+				p.isexclautopricing,
 				-- Citerade alias: PostgreSQL gör annars om isTradeIn till istradein och
 				-- sidorna som läser \$rows->isTradeIn får null (buggen bakom felprissatta inbyten).
 				CASE WHEN p.istradein = 'Y' THEN -1 ELSE 0 END AS \"isTradeIn\",
@@ -699,9 +705,10 @@ Class CProduct {
 		unset($groupday);
 		unset($groupday2);
 	
-		$select  = "SELECT p.value as artnr, u.value as user, pu.*, p.name ";
+		$select  = "SELECT p.value as artnr, u.value as user, pu.*, p.name, manu.name AS tillverkare ";
 		$select .= "FROM m_product_update pu ";
 		$select .= "JOIN m_product p ON p.m_product_id = pu.m_product_id ";
+		$select .= "LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id ";
 		$select .= "JOIN ad_user u ON u.ad_user_id = pu.salesrep_id ";
 		if ($old) {
 			$select .= "WHERE isupdated = 'Y' ";
@@ -728,7 +735,7 @@ Class CProduct {
 		echo "<colgroup>";
 		echo "<col class=\"col-icon\" /><col class=\"col-date\" /><col class=\"col-left\" />";
 		echo "<col class=\"col-art\" /><col class=\"col-prod\" /><col class=\"col-price\" />";
-		echo "<col class=\"col-status\" /><col class=\"col-status\" /><col class=\"col-status\" /><col class=\"col-status\" />";
+		echo "<col class=\"col-status\" /><col class=\"col-status\" /><col class=\"col-status\" /><col class=\"col-status\" /><col class=\"col-status\" />";
 		echo "<col class=\"col-owner\" /><col class=\"col-icon\" />";
 		echo "</colgroup>";
 		echo "<thead><tr>";
@@ -736,13 +743,14 @@ Class CProduct {
 		echo "<th>Datum</th>";
 		echo "<th class=\"text-center\">Återstår</th>";
 		echo "<th>Artikel</th>";
-		echo "<th>Namn</th>";
+		echo "<th>Produkt</th>";
 		echo "<th class=\"text-center\">Nytt pris</th>";
 		echo "<th class=\"text-center\">Visas</th>";
 		echo "<th class=\"text-center\">Utgången</th>";
-		echo "<th class=\"text-center\">Beskrivning</th>";
+		echo "<th class=\"text-center\">PriceShape</th>";
+		echo "<th class=\"text-center\">Namn</th>";
 		echo "<th class=\"text-center\">Kommentar</th>";
-		echo "<th class=\"text-center\">Ansvarig</th>";
+		echo "<th class=\"text-center\">Av</th>";
 		echo "<th></th>";
 		echo "</tr></thead>";
 		echo "<tbody>";
@@ -767,11 +775,11 @@ Class CProduct {
 				if ($groupday != $groupday2) {
 					if (date("Y-m-d",strtotime($row->updatetime)) == date("Y-m-d", time())) {
 						echo "<tr class=\"cat-head\">";
-						echo "<td colspan=\"12\">Idag</td>";
+						echo "<td colspan=\"13\">Idag</td>";
 						echo "</tr>";
 					} else {
 						echo "<tr class=\"cat-head\">";
-						echo "<td colspan=\"12\">" . $h(CDeparture::replace_days(date("l",strtotime($row->updatetime)))) . " " . $h(date("Y-m-d",strtotime($row->updatetime))) . "</td>";
+						echo "<td colspan=\"13\">" . $h(CDeparture::replace_days(date("l",strtotime($row->updatetime)))) . " " . $h(date("Y-m-d",strtotime($row->updatetime))) . "</td>";
 						echo "</tr>";
 					}
 				}
@@ -786,12 +794,18 @@ Class CProduct {
 				echo "\t\t<td></td>\n";
 				echo "\t\t<td class=\"nowrap\">" . $h(date("H:i",strtotime($row->updatetime))) . "</td>";
 				if (!$old) {
-					echo "\t\t<td class=\"text-center nowrap\">" . $h(CCampaignCheck::getTimeLeftNew($row->updatetime)) . "</td>";
+					// getTimeLeftNew kan returnera "<i>Körs inom kort</i>" – visa som kursiv text, inte som escapad HTML
+					$timeLeft = CCampaignCheck::getTimeLeftNew($row->updatetime);
+					if ($timeLeft !== strip_tags($timeLeft)) {
+						echo "\t\t<td class=\"text-center nowrap muted\"><i>" . $h(strip_tags($timeLeft)) . "</i></td>";
+					} else {
+						echo "\t\t<td class=\"text-center nowrap\">" . $h($timeLeft) . "</td>";
+					}
 				} else {
 					echo "\t\t<td class=\"text-center muted\"><i>Utförd</i></td>";
 				}
 				echo "\t\t<td>" . $h($row->artnr) . "</td>";
-				echo "\t\t<td><a target=\"_blank\" rel=\"noopener\" href=\"" . $h($productUrl) . "\">" . $h($row->name) . "</a></td>";
+				echo "\t\t<td><a target=\"_blank\" rel=\"noopener\" href=\"" . $h($productUrl) . "\">" . $h(trim($row->tillverkare . " " . $row->name)) . "</a></td>";
 				if ($row->isupdtpricestd == "Y") {
 					echo "\t\t<td class=\"text-center nowrap\">" . $h(number_format($utpris_moms, 0, ',', ' ') . " " . $valuta) . "</td>";
 				} else {
@@ -804,6 +818,11 @@ Class CProduct {
 				}
 				if ($row->isupdtdiscontinued == "Y") {
 					echo "\t\t<td class=\"text-center\"><img border=\"0\" src=\"status_" . ($row->discontinued == "Y" ? "green" : "red") . ".png\"></td>\n";
+				} else {
+					echo "<td></td>";
+				}
+				if ($row->isupdtexclautopricing == "Y") {
+					echo "\t\t<td class=\"text-center\"><img border=\"0\" src=\"status_" . ($row->isexclautopricing == "Y" ? "green" : "red") . ".png\" title=\"" . ($row->isexclautopricing == "Y" ? "Utesluts från PriceShape" : "Tas med i PriceShape") . "\"></td>\n";
 				} else {
 					echo "<td></td>";
 				}
@@ -828,7 +847,7 @@ Class CProduct {
 
 		} else {
 			echo "<tr>";
-			echo "<td colspan=\"12\" class=\"muted\"><i>Inga produktuppdateringar finns registrerade</i></td>";
+			echo "<td colspan=\"13\" class=\"muted\"><i>Inga produktuppdateringar finns registrerade</i></td>";
 			echo "</tr>";
 		}
 

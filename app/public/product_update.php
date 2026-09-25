@@ -205,6 +205,70 @@ if (isset($addprice_net) && $addprice_net !== null && $addprice_net !== "") {
     $addprice = round((float)$addprice_net * $moms_faktor, 2);
 }
 
+/**
+ * Produktens nuvarande värden. Formuläret förifylls med dem och vid sparande
+ * uppdateras bara det som skiljer sig – ingen "Uppdatera ..."-bock behövs.
+ */
+$cur_price      = $is_vmb ? (float)$rows->utpris : (float)$rows->utpris + (float)$rows->utpris * (float)$rows->momssats;
+$cur_price      = round($cur_price, 0);
+$cur_showweb    = ($rows && $rows->isselfservice == "Y");
+$cur_utgangen   = ($rows && $rows->utgangen == "Y");
+$cur_priceshape = ($rows && $rows->isexclautopricing == "Y");
+$cur_name       = $rows ? str_replace('`', '"', $rows->beskrivning) : "";
+$cur_comment    = $rows ? (string)$rows->kommentar : "";
+
+// Första visningen: bockarna visar produktens läge (i edit-läge uppdragets värde om det ändrar fältet)
+if (!$subm && !$submC) {
+    if (($check_showweb ?? "") != "yes")    { $showweb    = $cur_showweb    ? "yes" : ""; }
+    if (($check_utgangen ?? "") != "yes")   { $utgangen   = $cur_utgangen   ? "yes" : ""; }
+    if (($check_priceshape ?? "") != "yes") { $priceshape = $cur_priceshape ? "yes" : ""; }
+}
+
+/**
+ * Jämför postade värden mot produktens nuvarande och sätt check_* för det som ändrats.
+ * Helgkampanj har egna bockar och hanteras som tidigare.
+ */
+function detectProductChanges()
+{
+    global $addprice, $showweb, $utgangen, $priceshape, $addname, $addcomment,
+           $check_addprice, $check_showweb, $check_utgangen, $check_priceshape, $check_name, $check_comment,
+           $cur_price, $cur_showweb, $cur_utgangen, $cur_priceshape, $cur_name, $cur_comment, $wrongmess;
+
+    $ok = true;
+
+    // Tillåt "18 990" och "18990,50"
+    $addprice = str_replace([' ', ','], ['', '.'], trim((string)$addprice));
+    if (!is_numeric($addprice)) {
+        $ok         = false;
+        $wrongmess .= "<p class=\"wrongmess\">- Ogiltigt pris. Ange bara siffror, t.ex. 18990</p>";
+        $check_addprice = "";
+    } else {
+        $check_addprice = (round((float)$addprice, 2) != round((float)$cur_price, 2)) ? "yes" : "";
+    }
+
+    $check_showweb    = ((($showweb ?? "") == "yes")    != $cur_showweb)    ? "yes" : "";
+    $check_utgangen   = ((($utgangen ?? "") == "yes")   != $cur_utgangen)   ? "yes" : "";
+    $check_priceshape = ((($priceshape ?? "") == "yes") != $cur_priceshape) ? "yes" : "";
+    $addname          = trim((string)$addname);
+    $addcomment       = trim((string)$addcomment);
+    $check_name       = ($addname    !== trim($cur_name))    ? "yes" : "";
+    $check_comment    = ($addcomment !== trim($cur_comment)) ? "yes" : "";
+
+    if ($ok &&
+        $check_addprice != "yes" &&
+        $check_showweb != "yes" &&
+        $check_utgangen != "yes" &&
+        $check_name != "yes" &&
+        $check_comment != "yes" &&
+        $check_priceshape != "yes") {
+
+        $ok         = false;
+        $wrongmess .= "<p class=\"wrongmess\">- Inget är ändrat jämfört med produktens nuvarande värden. Ändra något fält innan du sparar.</p>";
+    }
+
+    return $ok;
+}
+
 /*
 if (isset($_COOKIE['login_mail']) &&
    ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se' || $_COOKIE['login_mail'] == 'borje@cyberphoto.nu')) {
@@ -289,6 +353,10 @@ if ($subm) {
 
     $olright = true;
 
+    if (!$is_hcampaign && !detectProductChanges()) {
+        $olright = false;
+    }
+
 	if ($check_showweb == "yes" && $showweb == "yes") {
 
 		$saleStart = $product->getSaleStartDate($m_product_id);
@@ -307,9 +375,13 @@ if ($subm) {
 		}
 	}
 
-    if ($addprice <> $init_price) {
-        $check_addprice = "yes";
-        $diffprice      = (float)$addprice - (float)$init_price;
+    if ($is_hcampaign) {
+        if ($addprice <> $init_price) {
+            $check_addprice = "yes";
+        }
+    }
+    if ($check_addprice == "yes") {
+        $diffprice = (float)$addprice - (float)$init_price;
     }
 
     if ($addfrom != "") {
@@ -319,7 +391,8 @@ if ($subm) {
         }
     }
 
-    if ($check_addprice != "yes" &&
+    if ($is_hcampaign &&
+        $check_addprice != "yes" &&
         $check_showweb != "yes" &&
         $check_utgangen != "yes" &&
         $check_name != "yes" &&
@@ -494,7 +567,10 @@ if ($subm) {
             );
         }
 
-        $uppdate_ok = true;
+        // Stäng bara fönstret om sparandet gick igenom, annars syns felmeddelandet aldrig
+        if ($olright) {
+            $uppdate_ok = true;
+        }
     }
 }
 
@@ -508,7 +584,7 @@ if ($submC && !$is_logged_in) {
 
 if ($submC) {
 
-    $olright = true;
+    $olright = detectProductChanges();
 
 	if ($check_showweb == "yes" && $showweb == "yes") {
 
@@ -522,10 +598,6 @@ if ($submC) {
 			}
 		}
 	}
-
-    if ($addprice <> $init_price) {
-        $check_addprice = "yes";
-    }
 
     if ($run_now == "yes") {
         $addfrom = date("Y-m-d H:i:s");
@@ -831,7 +903,7 @@ if ($calc) {
             overflow-x: auto;
         }
         .update-table {
-            min-width: 640px;
+            min-width: 480px;
         }
         .update-table label {
             white-space: nowrap;
@@ -839,6 +911,16 @@ if ($calc) {
         .update-table input[type="text"]:not(.textbox_green) {
             max-width: 100%;
             box-sizing: border-box;
+        }
+        .update-table .field-label {
+            width: 1%;
+            white-space: nowrap;
+            padding-right: 20px;
+            font-weight: bold;
+            color: #374151;
+        }
+        .update-table tr.row-changed td {
+            background: #fef9c3;
         }
     </style>
 </head>
@@ -893,7 +975,7 @@ if ($calc) {
         <input type="hidden" value="<?php echo $m_product_id; ?>" name="m_product_id">
         <input type="hidden" value="<?php echo $artnr; ?>" name="artnr">
         <input type="hidden" value="<?php echo $force_lang; ?>" name="force_lang">
-        <input type="hidden" value="<?php echo $addprice; ?>" name="init_price">
+        <input type="hidden" value="<?php echo $cur_price; ?>" name="init_price">
     <?php if ($is_hcampaign) { ?>
         <input type="hidden" value="yes" name="hcampaign">
     <?php } ?>
@@ -996,41 +1078,32 @@ if ($calc) {
                   </tr>
               <?php } else { ?>
                   <tr>
-                    <td colspan="2">
-                        <label>
-                            <input type="checkbox" name="check_addprice" value="yes" <?php if ($check_addprice == "yes") { ?>checked<?php } ?>>
-                            Uppdatera pris --------------------->
-                        </label>
-                    </td>
+                    <td colspan="2" class="field-label">Pris</td>
                     <td>
-                        <input onclick="this.select()" class="textbox_white" type="text" name="addprice" size="7" value="<?php echo $addprice; ?>">
+                        <input onclick="this.select()" class="textbox_white" type="text" name="addprice" size="7" value="<?php echo htmlspecialchars((string)$addprice); ?>" data-orig="<?php echo $cur_price; ?>">
                         &nbsp;<?php echo $prislabel; ?>
                     </td>
                   </tr>
-				  <tr>
-					<td colspan="2">
-						<label>
-							<input type="checkbox" name="check_priceshape" value="yes" <?php if ($check_priceshape == "yes") { ?>checked<?php } ?>>
-							Uteslut från PriceShape ----------->
-						</label>
-					</td>
-					<td>
-						<label>
-							<input type="checkbox" name="priceshape" value="yes" <?php if ($priceshape == "yes") { ?>checked<?php } ?>>
-							Uteslut
-						</label>
-					</td>
-				  </tr>
+                  <tr>
+                    <td colspan="2" class="field-label">PriceShape</td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="priceshape" value="yes" <?php if ($priceshape == "yes") { ?>checked<?php } ?> data-orig="<?php echo $cur_priceshape ? "1" : "0"; ?>">
+                            Uteslut från PriceShape
+                        </label>
+                    </td>
+                  </tr>
               <?php } ?>
           <?php if ($is_tradein) { ?>
               <tr>
-                <td colspan="2">
+                <td colspan="2" class="field-label">Inköpspris</td>
+                <td>
                     <label>
                         <input type="checkbox" name="allow_below_cost" value="yes" <?php if ($allow_below_cost == "yes") { ?>checked<?php } ?>>
-                        Tillåt pris under inköpspris ------->
+                        Tillåt pris under inköpspris
                     </label>
+                    <div class="small-muted">Annars stoppas ett pris som är lägre än inköpspriset.</div>
                 </td>
-                <td class="small-muted">Annars stoppas ett pris som är lägre än inköpspriset.</td>
               </tr>
           <?php } ?>
 
@@ -1059,50 +1132,33 @@ if ($calc) {
               </tr>
           <?php } else { ?>
               <tr>
-                <td colspan="2">
-                    <label>
-                        <input type="checkbox" name="check_showweb" value="yes" <?php if ($check_showweb == "yes") { ?>checked<?php } ?>>
-                        Uppdatera visas på webben ------->
-                    </label>
-                </td>
+                <td colspan="2" class="field-label">Webben</td>
                 <td>
                     <label>
-                        <input type="checkbox" name="showweb" value="yes" <?php if ($showweb == "yes") { ?>checked<?php } ?>>
+                        <input type="checkbox" name="showweb" value="yes" <?php if ($showweb == "yes") { ?>checked<?php } ?> data-orig="<?php echo $cur_showweb ? "1" : "0"; ?>">
                         Visas på webben
                     </label>
                 </td>
               </tr>
               <tr>
-                <td colspan="2">
-                    <label>
-                        <input type="checkbox" name="check_utgangen" value="yes" <?php if ($check_utgangen == "yes") { ?>checked<?php } ?>>
-                        Uppdatera utgången --------------->
-                    </label>
-                </td>
+                <td colspan="2" class="field-label">Utgången</td>
                 <td>
                     <label>
-                        <input type="checkbox" name="utgangen" value="yes" <?php if ($utgangen == "yes") { ?>checked<?php } ?>>
-                        Sätt utgången
+                        <input type="checkbox" name="utgangen" value="yes" <?php if ($utgangen == "yes") { ?>checked<?php } ?> data-orig="<?php echo $cur_utgangen ? "1" : "0"; ?>">
+                        Utgången
                     </label>
                 </td>
               </tr>
               <tr>
-                <td colspan="2">
-                    <label>
-                        <input type="checkbox" name="check_name" value="yes" <?php if ($check_name == "yes") { ?>checked<?php } ?>>
-                        Uppdatera namnet ----------------->
-                    </label>
-                </td>
-                <td><input class="textbox_white" type="text" name="addname" size="50" value="<?php echo $addname; ?>"></td>
+                <td colspan="2" class="field-label">Namn</td>
+                <td><input class="textbox_white" type="text" name="addname" size="50" value="<?php echo htmlspecialchars((string)$addname); ?>" data-orig="<?php echo htmlspecialchars(trim($cur_name)); ?>"></td>
               </tr>
               <tr>
-                <td colspan="2">
-                    <label>
-                        <input type="checkbox" name="check_comment" value="yes" <?php if ($check_comment == "yes") { ?>checked<?php } ?>>
-                        Uppdatera kommentaren ---------->
-                    </label>
-                </td>
-                <td><input class="textbox_white" type="text" name="addcomment" size="50" value="<?php echo $addcomment; ?>"></td>
+                <td colspan="2" class="field-label">Kommentar</td>
+                <td><input class="textbox_white" type="text" name="addcomment" size="50" value="<?php echo htmlspecialchars((string)$addcomment); ?>" data-orig="<?php echo htmlspecialchars(trim($cur_comment)); ?>"></td>
+              </tr>
+              <tr>
+                <td colspan="3" class="small-muted">Bara fält du ändrar sparas i uppdraget. Ändrade fält markeras gult.</td>
               </tr>
           <?php } ?>
         </table>
@@ -1116,6 +1172,34 @@ if ($calc) {
             <?php } ?>
         </div>
     </form>
+    <script>
+    // Markera rader som skiljer sig från produktens nuvarande värden (samma jämförelse som servern gör)
+    (function () {
+        var form = document.forms['update_form'];
+        if (!form) { return; }
+        function isChanged(el) {
+            var orig = el.getAttribute('data-orig');
+            if (el.type === 'checkbox') {
+                return (el.checked ? '1' : '0') !== orig;
+            }
+            if (el.name === 'addprice') {
+                var v = parseFloat(el.value.replace(/\s/g, '').replace(',', '.'));
+                return isNaN(v) || Math.abs(v - parseFloat(orig)) >= 0.005;
+            }
+            return el.value.trim() !== orig;
+        }
+        function refresh() {
+            var inputs = form.querySelectorAll('[data-orig]');
+            for (var i = 0; i < inputs.length; i++) {
+                var row = inputs[i].closest('tr');
+                if (row) { row.classList.toggle('row-changed', isChanged(inputs[i])); }
+            }
+        }
+        form.addEventListener('input', refresh);
+        form.addEventListener('change', refresh);
+        refresh();
+    })();
+    </script>
     <?php } ?>
 </div>
 
@@ -1125,11 +1209,11 @@ if ($calc) {
     <table border="0" cellpadding="4" cellspacing="0">
       <tr>
       	<td colspan="3"><b>Nettopriser</b></td>
-        <td width="40">&nbsp;</td>
+        <td width="20">&nbsp;</td>
         <td colspan="2"><b>Utpriser</b></td>
-      	<td width="40">&nbsp;</td>
+      	<td width="20">&nbsp;</td>
         <td><b>Marginal TG</b></td>
-      	<td width="40">&nbsp;</td>
+      	<td width="20">&nbsp;</td>
       	<td colspan="2"><b>Marginal TB</b></td>
       </tr>
       <tr>
