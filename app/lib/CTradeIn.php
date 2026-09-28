@@ -420,23 +420,15 @@ Class CTradeIn {
 				-- Utpris inkl moms (från prislistan)
 				COALESCE(pp.pricestd, pp.pricelist, 0)
 				    * (1 + COALESCE(ct.rate, 0) / 100)          AS utpris_inkl,
-				-- Orderpris inkl moms: vid packey = inköpspris + marginal inkl moms
+				-- Orderpris inkl moms: vid uppdelad packey-rad (privatperson) = inköpspris + marginal inkl moms
 				CASE
-				    WHEN col.packey IS NOT NULL THEN
-				        col.priceentered + COALESCE((
-				            SELECT comp.priceentered * (1 + COALESCE(ct2.rate, 0) / 100)
-				            FROM c_orderline comp
-				            LEFT JOIN c_tax ct2 ON ct2.c_tax_id = comp.c_tax_id
-				            WHERE comp.c_order_id    = col.c_order_id
-				              AND comp.m_product_id IS NULL
-				              AND comp.packey       IS NOT NULL
-				              AND comp.line          > col.line
-				            ORDER BY comp.line ASC
-				            LIMIT 1
-				        ), 0)
+				    WHEN pk.marginal_inkl IS NOT NULL THEN
+				        col.priceentered + pk.marginal_inkl
 				    ELSE
 				        col.priceentered * (1 + COALESCE(ct.rate, 0) / 100)
-				END AS orderpris_inkl
+				END AS orderpris_inkl,
+				-- Uppdelad på två rader (produkt + marginal)? packey kan även vara t.ex. 'offertpac'
+				(pk.marginal_inkl IS NOT NULL) AS packey_split
 			FROM c_orderline col
 			JOIN c_order o       ON o.c_order_id       = col.c_order_id
 			JOIN m_product p     ON col.m_product_id   = p.m_product_id
@@ -457,6 +449,20 @@ Class CTradeIn {
 				LIMIT 1
 			) ship ON true
 			LEFT JOIN c_tax ct   ON ct.c_tax_id        = col.c_tax_id
+			-- Marginalraden för uppdelad packey-rad (rad utan produkt efter produktraden)
+			LEFT JOIN LATERAL (
+				SELECT comp.priceentered * (1 + COALESCE(ct2.rate, 0) / 100) AS marginal_inkl
+				FROM c_orderline comp
+				LEFT JOIN c_tax ct2 ON ct2.c_tax_id = comp.c_tax_id
+				WHERE col.packey IS NOT NULL
+				  AND col.packey NOT ILIKE 'offert%'
+				  AND comp.c_order_id    = col.c_order_id
+				  AND comp.m_product_id IS NULL
+				  AND comp.packey       IS NOT NULL
+				  AND comp.line          > col.line
+				ORDER BY comp.line ASC
+				LIMIT 1
+			) pk ON true
 			LEFT JOIN m_productprice pp
 				ON  pp.m_product_id          = p.m_product_id
 				AND pp.m_pricelist_version_id = 1000000
@@ -541,7 +547,8 @@ Class CTradeIn {
 			$utpris    = (float)$r['utpris_inkl'];
 			$orderpris = (float)$r['orderpris_inkl'];
 
-			$inkopspris = !empty($r['packey'])
+			// Inköpspris: uppdelad packey-rad = vad vi betalade till privatperson, annars pricelimit
+			$inkopspris = ($r['packey_split'] === 't')
 				? (float)$r['priceentered']
 				: (float)$r['pricelimit'];
 
@@ -1859,23 +1866,15 @@ Class CTradeIn {
 				-- Utpris inkl moms (från prislistan)
 				COALESCE(pp.pricestd, pp.pricelist, 0)
 				    * (1 + COALESCE(ct.rate, 0) / 100)  AS utpris_inkl,
-				-- Orderpris inkl moms: vid packey (privatperson) = inköpspris + marginal inkl moms
+				-- Orderpris inkl moms: vid uppdelad packey-rad (privatperson) = inköpspris + marginal inkl moms
 				CASE
-				    WHEN col.packey IS NOT NULL THEN
-				        col.priceentered + COALESCE((
-				            SELECT comp.priceentered * (1 + COALESCE(ct2.rate, 0) / 100)
-				            FROM c_orderline comp
-				            LEFT JOIN c_tax ct2 ON ct2.c_tax_id = comp.c_tax_id
-				            WHERE comp.c_order_id    = col.c_order_id
-				              AND comp.m_product_id IS NULL
-				              AND comp.packey       IS NOT NULL
-				              AND comp.line          > col.line
-				            ORDER BY comp.line ASC
-				            LIMIT 1
-				        ), 0)
+				    WHEN pk.marginal_inkl IS NOT NULL THEN
+				        col.priceentered + pk.marginal_inkl
 				    ELSE
 				        col.priceentered * (1 + COALESCE(ct.rate, 0) / 100)
-				END AS orderpris_inkl
+				END AS orderpris_inkl,
+				-- Uppdelad på två rader (produkt + marginal)? packey kan även vara t.ex. 'offertpac'
+				(pk.marginal_inkl IS NOT NULL) AS packey_split
 			FROM c_orderline col
 			JOIN c_order o       ON o.c_order_id       = col.c_order_id
 			JOIN m_product p     ON col.m_product_id   = p.m_product_id
@@ -1884,6 +1883,20 @@ Class CTradeIn {
 			JOIN c_bpartner bp   ON bp.c_bpartner_id   = po.c_bpartner_id
 			JOIN m_locator mloc  ON mloc.m_locator_id  = p.m_locator_id
 			LEFT JOIN c_tax ct   ON ct.c_tax_id        = col.c_tax_id
+			-- Marginalraden för uppdelad packey-rad (rad utan produkt efter produktraden)
+			LEFT JOIN LATERAL (
+				SELECT comp.priceentered * (1 + COALESCE(ct2.rate, 0) / 100) AS marginal_inkl
+				FROM c_orderline comp
+				LEFT JOIN c_tax ct2 ON ct2.c_tax_id = comp.c_tax_id
+				WHERE col.packey IS NOT NULL
+				  AND col.packey NOT ILIKE 'offert%'
+				  AND comp.c_order_id    = col.c_order_id
+				  AND comp.m_product_id IS NULL
+				  AND comp.packey       IS NOT NULL
+				  AND comp.line          > col.line
+				ORDER BY comp.line ASC
+				LIMIT 1
+			) pk ON true
 			LEFT JOIN m_productprice pp
 				ON  pp.m_product_id          = p.m_product_id
 				AND pp.m_pricelist_version_id = 1000000
@@ -1972,8 +1985,8 @@ Class CTradeIn {
 			$orderpris = (float)$r['orderpris_inkl'];
 			$isVmb     = ($r['c_tax_id'] == 1000000);
 
-			// Inköpspris: packey = vad vi betalade till privatperson, annars pricelimit
-			$inkopspris = !empty($r['packey'])
+			// Inköpspris: uppdelad packey-rad = vad vi betalade till privatperson, annars pricelimit
+			$inkopspris = ($r['packey_split'] === 't')
 				? (float)$r['priceentered']
 				: (float)$r['pricelimit'];
 			// TB och TG räknas ex. moms så att vi jämför äpplen med äpplen.
