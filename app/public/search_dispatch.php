@@ -87,8 +87,12 @@ if ($isProductMode && !$hasOpen && $looksSafe && !$isWide && !$hasFilters) {
     // ------------------------------------------------------------
     // 3) Fastlane #3: EAN/UPC (p.upc), digits-only
     //    - redirect ENDAST om unik
+    //    - körs bara om sökningen ser ut som en EAN/UPC (endast siffror,
+    //      ev. bindestreck, 8-14 siffror). Annars blir t.ex. "ILCE6700B.CEC"
+    //      -> "6700" och matchar skräp-EAN som "iP6700d".
     // ------------------------------------------------------------
-    if ($qDigits !== '') {
+    $looksLikeEan = preg_match('/^[0-9-]+$/', $q) && strlen($qDigits) >= 8 && strlen($qDigits) <= 14;
+    if ($looksLikeEan) {
         $sqlUpc = "
             SELECT p.m_product_id
             FROM m_product p
