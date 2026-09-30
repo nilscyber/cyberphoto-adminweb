@@ -142,7 +142,7 @@ echo "<h1>Textmallar att använda</h1>";
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i superskick (5/5), saknar originalkartong. 6 månaders garanti!</span>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i mycket fint skick (4/5), saknar originalkartong. 6 månaders garanti!</span>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i fint skick (3/5), saknar originalkartong. 6 månaders garanti!</span>
-        <span class="tm-row" onclick="copyText(this)">Begagnat ex i bra skick (2/5, saknar originalkartong). 6 månaders garanti!</span>
+        <span class="tm-row" onclick="copyText(this)">Begagnat ex i bra skick (2/5), saknar originalkartong. 6 månaders garanti!</span>
         <span class="tm-row" onclick="copyText(this)">Begagnat ex i bruksskick (1/5), saknar originalkartong. 6 månaders garanti!</span>
     </div>
 
