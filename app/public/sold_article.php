@@ -25,8 +25,11 @@ $isValidDate = function($s){
     $d = DateTime::createFromFormat('Y-m-d', $s);
     return $d && $d->format('Y-m-d') === $s;
 };
-$dateFrom = (isset($_GET['date_from']) && $isValidDate($_GET['date_from'])) ? $_GET['date_from'] : '';
-$dateTo   = (isset($_GET['date_to'])   && $isValidDate($_GET['date_to']))   ? $_GET['date_to']   : '';
+// Datum i URL (även tomma) har företräde, annars används senast valda datum (cookie)
+$rawFrom  = isset($_GET['date_from']) ? $_GET['date_from'] : (isset($_COOKIE['sa_date_from']) ? $_COOKIE['sa_date_from'] : '');
+$rawTo    = isset($_GET['date_to'])   ? $_GET['date_to']   : (isset($_COOKIE['sa_date_to'])   ? $_COOKIE['sa_date_to']   : '');
+$dateFrom = $isValidDate($rawFrom) ? $rawFrom : '';
+$dateTo   = $isValidDate($rawTo)   ? $rawTo   : '';
 
 $limit  = 2000;
 $offset = ($page - 1) * $limit;
@@ -323,6 +326,9 @@ echo '<style>
 .so-filter   { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin:0 0 14px; }
 .so-filter label { display:block; font-size:12px; color:#6b7280; margin-bottom:3px; }
 .so-filter input[type=date] { border:1px solid #d1d5db; border-radius:4px; padding:5px 8px; font-size:13px; }
+.so-quick    { display:flex; gap:6px; flex-wrap:wrap; }
+.so-quick .btn-filter { cursor:pointer; font-family:inherit; }
+.so-quick .btn-filter.is-active { background:#d1f2f0; border-color:#0d9488; color:#0f766e; }
 .so-filter .btn-primary { background:#0d9488; color:#fff; border:1px solid #0d9488; }
 .so-filter .btn-primary:hover { background:#0f766e; }
 </style>';
@@ -339,11 +345,62 @@ echo '<form class="so-filter" method="get" action="/sold_article.php">'
    . '<input type="date" id="date_from" name="date_from" value="' . $h($dateFrom) . '"></div>'
    . '<div><label for="date_to">Till datum</label>'
    . '<input type="date" id="date_to" name="date_to" value="' . $h($dateTo) . '"></div>'
+   . '<div class="so-quick">'
+   . '<button type="button" class="btn-filter" data-range="prevmonth">F&ouml;reg&aring;ende m&aring;nad</button>'
+   . '<button type="button" class="btn-filter" data-range="prevyear">F&ouml;reg&aring;ende &aring;r</button>'
+   . '<button type="button" class="btn-filter" data-range="ytd">Hittills i &aring;r</button>'
+   . '<button type="button" class="btn-filter" data-range="custom">Eget datum</button>'
+   . '<button type="button" class="btn-filter" data-range="all">Allt</button>'
+   . '</div>'
    . '<div><button type="submit" class="btn-filter btn-primary">Filtrera</button></div>'
-   . (($dateFrom !== '' || $dateTo !== '')
-        ? '<div><a class="btn-filter" href="/sold_article.php?product_id=' . (int)$product_id . ($showBundle ? '&show_salesbundle=yes' : '') . '">Rensa datum</a></div>'
-        : '')
-   . '</form>';
+   . '</form>'
+   . '<script>
+(function(){
+    var form = document.querySelector(".so-filter");
+    var from = document.getElementById("date_from");
+    var to   = document.getElementById("date_to");
+    function pad(n){ return (n < 10 ? "0" : "") + n; }
+    function fmt(d){ return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+    function saveCookies(){
+        var exp = "; max-age=31536000; path=/; samesite=lax";
+        document.cookie = "sa_date_from=" + encodeURIComponent(from.value) + exp;
+        document.cookie = "sa_date_to="   + encodeURIComponent(to.value)   + exp;
+    }
+    function rangeOf(r){
+        var now = new Date(), y = now.getFullYear(), m = now.getMonth();
+        if (r === "prevmonth") return [fmt(new Date(y, m - 1, 1)), fmt(new Date(y, m, 0))];
+        if (r === "prevyear")  return [(y - 1) + "-01-01", (y - 1) + "-12-31"];
+        if (r === "ytd")       return [y + "-01-01", fmt(now)];
+        return ["", ""];
+    }
+    function updateActive(){
+        var active = "custom";
+        ["prevmonth", "prevyear", "ytd", "all"].some(function(r){
+            var v = rangeOf(r);
+            if (v[0] === from.value && v[1] === to.value) { active = r; return true; }
+            return false;
+        });
+        form.querySelectorAll("[data-range]").forEach(function(btn){
+            btn.classList.toggle("is-active", btn.getAttribute("data-range") === active);
+        });
+    }
+    saveCookies();
+    updateActive();
+    from.addEventListener("input", updateActive);
+    to.addEventListener("input", updateActive);
+    form.addEventListener("submit", saveCookies);
+    form.querySelectorAll("[data-range]").forEach(function(btn){
+        btn.addEventListener("click", function(){
+            var r = btn.getAttribute("data-range");
+            if (r === "custom") { from.focus(); return; }
+            var v = rangeOf(r);
+            from.value = v[0]; to.value = v[1];
+            saveCookies();
+            form.submit();
+        });
+    });
+})();
+</script>';
 
 if ($showBundle) {
     echo '<div class="so-sub">' . (int)$total . ' ordrar s&aring;lda med v&auml;rdepaket</div>';
