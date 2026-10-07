@@ -38,8 +38,8 @@
 	$ct = isset($_GET['customer_type']) ? $_GET['customer_type'] : "";
 	echo "<label>Kundtyp: <select name=\"customer_type\" onChange=\"submit()\">\n";
 	echo "<option value=\"\">Alla</option>\n";
-	echo "<option value=\"b2b\"" . ($ct == "b2b" ? " selected" : "") . ">Endast B2B</option>\n";
-	echo "<option value=\"b2c\"" . ($ct == "b2c" ? " selected" : "") . ">Endast B2C</option>\n";
+	echo "<option value=\"b2b\"" . ($ct == "b2b" ? " selected" : "") . ">Företag</option>\n";
+	echo "<option value=\"b2c\"" . ($ct == "b2c" ? " selected" : "") . ">Privat</option>\n";
 	echo "</select></label>\n";
 
 	$pt = isset($_GET['paymentterm']) ? (int)$_GET['paymentterm'] : 0;
