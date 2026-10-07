@@ -2355,6 +2355,16 @@ Class CTurnOverNew {
 
 	}
 	
+	// Betalsätt (aktiva) för filterlistan på incomingOrders.php
+	function getPaymentTermsForFilter() {
+		$terms = array();
+		$res = (Db::getConnectionAD()) ? @pg_query(Db::getConnectionAD(), "SELECT c_paymentterm_id, name FROM c_paymentterm WHERE isactive = 'Y' ORDER BY name") : false;
+		while ($res && $row = pg_fetch_object($res)) {
+			$terms[$row->c_paymentterm_id] = $row->name;
+		}
+		return $terms;
+	}
+
 	function displayIncommingOrders($sv,$fi,$no) {
 		global $delivered, $svea, $part_delivered, $one_week, $sales_by_seller, $group_by_seller, $group_by_litium, $only_shop, $only_delivered;
 	
@@ -2403,8 +2413,20 @@ Class CTurnOverNew {
 		$select .= "JOIN c_paymentterm pay ON pay.c_paymentterm_id = o.c_paymentterm_id ";
 		$select .= "JOIN c_bpartner_location bpl ON bpl.c_bpartner_location_id = o.c_bpartner_location_id ";
 		$select .= "JOIN c_location loc ON loc.c_location_id = bpl.c_location_id ";
+		$select .= "LEFT JOIN c_bp_group bpg ON bpg.c_bp_group_id = bp.c_bp_group_id ";
 		// $select .= "WHERE o.c_doctype_id = 1000030 AND o.docstatus IN ('CO','IP') ";
 		$select .= "WHERE o.c_doctype_id = 1000030 AND o.docstatus NOT IN ('VO', 'RE') ";
+		// Kundtyp: B2C = affärspartnergrupp som börjar med "privat" (samma logik som CSearch), B2B = övriga
+		$customer_type = isset($_GET['customer_type']) ? $_GET['customer_type'] : "";
+		if ($customer_type == "b2c") {
+			$select .= "AND LOWER(COALESCE(bpg.name,'')) LIKE 'privat%' ";
+		} elseif ($customer_type == "b2b") {
+			$select .= "AND LOWER(COALESCE(bpg.name,'')) NOT LIKE 'privat%' ";
+		}
+		$paymentterm = isset($_GET['paymentterm']) ? (int)$_GET['paymentterm'] : 0;
+		if ($paymentterm > 0) {
+			$select .= "AND o.c_paymentterm_id = " . $paymentterm . " ";
+		}
 		if ($svea == "yes") {
 			if ($fi) {
 				$select .= " AND o.c_paymentterm_id IN (1000025,1000027) AND o.totallines > 500 ";

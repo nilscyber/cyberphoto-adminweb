@@ -35,6 +35,21 @@
 	$chk = ($only_shop == "yes") ? " checked" : "";
 	echo "<label><input type=\"checkbox\" name=\"only_shop\" value=\"yes\" onClick=\"submit()\"$chk> Endast butiken</label>\n";
 
+	$ct = isset($_GET['customer_type']) ? $_GET['customer_type'] : "";
+	echo "<label>Kundtyp: <select name=\"customer_type\" onChange=\"submit()\">\n";
+	echo "<option value=\"\">Alla</option>\n";
+	echo "<option value=\"b2b\"" . ($ct == "b2b" ? " selected" : "") . ">Endast B2B</option>\n";
+	echo "<option value=\"b2c\"" . ($ct == "b2c" ? " selected" : "") . ">Endast B2C</option>\n";
+	echo "</select></label>\n";
+
+	$pt = isset($_GET['paymentterm']) ? (int)$_GET['paymentterm'] : 0;
+	echo "<label>Betalsätt: <select name=\"paymentterm\" onChange=\"submit()\">\n";
+	echo "<option value=\"\">Alla</option>\n";
+	foreach ($turnover->getPaymentTermsForFilter() as $ptId => $ptName) {
+		echo "<option value=\"" . (int)$ptId . "\"" . ($pt == $ptId ? " selected" : "") . ">" . htmlspecialchars($ptName) . "</option>\n";
+	}
+	echo "</select></label>\n";
+
 	echo "</div>\n";
 	echo "</form>\n";
 
