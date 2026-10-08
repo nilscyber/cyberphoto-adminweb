@@ -1054,10 +1054,10 @@ public function getNewProductsForPage($daysBack = 14)
     return $out;
 }
 
-public function getUpcomingProductsForPage($daysAhead = 60)
+public function getUpcomingProductsForPage($daysAhead = 730)
 {
     $daysAhead = (int)$daysAhead;
-    if ($daysAhead <= 0) { $daysAhead = 60; }
+    if ($daysAhead <= 0) { $daysAhead = 730; }
 
     $dbAD = Db::getConnectionAD(false);
 
