@@ -55,6 +55,7 @@ $h_latin1 = function ($s) {
   }
   .btn:hover { background:#ededed; }
   .num { text-align:right; white-space:nowrap; }
+  .center { text-align:center; white-space:nowrap; padding-left:20px; padding-right:20px; }
   .muted { color:#777; font-size:12px; }
   .copy-artnr { cursor:pointer; }
   .copy-artnr:hover { text-decoration: underline; }
@@ -75,6 +76,7 @@ $h_latin1 = function ($s) {
   <thead>
     <tr>
       <th>Launchdatum</th>
+      <th class="center">Dagar kvar</th>
       <th>Artnr</th>
       <th>Produkt</th>
       <th>Leverantör</th>
@@ -94,9 +96,19 @@ $h_latin1 = function ($s) {
 		$productUrl = 'search_dispatch.php?q=' . urlencode($artnr) . '&open=product&id=' . $pid . '#';
 
 		$productLabel = trim((string)$r['manufacturer'] . ' ' . (string)$r['description']);
+
+		// Kalenderdagar kvar till launchdatum
+		$daysLeft = '';
+		if (!empty($r['launch_date'])) {
+			$launchDay = new DateTime(substr((string)$r['launch_date'], 0, 10));
+			$today     = new DateTime(date('Y-m-d'));
+			$daysLeft  = (int)$today->diff($launchDay)->format('%r%a');
+		}
     ?>
       <tr>
 		<td><?php echo htmlspecialchars((string)$r['launch_date'], ENT_QUOTES); ?></td>
+
+		<td class="center"><?php echo $daysLeft; ?></td>
 
 		<td>
 		  <span class="copy-artnr" data-copy="<?php echo htmlspecialchars($artnr, ENT_QUOTES); ?>" title="Klicka för att kopiera">
