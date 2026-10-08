@@ -124,6 +124,8 @@ Class CCyberAdmin {
 			echo "<title>Återställning lösenord - CyberPhoto</title>\n";
 		} elseif (preg_match("/logistik\.php/i", $_SERVER['PHP_SELF'])) {
 			echo "<title>Logistikflöden - CyberPhoto</title>\n";
+		} elseif (preg_match("/goods_inflow\.php/i", $_SERVER['PHP_SELF'])) {
+			echo "<title>Inleveransflöde - CyberPhoto</title>\n";
 		} elseif (preg_match("/menu_web\.php/i", $_SERVER['PHP_SELF'])) {
 			echo "<title>Meny webbshop - CyberPhoto</title>\n";
 		} elseif (preg_match("/tech_mobile\.php/i", $_SERVER['PHP_SELF'])) {

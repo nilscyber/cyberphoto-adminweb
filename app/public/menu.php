@@ -186,6 +186,7 @@
     <li><a href="logistik.php" <?php if (preg_match("/logistik\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Logistikflöden</a></li>
     <li><a href="goods_expectation.php" <?php if (preg_match("/goods_expectation\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Förväntad godsvolym</a></li>
     <li><a href="goods_delays.php" <?php if (preg_match("/goods_delays\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Försenade godsvolym</a></li>
+    <li><a href="goods_inflow.php" <?php if (preg_match("/goods_inflow\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Inleveransflöde</a></li>
 	</ul>
 </li>
 
