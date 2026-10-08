@@ -95,3 +95,46 @@ FROM m_product p
 LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
 WHERE p.value = $1
 ```
+
+## Anatomy of a page (what a new page needs)
+
+Every page is a flat PHP file in `app/public/`, no router. Skeleton:
+
+```php
+<?php
+	include_once("top.php");      // session, autoload, globals ($admin, $turnover, $adintern, ...)
+	include_once("header.php");   // <html>, <head>, menu, opens #mainpanel
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
+	echo "<h1>Rubrik</h1>\n";
+	// ... content ...
+	include_once("footer.php");   // closes #mainpanel, drawer + prefs modal
+?>
+```
+
+- **Menu:** add an `<li>` in `app/public/menu.php` in the right category; the `id="current"` highlight is a `preg_match` on `$_SERVER['PHP_SELF']`, copy a neighbouring line.
+- **Browser title:** `CCyberAdmin::displayPageTitle()` in `app/lib/CCyberAdmin.php` is one long `elseif` chain on the filename; add a branch or the tab says the default.
+- **Classes:** `app/lib/<ClassName>.php`, autoloaded by `top.php` (`include $class . '.php'`) — `new CFoo()` just works, no require needed.
+- **Globals:** `top.php` emulates register_globals (`extract($_GET)`, `$_POST`, `$_COOKIE`), so legacy code reads `$supID` directly. New code: read `$_GET` explicitly and validate.
+- **Page-specific CSS/JS:** allowed as separate files next to the page (`goods_inflow.css`, `goods_inflow.js`), loaded with the same `?ver=ad` cache-buster. Not inline `<style>` blocks.
+- `#mainpanel` is a fixed 1260 px; the sidebar menu takes the rest. Design for that width, not for phones.
+- No login gate on plain GET in the local container: pages render for curl without cookies (the header just shows "Logga in").
+
+## Querying ADempiere from here
+
+- `Db::getConnectionAD()` is a **persistent** `pg_pconnect` (`$ad_r`). Use `pg_query_params($conn, $sql, [...])` with `$1..$n`; cast dates explicitly (`$2::date`). Never create temp tables or anything session-scoped — the connection is reused by the next request and the read host may be read-only.
+- The read host (`AD_HOST`, erp-db-node3:5000, PostgreSQL 18, standalone — `pg_is_in_recovery()` is false) **has never been ANALYZEd**: `pg_stat_user_tables` shows 55k rows for `m_transaction` against 3.9M real. Plans that are fine on the dev DB can be 20–30× slower here. Concretely: a correlated subquery over a CTE that is referenced twice (hence materialized) is rescanned per outer row — write it as a grouped `LEFT JOIN … FILTER (WHERE …)` instead, and mark small per-row CTEs `AS MATERIALIZED` so they are not re-evaluated inside a nested loop. Time queries in the real container, not against the dev DB (see below).
+- Heredoc SQL: use nowdoc (`<<<'SQL'`) so `$1` and `$this` are not interpolated.
+- Warehouse ids: 1000000 = Umeå (Standard), 1000001 = Returavdelningen, 1000003 = Direktleverans, 1000006 = Butiken. `m_locator.m_warehouse_id` is the join from `m_storage`/`m_transaction` to a warehouse.
+- Stock history = `m_transaction` (`movementtype` V+/V-/C+/C-/M+/M-/I+/I-, `created` is the completion timestamp, `movementdate` is date-only). Current stock = `m_storage.qtyonhand`.
+
+## Local run, test and deploy
+
+- `docker compose up -d` here → http://localhost:8091 (also https://localhost:8443, self-signed). Needs the external `proxy-net` docker network and `.env` (gitignored; `.env.example` lists the keys). `.env` points at the real MariaDB and the real AD read host, so local = live data.
+- Syntax check inside the container (Git Bash mangles `/var/...` paths unless you set `MSYS_NO_PATHCONV=1`):
+  ```bash
+  MSYS_NO_PATHCONV=1 docker exec cyberphoto-adminweb php -l /var/www/html/public/<page>.php
+  ```
+  Timing a query: drop a small PHP script in the container with `docker cp` (use a Windows path for the source, `/tmp` is not what you think in Git Bash) and run it with `docker exec … php /tmp/x.php`.
+- `docker cp` / curl from the host: `curl -s -k https://localhost:8443/<page>.php` returns the full page for GET-only pages.
+- **Deploy = `git push origin main`, then `ssh dockops@docker-100` and `git pull --ff-only` in `/home/dockops/cyberphoto-adminweb`.** `app/` is volume-mounted into the container there, so PHP/CSS/JS changes are live at once; no build, no restart. The host name is plain `docker-100` (`docker-100.cyberphoto.local` does not resolve). Verify with `docker exec cyberphoto-adminweb curl -s http://localhost/<page>.php` on the box.
+- Commit with an explicit pathspec (`git commit -m … -- <files>`): the checkout on docker-100 and this one can both carry untracked WIP that must not be swept in.
