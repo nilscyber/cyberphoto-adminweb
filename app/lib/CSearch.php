@@ -2162,8 +2162,10 @@ public static function renderOrderDetailsAD($orderNo)
         $csHtml  = '<em>ej angivet</em>';
     }
     $html .= '  <div class="dw-row"><span class="dw-label">Kreditstatus:</span> <span class="dw-value">' . $csHtml . '</span></div>';
-    if (!empty($order['shipper'])) {
-        $html .= '  <div class="dw-row"><span class="dw-label">Leveranssätt:</span> <span class="dw-value"><strong>' . $eh($order['shipper']) . '</strong></span></div>';
+    // Hämtas i butik (deliveryviarule = 'P') - m_shipper kan ändå vara satt om det är en speditörsorder
+    $shipperLabel = (($order['deliveryviarule'] ?? '') === 'P') ? 'Hämtas i butik' : ($order['shipper'] ?? '');
+    if ($shipperLabel !== '') {
+        $html .= '  <div class="dw-row"><span class="dw-label">Leveranssätt:</span> <span class="dw-value"><strong>' . $eh($shipperLabel) . '</strong></span></div>';
     }
     // if ($pclassLabel !== '') {
     //     $html .= '  <div class="dw-row"><span class="dw-label">Kreditklass:</span> <span class="dw-value"><strong>' . $eh($pclassLabel) . '</strong></span></div>';
