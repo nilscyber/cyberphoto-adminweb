@@ -2161,7 +2161,10 @@ public static function renderOrderDetailsAD($orderNo)
     } else {
         $csHtml  = '<em>ej angivet</em>';
     }
-    $html .= '  <div class="dw-row"><span class="dw-label">Kreditstatus:</span> <span class="dw-value">' . $csHtml . '</span></div>';
+    // Kreditstatus är ointressant när ordern redan är skickad/dellevererad
+    if ($statusLabel !== 'Skickad' && $statusLabel !== 'Dellevererad') {
+        $html .= '  <div class="dw-row"><span class="dw-label">Kreditstatus:</span> <span class="dw-value">' . $csHtml . '</span></div>';
+    }
     // Hämtas i butik (deliveryviarule = 'P') - m_shipper kan ändå vara satt om det är en speditörsorder
     $shipperLabel = (($order['deliveryviarule'] ?? '') === 'P') ? 'Hämtas i butik' : ($order['shipper'] ?? '');
     if ($shipperLabel !== '') {
