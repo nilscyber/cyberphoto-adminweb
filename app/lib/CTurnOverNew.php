@@ -2372,10 +2372,13 @@ Class CTurnOverNew {
 		$countrow_by_day = 0;
 		$ordervarde = 0;
 		$margin = 0;
+		$day_sum = 0;
+		$day_margin = 0;
 		unset($row_note);
-	
-		echo "<div style=\"overflow-x:auto\">\n";
-		echo "<table class=\"table-list\">\n";
+
+		// Ingen overflow på wrappern: den skulle bryta position: sticky på kolumnrubrikerna
+		echo "<div>\n";
+		echo "<table class=\"table-list table-sticky\">\n";
 		if ($group_by_seller == "yes") {
 			echo "\t<thead><tr>\n";
 			echo "\t\t<th class=\"c\">Antal</th>\n";
@@ -2520,8 +2523,10 @@ Class CTurnOverNew {
 					if ($this_day != $actual_day) {
 
 						if ($countrow_by_day != 0) {
-							echo "\t<tr class=\"info-row\"><td colspan=\"11\">" . $countrow_by_day . " st</td></tr>\n";
+							$this->displayIncommingDaySummary($countrow_by_day, $day_sum, $day_margin, $valuta_kod);
 							$countrow_by_day = 0;
+							$day_sum = 0;
+							$day_margin = 0;
 						}
 
 						echo "\t<tr class=\"cat-head\">";
@@ -2556,6 +2561,8 @@ Class CTurnOverNew {
 
 					$countrow++;
 					$countrow_by_day++;
+					$day_sum = $day_sum + $row->totallines;
+					$day_margin = $day_margin + $row->marginamt;
 					$ordervarde = $ordervarde + $row->totallines;
 					$margin = $margin + $row->marginamt;
 					$valuta_kod = $row->iso_code;
@@ -2584,7 +2591,9 @@ Class CTurnOverNew {
 			echo "\t</tfoot>\n";
 		} else {
 			echo "\t<tfoot>\n";
-			echo "\t<tr class=\"info-row\"><td colspan=\"11\">" . $countrow_by_day . " st</td></tr>\n";
+			if ($countrow_by_day != 0) {
+				$this->displayIncommingDaySummary($countrow_by_day, $day_sum, $day_margin, $valuta_kod);
+			}
 			echo "\t<tr class=\"total-row\">\n";
 			echo "\t\t<td colspan=\"4\">Totalt: $countrow st ordrar</td>\n";
 			echo "\t\t<td class=\"r\">" . number_format($ordervarde, 0, ',', ' ') . " " . $valuta_kod . "</td>\n";
@@ -2596,6 +2605,18 @@ Class CTurnOverNew {
 
 		echo "</table>\n";
 		echo "</div>\n";
+	}
+
+	private function displayIncommingDaySummary($antal, $summa, $marginal, $valuta) {
+		$tg = ($summa != 0) ? number_format($marginal / $summa * 100, 2, '.', '') . " %" : "";
+		$neg_class = ($marginal < 0) ? " text-negative" : "";
+		echo "\t<tr class=\"info-row\">\n";
+		echo "\t\t<td colspan=\"4\">" . $antal . " st</td>\n";
+		echo "\t\t<td class=\"r\">" . number_format($summa, 0, ',', ' ') . " " . $valuta . "</td>\n";
+		echo "\t\t<td class=\"r$neg_class\">" . number_format($marginal, 0, ',', ' ') . " " . $valuta . "</td>\n";
+		echo "\t\t<td class=\"r$neg_class\">" . $tg . "</td>\n";
+		echo "\t\t<td colspan=\"4\"></td>\n";
+		echo "\t</tr>\n";
 	}
 
 	function displaySalesPerUser() {
