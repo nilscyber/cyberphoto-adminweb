@@ -2445,10 +2445,12 @@ Class CTurnOverNew {
 			$select .= "AND o.created > '" . date("Y-m-d H:i:s",strtotime("-180 days")) . "' ";
 		} elseif ($one_week == "yes") {
 			// $select .= "AND o.created > current_date - integer '7' ";
-			$select .= "AND o.created > '" . date("Y-m-d H:i:s",strtotime("-1 week")) . "' ";
+			// innevarande dag + 7 hela dagar bakåt (från midnatt)
+			$select .= "AND o.created >= '" . date("Y-m-d 00:00:00",strtotime("-7 days")) . "' ";
 		} else {
 			// $select .= "AND o.created > current_date - integer '3' ";
-			$select .= "AND o.created > '" . date("Y-m-d H:i:s",strtotime("-3 days")) . "' ";
+			// innevarande dag + 3 hela dagar bakåt (från midnatt)
+			$select .= "AND o.created >= '" . date("Y-m-d 00:00:00",strtotime("-3 days")) . "' ";
 		}
 		if ($part_delivered == "no") {
 			$select .= "AND o.ispartdelivered = 'N' ";
