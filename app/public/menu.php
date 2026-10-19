@@ -106,6 +106,7 @@
     <li><a href="best_tg.php" <?php if (preg_match("/best_tg\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Bäst täckningsgrad</a></li>
     <li><a href="pay_methods.php" <?php if (preg_match("/pay_methods\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Fördelning betalsätt</a></li>
 	<li><a href="product_feedback.php" <?php if (preg_match("/product_feedback\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Missad försäljning</a></li>
+	<li><a href="sales_export.php" <?php if (preg_match("/sales_export\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Försäljningsexport</a></li>
 	<?php if ($_COOKIE['login_mail'] == 'stefan@cyberphoto.se') { ?>
 	<li><a href="focus_products.php" <?php if (preg_match("/focus_products\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Våra fokusprodukter</a></li>
 	<?php } ?>

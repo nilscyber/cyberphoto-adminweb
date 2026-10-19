@@ -1,0 +1,26 @@
+/* Försäljningsexport (sales_export.php). Tabeller kommer från admin_core.css. */
+.se-intro { max-width: 80ch; color: #374151; margin: 0 0 10px; }
+.se-form { margin-bottom: 6px; }
+.se-form .filter-bar { align-items: center; }
+.se-form input[type="date"], .se-form select { border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 6px; font: inherit; background: #fff; }
+.se-form input[type="date"]:focus, .se-form select:focus { outline: 2px solid #2dd4bf; outline-offset: 1px; }
+.se-btn { background: #0d9488; color: #fff; border: 1px solid #0d9488; border-radius: 5px; padding: 5px 14px; font: inherit; cursor: pointer; }
+.se-btn:hover { background: #0f766e; border-color: #0f766e; }
+.se-btn-secondary { background: #fff; color: #0f766e; }
+.se-btn-secondary:hover { background: #f0fdfa; }
+.se-quick { color: #6b7280; font-size: 12px; margin: 6px 0 4px; }
+.se-note { color: #92400e; background: #fef3c7; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 12px; display: inline-block; }
+.se-period { color: #6b7280; font-size: 12px; margin: 8px 0; }
+.se-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 8px 0 4px; max-width: 900px; }
+.se-kpi { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px 8px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.se-kpi .v { font-size: 24px; font-weight: 600; line-height: 1.1; letter-spacing: -0.01em; color: #111; font-variant-numeric: tabular-nums; }
+.se-kpi .l { font-size: 12.5px; color: #4b5563; margin-top: 4px; }
+.se-h2 { font-size: 15px; margin: 16px 0 6px; }
+.se-scroll { overflow-x: auto; max-width: 100%; }
+.se-scroll table { white-space: nowrap; }
+.table-list th.n, .table-list td.n { text-align: right; font-variant-numeric: tabular-nums; }
+.se-method { margin: 18px 0; max-width: 100ch; }
+.se-method summary { cursor: pointer; color: #374151; font-size: 13px; }
+.se-method td { vertical-align: top; }
+.se-note2 { color: #4b5563; font-size: 12.5px; }
+@media (max-width: 900px) { .se-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
