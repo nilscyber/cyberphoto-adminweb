@@ -71,7 +71,7 @@
 	echo "<div class=\"filter-bar\">\n";
 	echo "<label>Från <input type=\"date\" name=\"from\" value=\"" . $h($from) . "\"></label>\n";
 	echo "<label>Till <input type=\"date\" name=\"to\" value=\"" . $h($to) . "\"></label>\n";
-	echo "<label>Perioden avser <select name=\"basis\"><option value=\"order\"" . ($basis == 'order' ? ' selected' : '') . ">Orderdatum</option><option value=\"done\"" . ($basis == 'done' ? ' selected' : '') . ">Slutfört datum</option></select></label>\n";
+	echo "<label>Perioden avser <select name=\"basis\"><option value=\"order\"" . ($basis == 'order' ? ' selected' : '') . ">Orderdatum (skapad)</option><option value=\"done\"" . ($basis == 'done' ? ' selected' : '') . ">Slutfört datum</option></select></label>\n";
 	echo "<label>Format <select name=\"format\"><option value=\"standard\"" . ($format == 'standard' ? ' selected' : '') . ">Standard (komma, decimalpunkt)</option><option value=\"excel\"" . ($format == 'excel' ? ' selected' : '') . ">Svenskt Excel (semikolon, decimalkomma)</option></select></label>\n";
 	echo "<button type=\"submit\" class=\"se-btn se-btn-secondary\">Förhandsgranska</button>\n";
 	echo "<button type=\"submit\" name=\"download\" value=\"1\" class=\"se-btn\">Ladda ner CSV</button>\n";
@@ -130,7 +130,7 @@
 	echo "<table class=\"table-list\"><thead><tr><th>Kolumn</th><th>Innehåll</th></tr></thead><tbody>\n";
 	$defs = array(
 		array('Ordernummer', 'Ordernumret. Samma nummer på alla rader i ordern.'),
-		array('Orderdatum', 'Datum då ordern lades.'),
+		array('Orderdatum', 'Datum då ordern skapades i ADempiere (fältet Created, som aldrig ändras). Det manuellt ändringsbara fältet Orderdatum används inte.'),
 		array('Slutfört datum', 'Datum då ordern senast slutfördes i ADempiere (ProcessedOn). För 11 % av ordrarna är det en annan dag än orderdatum. En order som återöppnas och slutförs igen får det senaste datumet.'),
 		array('Orderstatus', 'Slutförd (CO) eller Stängd (CL). Endast dessa ingår; makulerade, pågående och utkast ingår inte.'),
 		array('Kanal', 'Webb = säljare "Weborder". Telefon / E-post / Fax = ordermetod som säljaren angett på ordern (fylld på ca 5 % av de manuella ordrarna). Butik = manuell order som hämtas i butiken. Övrig manuell = resten av de manuella ordrarna, där kanalen inte är angiven.'),

@@ -25,7 +25,7 @@ class CSalesExport {
     }
 
     /**
-     * Parametrar: $1 = 'order' (period avser orderdatum) eller 'done' (period avser slutförandedatum),
+     * Parametrar: $1 = 'order' (period avser orderdatum = när ordern skapades, C_Order.Created) eller 'done' (period avser slutförandedatum),
      *             $2 = från (datum), $3 = till (datum, inklusive).
      */
     private function sql() {
@@ -39,14 +39,14 @@ WITH RECURSIVE up AS (
 ),
 cat AS (SELECT DISTINCT ON (leaf) leaf, names FROM up ORDER BY leaf, depth DESC),
 ord AS MATERIALIZED (
-  SELECT o.c_order_id, o.documentno, o.dateordered::date AS orderdate,
+  SELECT o.c_order_id, o.documentno, o.created::date AS orderdate,
          (to_timestamp(o.processedon / 1000.0) AT TIME ZONE 'Europe/Stockholm')::date AS donedate,
          o.docstatus, o.salesrep_id, o.ordermethod, o.deliveryviarule, o.c_bpartner_id,
          o.c_currency_id, o.c_conversiontype_id, o.dateacct, o.ad_client_id, o.ad_org_id
   FROM c_order o
   JOIN c_doctype dt ON dt.c_doctype_id = o.c_doctypetarget_id
   WHERE o.ad_client_id = 1000000 AND o.issotrx = 'Y' AND dt.docsubtypeso = 'SO' AND o.docstatus IN ('CO','CL')
-    AND (($1::text = 'order' AND o.dateordered >= $2::date AND o.dateordered < $3::date + 1)
+    AND (($1::text = 'order' AND o.created >= $2::date AND o.created < $3::date + 1)
       OR ($1::text = 'done' AND o.processedon >= extract(epoch FROM $2::date::timestamp AT TIME ZONE 'Europe/Stockholm') * 1000
                             AND o.processedon <  extract(epoch FROM ($3::date + 1)::timestamp AT TIME ZONE 'Europe/Stockholm') * 1000))
 ),
