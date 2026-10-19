@@ -96,6 +96,20 @@ LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
 WHERE p.value = $1
 ```
 
+### Sales figures: use the ERP sales views
+
+For revenue, contribution, quantities, trade-in margin, web/manual and B2B/B2C
+per product, customer, seller and day, read the materialized views
+`adempiere.mv_powerbi_orders_v1` (sales orders, incl. not yet shipped/invoiced;
+`docstatus` tells completed from open) and `adempiere.mv_powerbi_sales_v5`
+(invoiced and posted sales from the ledger). Both are on the read host, refreshed
+hourly, read in milliseconds, and already apply the margin-scheme (VMB) rule
+above. Do not write a new `c_order`/`fact_acct` aggregate for a report page;
+if a column is missing, the view is extended in the ADempiere trunk, not worked
+around here. Columns, scope and examples: `docs/erp-sales-views.md`. The
+existing `CSalesExport.php` predates the order view and queries `c_order`
+directly (it also needs line-level detail); new pages should start from the views.
+
 ## Anatomy of a page (what a new page needs)
 
 Every page is a flat PHP file in `app/public/`, no router. Skeleton:
