@@ -490,6 +490,12 @@ h2 {
   font-size:13px; font-weight:600; text-decoration:none;
   white-space:nowrap; transition:background .15s, border-color .15s;
 }
+.ext-link-btn.portal{
+  background:#fef2f2; color:#b91c1c; border-color:#fecaca;
+}
+.ext-link-btn.portal:hover{
+  background:#fee2e2; border-color:#fca5a5;
+}
 .ext-link-btn.insights{
   background:#eef2ff; color:#3730a3; border-color:#c7d2fe;
 }
@@ -576,6 +582,13 @@ h2 {
 
 	<!-- Snabblänkar externa system -->
 	<div class="ext-links">
+	  <a href="https://portal.cyberphoto.se/" target="_blank" rel="noopener" class="ext-link-btn portal"
+	     title="Nya personalportalen (ersätter gamla admin sida för sida)">
+	    <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true">
+	      <path d="M1 1h6v6H1V1zm8 0h6v6H9V1zM1 9h6v6H1V9zm8 0h6v6H9V9z"/>
+	    </svg>
+	    Portalen
+	  </a>
 	  <a href="https://insights.cyberphoto.se/" target="_blank" rel="noopener" class="ext-link-btn insights"
 	     title="Intern analyssida">
 	    <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true">
