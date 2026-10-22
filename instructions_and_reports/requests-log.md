@@ -17,4 +17,8 @@ record and the FortiGate has no inbound policy to 192.168.1.0/24, so LAN/VPN onl
 the version is explicit and verifiable (same as visit). Committed with an explicit
 pathspec (local WIP in `app/lib/CSalesExport.php` left out), pushed, pulled on
 docker-100, `docker compose build --pull` and `docker compose up -d`, then verified
-`php -v` in the container and `healthz.php`. Outcome recorded below.
+`php -v` in the container and `healthz.php`. Outcome: commit `c7cf009` pushed and pulled
+on docker-100 2026-10-22, image rebuilt 08:42 local time, container recreated, now
+reports PHP 8.3.36; `healthz.php` 200, `/` 200 inside the container and through the
+proxy at admin.cyberphoto.se. Downtime was the container swap, a few seconds. The
+untracked `app/public/scan-test.html` on the server was left as it was.
