@@ -1,4 +1,8 @@
-FROM php:8.3-apache
+# Pinned to the exact PHP release so a rebuild is verifiable with `php -v`.
+# 8.3.36 (2026-10-21) fixes CVE-2026-109618 / CVE-2026-109619 ("PHP2Shell",
+# unauthenticated RCE, worst on mod_php). Bump this line for future PHP fixes,
+# then on docker-100: git pull --ff-only && docker compose build --pull && docker compose up -d
+FROM php:8.3.36-apache
 
 # Install PHP extensions
 RUN apt-get update && apt-get install -y libpq-dev libxml2-dev && rm -rf /var/lib/apt/lists/*
