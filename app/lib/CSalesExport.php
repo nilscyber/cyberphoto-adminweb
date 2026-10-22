@@ -31,7 +31,30 @@ class CSalesExport {
 
     function __construct() {
         $this->ad_r = Db::getConnectionAD(false);
-        if ($this->ad_r) { @pg_set_client_encoding($this->ad_r, "UTF8"); }
+        if ($this->ad_r) {
+            @pg_set_client_encoding($this->ad_r, "UTF8");
+            // Läshosten har work_mem 4 MB; hash-joinen mot fact_acct spiller annars till disk och tar minuter.
+            @pg_query($this->ad_r, "SET work_mem = '64MB'");
+        }
+    }
+
+    /**
+     * Delar upp perioden i kalendermånader (hela ordrar hamnar i exakt en bit, så radräkningen per order stämmer).
+     * Varje bit körs som egen fråga: första byten kommer snabbt, proxyn hinner inte ge upp, och en avbruten
+     * nedladdning slutar efter pågående bit i stället för att köra hela perioden klart i bakgrunden.
+     * @return array av array(from, to); open-läget ger en enda bit med null-datum.
+     */
+    static function chunks($from, $to, $mode) {
+        if ($mode === 'open') return array(array(null, null));
+        $out = array();
+        $cur = new DateTime($from); $end = new DateTime($to);
+        while ($cur <= $end) {
+            $last = (clone $cur)->modify('last day of this month');
+            if ($last > $end) $last = clone $end;
+            $out[] = array($cur->format('Y-m-d'), $last->format('Y-m-d'));
+            $cur = (clone $last)->modify('+1 day');
+        }
+        return $out;
     }
 
     /**

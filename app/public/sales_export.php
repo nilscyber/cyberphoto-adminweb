@@ -22,8 +22,10 @@
 	// ---------- CSV-nedladdning (ingen HTML runt omkring) ----------
 	if (isset($_GET['download'])) {
 		$exp = new CSalesExport();
-		@set_time_limit(600);
-		$res = $exp->query($from, $to, $basis);
+		@set_time_limit(1800);
+		$chunks = CSalesExport::chunks($from, $to, $basis);
+		// Första biten körs innan några headers skickas, så att ett databasfel kan ge ett riktigt felmeddelande
+		$res = $exp->query($chunks[0][0], $chunks[0][1], $basis);
 		if (!$res) {
 			header('Content-Type: text/plain; charset=utf-8', true, 500);
 			echo "Kunde inte läsa från ADempiere: " . $exp->error;
@@ -46,13 +48,23 @@
 		$isNum = array();
 		foreach ($cols as $i => $c) { $isNum[$i] = in_array($c, CSalesExport::$numericColumns, true); }
 		fputcsv($out, $cols, $delim, '"', '');
+		flush();
 		$n = 0;
-		while ($row = pg_fetch_row($res)) {
-			if ($format === 'excel') {
-				foreach ($row as $i => $v) { if ($isNum[$i] && $v !== null) { $row[$i] = str_replace('.', ',', $v); } }
+		foreach ($chunks as $ci => $ch) {
+			if ($ci > 0) {
+				if (connection_aborted()) break;
+				$res = $exp->query($ch[0], $ch[1], $basis);
+				if (!$res) { fputcsv($out, array("FEL: avbruten, " . $exp->error), $delim, '"', ''); break; }
 			}
-			fputcsv($out, $row, $delim, '"', '');
-			if ((++$n % 2000) == 0) { flush(); }
+			while ($row = pg_fetch_row($res)) {
+				if ($format === 'excel') {
+					foreach ($row as $i => $v) { if ($isNum[$i] && $v !== null) { $row[$i] = str_replace('.', ',', $v); } }
+				}
+				fputcsv($out, $row, $delim, '"', '');
+				if ((++$n % 2000) == 0) { flush(); }
+			}
+			pg_free_result($res);
+			flush();
 		}
 		fclose($out);
 		exit;
@@ -96,13 +108,15 @@
 	// ---------- Förhandsgranskning ----------
 	if (isset($_GET['from']) || isset($_GET['to']) || isset($_GET['basis'])) {
 		$exp = new CSalesExport();
-		@set_time_limit(600);
-		$res = $exp->query($from, $to, $basis);
-		if (!$res) {
-			echo "<p class=\"se-note\">Kunde inte läsa från ADempiere: " . $h($exp->error) . "</p>\n";
-		} else {
-			$cols = CSalesExport::columns($res);
-			$orders = array(); $lines = 0; $value = 0.0; $cost = 0.0; $remain = 0.0; $remQty = 0.0; $credited = 0.0; $preview = array(); $chan = array(); $reason = array();
+		@set_time_limit(1800);
+		$cols = null; $err = "";
+		$orders = array(); $lines = 0; $value = 0.0; $cost = 0.0; $remain = 0.0; $remQty = 0.0; $credited = 0.0; $preview = array(); $chan = array(); $reason = array();
+		foreach (CSalesExport::chunks($from, $to, $basis) as $ch) {
+			// håller anslutningen vid liv genom proxyn (60 s tystnad ger 504) medan månaderna läses
+			echo "<!-- läser " . $h($ch[0]) . " -->\n"; flush();
+			$res = $exp->query($ch[0], $ch[1], $basis);
+			if (!$res) { $err = $exp->error; break; }
+			if ($cols === null) $cols = CSalesExport::columns($res);
 			while ($row = pg_fetch_assoc($res)) {
 				$lines++;
 				if (!isset($orders[$row['Ordernummer']])) { $orders[$row['Ordernummer']] = 1; $k = $row['Kanal']; $chan[$k] = ($chan[$k] ?? 0) + 1; }
@@ -110,6 +124,11 @@
 				if ($basis === 'open' && (float)$row['Kvarstående antal'] > 0) { $k = $row['Restorsak']; $reason[$k] = ($reason[$k] ?? 0) + (float)$row['Kvarstående värde']; }
 				if ($lines <= 25) $preview[] = $row;
 			}
+			pg_free_result($res);
+		}
+		if ($err !== "") {
+			echo "<p class=\"se-note\">Kunde inte läsa från ADempiere: " . $h($err) . "</p>\n";
+		} else {
 			$nOrders = count($orders);
 			if ($basis === 'open') {
 				echo "<p class=\"se-period\">Öppen orderstock, ögonblicksbild per " . date('Y-m-d H:i') . ". Alla ordrar med minst en varurad som inte är fullt levererad, oavsett orderdatum.</p>\n";
