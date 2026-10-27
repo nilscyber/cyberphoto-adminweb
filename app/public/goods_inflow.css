@@ -47,3 +47,20 @@
   .gi-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gi-grid2 { grid-template-columns: 1fr; }
 }
+/* klickbara staplar + detaljpanel */
+.gi-click { cursor: pointer; }
+.gi-card svg rect.gi-click:hover, .gi-card svg path.gi-click:hover { filter: brightness(0.92); }
+.gi-card svg path.gi-click:hover { fill-opacity: 0.45; }
+.gi-card svg text.gi-link:hover { text-decoration: underline; }
+.gi-hint { color: #6b7280; font-size: 12px; margin: 4px 0 0; }
+#gi-tip .gi-tip-hint { opacity: .75; font-size: 11.5px; }
+.gi-detail { border-color: #99d5cf; }
+.gi-detail-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.gi-detail-head h3 { margin: 0; }
+.gi-detail-count { color: #4b5563; font-size: 12.5px; }
+.gi-detail-close { margin-left: auto; background: #fff; color: #0f766e; border: 1px solid #0d9488; border-radius: 5px; padding: 3px 12px; font: inherit; cursor: pointer; }
+.gi-detail-close:hover { background: #f0fdfa; }
+.gi-det-scroll { max-height: 560px; overflow: auto; }
+.gi-det-scroll thead th { position: sticky; top: 0; z-index: 1; }
+.gi-det-scroll td { white-space: nowrap; }
+#gi-det-orders td:nth-child(3), #gi-det-stock td:nth-child(4) { white-space: normal; min-width: 220px; }

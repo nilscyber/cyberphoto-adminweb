@@ -153,9 +153,15 @@ sib AS MATERIALIZED (
 SELECT d.m_inoutline_id, r.documentno receipt_no, d.rdate, p.value product_value,
        CASE WHEN manu.name IS NOT NULL AND manu.name <> '' THEN manu.name || ' ' || p.name ELSE p.name END product_name,
        d.c_order_id, d.order_no, d.dateordered, bp.name customer, d.open_qty, d.alloc_qty, d.first_ship_after, d.ship_days,
-       COALESCE(s.open_siblings, 0) open_siblings, COALESCE(s.siblings_received_later, 0) siblings_received_later
+       COALESCE(s.open_siblings, 0) open_siblings, COALESCE(s.siblings_received_later, 0) siblings_received_later,
+       ol.qtyordered - ol.qtydelivered AS line_open_now,
+       (SELECT count(*) FROM c_orderline x WHERE x.c_order_id = d.c_order_id AND x.c_orderline_id <> d.c_orderline_id
+          AND x.m_product_id IS NOT NULL AND x.qtyordered > x.qtydelivered) AS other_open_now,
+       co.docstatus AS order_status
 FROM alloc d
 JOIN rcpt r ON r.m_inoutline_id = d.m_inoutline_id
+JOIN c_orderline ol ON ol.c_orderline_id = d.c_orderline_id
+JOIN c_order co ON co.c_order_id = d.c_order_id
 JOIN m_product p ON p.m_product_id = d.m_product_id
 LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
 LEFT JOIN c_bpartner bp ON bp.c_bpartner_id = d.c_bpartner_id
@@ -174,9 +180,27 @@ SQL;
         return $out;
     }
 
-    /** Orsakstext för en allokerad orderrad. */
+    /** Flödesnod för en allokerad orderrad (samma indelning som flödesdiagrammet). */
+    static function orderBucket($o) {
+        if ($o['ship_days'] === null || $o['ship_days'] === '') return 'A5';
+        $d = (int)$o['ship_days'];
+        return $d <= 1 ? 'A1' : ($d <= 7 ? 'A2' : 'A3');
+    }
+
+    /** Flödesnod för en inleveransrad som gick till lager (FIFO-dagar till slutsålt). */
+    static function stockBucket($r) {
+        if ($r['fifo_full_days'] === null || $r['fifo_full_days'] === '') return 'B5';
+        $d = (int)$r['fifo_full_days'];
+        return $d <= 1 ? 'B1' : ($d <= 7 ? 'B2' : ($d <= 30 ? 'B3' : 'B4'));
+    }
+
+    /** Orsakstext för en allokerad orderrad. Ej skickade rader beskrivs utifrån orderns läge just nu. */
     static function outcome($o) {
-        if ($o['ship_days'] === null || $o['ship_days'] === '') return 'Ej skickad ännu';
+        if ($o['ship_days'] === null || $o['ship_days'] === '') {
+            if (isset($o['line_open_now']) && (float)$o['line_open_now'] <= 0) return 'Ej skickad: raden ändrad efter inleveransen';
+            if (isset($o['other_open_now']) && (int)$o['other_open_now'] > 0) return 'Ej skickad: ordern väntar på andra varor';
+            return 'Ej skickad: inget annat saknas i ordern';
+        }
         $sd = (int)$o['ship_days'];
         if ($sd <= 1) return 'Skickad direkt (0–1 dag)';
         if ((int)$o['siblings_received_later'] > 0) return 'Väntade på annan vara (inlevererad senare)';

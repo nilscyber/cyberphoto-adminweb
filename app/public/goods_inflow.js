@@ -25,6 +25,48 @@
     node.addEventListener('mouseenter', show); node.addEventListener('mousemove', move); node.addEventListener('mouseleave', () => tip.hidden = true);
     node.addEventListener('focus', show); node.addEventListener('blur', () => tip.hidden = true);
   }
+  // ---------- klick: visa raderna bakom en stapel i detaljpanelen (#gi-detail)
+  const det = document.getElementById('gi-detail');
+  const CLICK = '<br><span class="gi-tip-hint">Klicka för att visa raderna</span>';
+  function pick(table, attr, vals, title) {
+    if (!det) return;
+    const want = new Set(vals.map(String));
+    let n = 0, q = 0;
+    ['orders', 'stock'].forEach(t => {
+      const box = document.getElementById('gi-det-' + t); if (!box) return;
+      box.hidden = t !== table;
+      if (t !== table) return;
+      box.querySelectorAll('tbody tr').forEach(tr => {
+        const on = want.has(tr.dataset[attr]);
+        tr.hidden = !on;
+        if (on) { n++; q += parseFloat(tr.dataset.q) || 0; }
+      });
+    });
+    document.getElementById('gi-detail-title').textContent = title;
+    document.getElementById('gi-detail-count').textContent = n === 0 ? 'Inga rader'
+      : `${f(n)} ${table === 'orders' ? (n === 1 ? 'orderrad' : 'orderrader') : (n === 1 ? 'inleveransrad' : 'inleveransrader')} · ${f(q)} enheter`;
+    det.hidden = false; tip.hidden = true;
+    det.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function clickable(node, fn) {
+    node.classList.add('gi-click');
+    if (!node.hasAttribute('tabindex')) node.setAttribute('tabindex', '0');
+    node.addEventListener('click', fn);
+    node.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } });
+  }
+  if (det) {
+    document.getElementById('gi-detail-close').addEventListener('click', () => { det.hidden = true; });
+    document.querySelectorAll('.gi-pick').forEach(a => a.addEventListener('click', e => {
+      e.preventDefault(); pick(a.dataset.table, a.dataset.attr, a.dataset.vals.split(','), a.dataset.title);
+    }));
+  }
+  // flödesnoderna -> vilka rader de motsvarar
+  const NODE = {
+    A: ['orders', ['A1', 'A2', 'A3', 'A5']], A1: ['orders', ['A1']], A2: ['orders', ['A2']], A3: ['orders', ['A3']], A5: ['orders', ['A5']],
+    B: ['stock', ['B1', 'B2', 'B3', 'B4', 'B5']], B1: ['stock', ['B1']], B2: ['stock', ['B2']], B3: ['stock', ['B3']], B4: ['stock', ['B4']], B5: ['stock', ['B5']]
+  };
+  function pickNode(id, label) { const m = NODE[id]; if (m) pick(m[0], 'b', m[1], label); }
+
   function niceMax(v) { if (v <= 0) return 10; const p = Math.pow(10, Math.floor(Math.log10(v))); const m = v / p; const n = m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10; return n * p; }
 
   // ---------- flöde
@@ -55,7 +97,8 @@
       const pa = pos[a], pb = pos[b]; if (pb.n.v <= 0) return; off[a] = off[a] || 0; off[b + '_in'] = off[b + '_in'] || 0;
       const h = pb.n.v * k; const y0 = pa.y + off[a], y1 = pb.y + off[b + '_in']; const x0 = pa.x + nw, x1 = pb.x; const cx = (x0 + x1) / 2;
       const p = el('path', { d: `M${x0},${y0} C${cx},${y0} ${cx},${y1} ${x1},${y1} L${x1},${y1 + h} C${cx},${y1 + h} ${cx},${y0 + h} ${x0},${y0 + h} Z`, fill: pb.n.c, 'fill-opacity': '0.28' }, g);
-      hook(p, `<b>${pa.n.label} → ${pb.n.label}</b><br>${f(pb.n.v)} enheter · ${pct1(pb.n.v, T.qty)} av allt inlevererat`);
+      hook(p, `<b>${pa.n.label} → ${pb.n.label}</b><br>${f(pb.n.v)} enheter · ${pct1(pb.n.v, T.qty)} av allt inlevererat` + (NODE[b] ? CLICK : ''));
+      if (NODE[b]) clickable(p, () => pickNode(b, pb.n.label));
       off[a] += h; off[b + '_in'] += h;
     });
     const rightNodes = cols[2].map(n => pos[n.id]); let ly = 0;
@@ -63,16 +106,19 @@
     const over = ly - (H - 16); if (over > 0) rightNodes.forEach(p => p.ly -= over);
     Object.values(pos).forEach(p => {
       const r = el('rect', { x: p.x, y: p.y, width: nw, height: p.h, fill: p.n.c, rx: 2 }, s);
-      hook(r, `<b>${p.n.label}</b><br>${f(p.n.v)} enheter · ${pct1(p.n.v, T.qty)} av inlevererat` + (p.n.src ? `<br>${pct1(p.n.v, pos[p.n.src].n.v)} av "${pos[p.n.src].n.label}"` : ''));
+      hook(r, `<b>${p.n.label}</b><br>${f(p.n.v)} enheter · ${pct1(p.n.v, T.qty)} av inlevererat` + (p.n.src ? `<br>${pct1(p.n.v, pos[p.n.src].n.v)} av "${pos[p.n.src].n.label}"` : '') + (NODE[p.n.id] && p.n.v > 0 ? CLICK : ''));
+      if (NODE[p.n.id] && p.n.v > 0) clickable(r, () => pickNode(p.n.id, p.n.label));
       const lx = p.x + nw + 8, cy = p.y + p.h / 2;
       if (p.x === xs[2]) {
         if (p.n.v <= 0) { txt(s, lx + 14, p.ly + 4, `${p.n.label}: 0`, { class: 'muted', 'font-size': '11.5' }); return; }
         if (Math.abs(p.ly - cy) > 3) el('path', { d: `M${p.x + nw + 2},${cy} L${lx + 6},${p.ly}`, stroke: '#c3c2b7', 'stroke-width': 1, fill: 'none' }, s);
         el('circle', { cx: lx + 6, cy: p.ly, r: 2.5, fill: p.n.c }, s);
-        txt(s, lx + 14, p.ly - 2, p.n.label, { class: 'ink', 'dominant-baseline': 'middle', 'font-size': '12.5' });
+        const lt = txt(s, lx + 14, p.ly - 2, p.n.label, { class: 'ink gi-link', 'dominant-baseline': 'middle', 'font-size': '12.5' });
+        clickable(lt, () => pickNode(p.n.id, p.n.label));
         txt(s, lx + 14, p.ly + 12, `${f(p.n.v)} · ${pct(p.n.v, pos[p.n.src].n.v)} av ${p.n.src === 'A' ? 'ordervarorna' : 'lagervarorna'}`, { class: 'muted', 'dominant-baseline': 'middle', 'font-size': '11.5' });
       } else {
-        txt(s, lx, cy - 8, p.n.label, { class: 'ink', 'dominant-baseline': 'middle', 'font-size': '13', 'font-weight': '600' });
+        const mt = txt(s, lx, cy - 8, p.n.label, { class: NODE[p.n.id] ? 'ink gi-link' : 'ink', 'dominant-baseline': 'middle', 'font-size': '13', 'font-weight': '600' });
+        if (NODE[p.n.id] && p.n.v > 0) clickable(mt, () => pickNode(p.n.id, p.n.label));
         txt(s, lx, cy + 8, `${f(p.n.v)} enheter · ${pct(p.n.v, T.qty)}`, { 'dominant-baseline': 'middle', 'font-size': '12' });
       }
     });
@@ -125,7 +171,8 @@
       const col = i <= 1 ? C.direct : C.wait;
       const r = el('rect', { x, y: y(0) - h, width: bar, height: h, fill: col, rx: 2 }, s);
       const lab = k === 'ej' ? 'Ej skickad ännu' : k === '15' ? '15 dagar eller mer' : `${k} ${k === '1' ? 'dag' : 'dagar'}`;
-      hook(r, `<b>${lab}</b><br>${f(v)} enheter · ${pct1(v, T.alloc)} av ordervarorna`);
+      hook(r, `<b>${lab}</b><br>${f(v)} enheter · ${pct1(v, T.alloc)} av ordervarorna` + (v > 0 ? CLICK : ''));
+      if (v > 0) clickable(r, () => pick('orders', 'd', [k], `Orderrader: ${k === 'ej' ? 'ej skickade ännu' : k === '0' ? 'skickade samma dag' : 'skickade efter ' + lab}`));
       if (v > 0 && (i === 0 || k === 'ej' || v === Math.max(...vals))) txt(s, x + bar / 2, y(v) - 5, f(v), { 'text-anchor': 'middle', class: 'ink', 'font-size': '11' });
       if (i % 2 === 0 || k === 'ej') txt(s, x + bar / 2, H - 22, labels[i], { 'text-anchor': 'middle', 'font-size': '10.5' });
     });
@@ -135,29 +182,32 @@
 
   // ---------- orsaker
   (function () {
-    const order = ['Väntade på annan vara (inlevererad senare)', 'Andra rader öppna, ingen inleverans', 'Komplett men skickad senare', 'Ej skickad ännu'];
-    const items = order.map(k => [k, D.reason[k] || 0]); const tot = items.reduce((a, b) => a + b[1], 0);
+    const order = ['Väntade på annan vara (inlevererad senare)', 'Andra rader öppna, ingen inleverans', 'Komplett men skickad senare',
+                   'Ej skickad: ordern väntar på andra varor', 'Ej skickad: inget annat saknas i ordern', 'Ej skickad: raden ändrad efter inleveransen'];
+    const items = order.map(k => [k, D.reason[k] || 0]).filter((it, i) => i < 3 || it[1] > 0); const tot = items.reduce((a, b) => a + b[1], 0);
     const W = 440, H = items.length * 50 + 6, s = svg('gi-reason', W, H); if (!s) return; s.style.minWidth = '380px';
     const max = niceMax(Math.max(1, ...items.map(i => i[1])) * 1.05), L = 8, pw = W - L - 90;
     items.forEach(([lab, v], i) => {
       const y0 = 4 + i * 50; txt(s, L, y0 + 10, lab, { class: 'ink', 'font-size': '12.5' });
       const w = Math.max(v / max * pw, v > 0 ? 2 : 0.5);
       const r = el('rect', { x: L, y: y0 + 18, width: w, height: 16, fill: C.wait, rx: 3 }, s);
-      hook(r, `<b>${lab}</b><br>${f(v)} enheter · ${pct1(v, tot)} av dem som inte gick direkt`);
+      hook(r, `<b>${lab}</b><br>${f(v)} enheter · ${pct1(v, tot)} av dem som inte gick direkt` + (v > 0 ? CLICK : ''));
+      if (v > 0) clickable(r, () => pick('orders', 'r', [lab], lab));
       txt(s, L + w + 8, y0 + 31, `${f(v)} · ${pct(v, tot)}`, { 'font-size': '12' });
     });
   })();
 
   // ---------- lager: dagar till slutsålt
   (function () {
-    const items = [['Slutsåld inom 1 dag', T.s1], ['Slutsåld inom 2–7 dagar', T.s7], ['Slutsåld inom 8–30 dagar', T.s30], ['Slutsåld efter mer än 30 dagar', T.sover30], ['Kvar i lager', T.kvar]];
+    const items = [['Slutsåld inom 1 dag', T.s1, 'B1'], ['Slutsåld inom 2–7 dagar', T.s7, 'B2'], ['Slutsåld inom 8–30 dagar', T.s30, 'B3'], ['Slutsåld efter mer än 30 dagar', T.sover30, 'B4'], ['Kvar i lager', T.kvar, 'B5']];
     const W = 900, rowH = 32, H = items.length * rowH + 8, s = svg('gi-stock', W, H); if (!s) return; s.style.minWidth = '560px';
     const L = 250, max = niceMax(Math.max(1, ...items.map(i => i[1])) * 1.05), pw = W - L - 120;
-    items.forEach(([lab, v], i) => {
+    items.forEach(([lab, v, id], i) => {
       const y0 = 4 + i * rowH; txt(s, L - 12, y0 + 16, lab, { 'text-anchor': 'end', class: 'ink', 'font-size': '13', 'dominant-baseline': 'middle' });
       const w = Math.max(v / max * pw, v > 0 ? 2 : 0.5);
       const r = el('rect', { x: L, y: y0 + 6, width: w, height: 20, fill: C.stock, rx: 3 }, s);
-      hook(r, `<b>${lab}</b><br>${f(v)} enheter · ${pct1(v, T.tl)} av det som gick till lager`);
+      hook(r, `<b>${lab}</b><br>${f(v)} enheter · ${pct1(v, T.tl)} av det som gick till lager` + (v > 0 ? CLICK : ''));
+      if (v > 0) clickable(r, () => pickNode(id, lab));
       txt(s, L + w + 8, y0 + 16, `${f(v)} · ${pct(v, T.tl)}`, { 'font-size': '12', 'dominant-baseline': 'middle' });
     });
   })();

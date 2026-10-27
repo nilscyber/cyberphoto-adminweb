@@ -69,7 +69,35 @@
 		echo "<h2 class=\"gi-h2\">Vart tog varorna vägen?</h2>\n";
 		echo "<p class=\"gi-sub\">Vänster: allt som kom in. Mitten: hade varan en väntande kundorder eller inte. Höger: vad som hänt med den fram till nu.</p>\n";
 		echo "<div class=\"gi-card\"><div class=\"gi-scroll\" id=\"gi-flow\"></div>\n";
-		echo "<div class=\"gi-legend\"><span><i class=\"sw sw-direct\"></i> Täckte order, skickad inom 1 dag</span><span><i class=\"sw sw-wait\"></i> Täckte order men väntade</span><span><i class=\"sw sw-stock\"></i> Till lager (ingen väntande order)</span></div></div>\n";
+		echo "<div class=\"gi-legend\"><span><i class=\"sw sw-direct\"></i> Täckte order, skickad inom 1 dag</span><span><i class=\"sw sw-wait\"></i> Täckte order men väntade</span><span><i class=\"sw sw-stock\"></i> Till lager (ingen väntande order)</span></div>\n";
+		echo "<p class=\"gi-hint\">Klicka på en stapel i flödet, eller i diagrammen längre ner, för att se orderraderna eller inleveranserna bakom den.</p></div>\n";
+
+		// Detaljer bakom en klickad stapel (filtreras av goods_inflow.js)
+		echo "<div class=\"gi-card gi-detail\" id=\"gi-detail\" hidden>\n";
+		echo "<div class=\"gi-detail-head\"><h3 id=\"gi-detail-title\">Detaljer</h3><span class=\"gi-detail-count\" id=\"gi-detail-count\"></span><button type=\"button\" class=\"gi-detail-close\" id=\"gi-detail-close\">Stäng</button></div>\n";
+		echo "<div class=\"gi-det-scroll\" id=\"gi-det-orders\" hidden><table class=\"table-list\"><thead><tr><th>Inlev. datum</th><th>Artikelnr</th><th>Produkt</th><th>Ordernr</th><th>Orderdatum</th><th>Kund</th><th class=\"n\">Antal</th><th>Skickad</th><th class=\"n\">Dagar</th><th>Utfall</th></tr></thead><tbody>\n";
+		foreach ($orders as $o) {
+			$days = ($o['ship_days'] === null || $o['ship_days'] === '') ? null : (int)$o['ship_days'];
+			$dkey = $days === null ? 'ej' : (string)min($days, 15);
+			$ship = $o['first_ship_after'] ? substr($o['first_ship_after'], 0, 16) : '–';
+			$out = CGoodsInflow::outcome($o);
+			echo "<tr data-b=\"" . CGoodsInflow::orderBucket($o) . "\" data-d=\"" . $dkey . "\" data-r=\"" . $h($out) . "\" data-q=\"" . (float)$o['alloc_qty'] . "\" hidden>"
+			   . "<td>" . $h($o['rdate']) . "</td><td>" . $h($o['product_value']) . "</td><td>" . $h($o['product_name']) . "</td>"
+			   . "<td><a href=\"customer_order.php?ordernr=" . $h($o['order_no']) . "\">" . $h($o['order_no']) . "</a></td><td>" . $h($o['dateordered']) . "</td><td>" . $h($o['customer']) . "</td>"
+			   . "<td class=\"n\">" . $nf($o['alloc_qty']) . "</td><td>" . $h($ship) . "</td><td class=\"n\">" . ($days === null ? '–' : $days) . "</td><td>" . $h($out) . "</td></tr>\n";
+		}
+		echo "</tbody></table></div>\n";
+		echo "<div class=\"gi-det-scroll\" id=\"gi-det-stock\" hidden><table class=\"table-list\"><thead><tr><th>Inlev. datum</th><th>Inleverans</th><th>Artikelnr</th><th>Produkt</th><th>Leverantör</th><th class=\"n\">Antal in</th><th class=\"n\">Till lager</th><th class=\"n\">Lager före</th><th class=\"n\">Sålt sedan</th><th class=\"n\">Dagar till slutsålt</th></tr></thead><tbody>\n";
+		foreach ($rows as $r) {
+			$tl = (float)$r['qty'] - (float)$r['alloc_qty'];
+			if ($tl <= 0) continue;
+			$fd = ($r['fifo_full_days'] === null || $r['fifo_full_days'] === '') ? '–' : (int)$r['fifo_full_days'];
+			echo "<tr data-b=\"" . CGoodsInflow::stockBucket($r) . "\" data-q=\"" . $tl . "\" hidden>"
+			   . "<td>" . $h($r['rdate']) . "</td><td>" . $h($r['receipt_no']) . "</td><td>" . $h($r['product_value']) . "</td><td>" . $h($r['product_name']) . "</td><td>" . $h($r['vendor']) . "</td>"
+			   . "<td class=\"n\">" . $nf($r['qty']) . "</td><td class=\"n\">" . $nf($tl) . "</td><td class=\"n\">" . $nf($r['onhand_before']) . "</td><td class=\"n\">" . $nf($r['ship_qty_after']) . "</td><td class=\"n\">" . $fd . "</td></tr>\n";
+		}
+		echo "</tbody></table></div>\n";
+		echo "</div>\n";
 
 		// Per dag
 		echo "<h2 class=\"gi-h2\">Per dag</h2>\n";
@@ -92,17 +120,7 @@
 		echo "<div class=\"gi-card\"><h3>Varför väntade de som inte gick ut direkt?</h3><p class=\"gi-sub\">" . $nf($waitQty) . " enheter skickades senare än nästa dag, eller inte alls.</p><div class=\"gi-scroll\" id=\"gi-reason\"></div></div>\n";
 		echo "</div>\n";
 
-		// Väntande order, tabell
-		$waiting = array_filter($orders, function ($o) { return $o['ship_days'] === null || $o['ship_days'] === '' || (int)$o['ship_days'] > 1; });
-		if (count($waiting) > 0) {
-			echo "<div class=\"gi-card\"><details><summary>Order som inte gick ut direkt (" . count($waiting) . " orderrader)</summary>\n";
-			echo "<table class=\"table-list\"><thead><tr><th>Inlev. datum</th><th>Artikelnr</th><th>Produkt</th><th>Ordernr</th><th>Orderdatum</th><th>Kund</th><th class=\"n\">Antal</th><th>Skickad</th><th class=\"n\">Dagar</th><th>Utfall</th></tr></thead><tbody>\n";
-			foreach ($waiting as $o) {
-				$ship = $o['first_ship_after'] ? substr($o['first_ship_after'], 0, 16) : '–';
-				echo "<tr><td>" . $h($o['rdate']) . "</td><td>" . $h($o['product_value']) . "</td><td>" . $h($o['product_name']) . "</td><td><a href=\"customer_order.php?ordernr=" . $h($o['order_no']) . "\">" . $h($o['order_no']) . "</a></td><td>" . $h($o['dateordered']) . "</td><td>" . $h($o['customer']) . "</td><td class=\"n\">" . $nf($o['alloc_qty']) . "</td><td>" . $h($ship) . "</td><td class=\"n\">" . ($o['ship_days'] === null || $o['ship_days'] === '' ? '–' : (int)$o['ship_days']) . "</td><td>" . $h(CGoodsInflow::outcome($o)) . "</td></tr>\n";
-			}
-			echo "</tbody></table></details></div>\n";
-		}
+		echo "<p class=\"gi-sub\"><a href=\"#gi-detail\" class=\"gi-pick\" data-table=\"orders\" data-attr=\"b\" data-vals=\"A2,A3,A5\" data-title=\"Orderrader som inte gick ut direkt\">Visa alla orderrader som inte gick ut direkt</a></p>\n";
 
 		// Lagersidan
 		echo "<h2 class=\"gi-h2\">Det som gick till lager</h2>\n";
@@ -135,6 +153,7 @@
 		echo "<li><b>Täckte en väntande order:</b> i inleveransögonblicket fanns en fullbordad kundorder på produkten som ännu inte skickats. Inlevererad kvantitet fördelas på de väntande orderraderna, äldst först.</li>\n";
 		echo "<li><b>Ut inom 1 dag:</b> orderraden skickades samma dag eller dagen efter inleveransen.</li>\n";
 		echo "<li><b>Väntade på annan vara:</b> ordern hade fler öppna rader vid inleveransen och minst en av dem levererades in senare, innan ordern skickades. <b>Andra rader öppna:</b> fler rader var öppna men ingen inleverans registrerades för dem. <b>Komplett men skickad senare:</b> inget annat saknades.</li>\n";
+		echo "<li><b>Ej skickad:</b> beskrivs utifrån orderns läge just nu. <b>Ordern väntar på andra varor</b> = minst en annan varurad i ordern är inte fullt levererad. <b>Inget annat saknas i ordern</b> = varan kom in och inget annat i ordern saknas, men raden är ändå inte skickad; de är värda att titta på. <b>Raden ändrad</b> = raden har annullerats eller minskats efter inleveransen.</li>\n";
 		echo "<li><b>Till lager, slutsålt inom N dagar:</b> dagar tills utleveranserna efter inleveransen förbrukat först det gamla saldot och sedan hela partiet.</li>\n";
 		echo "<li><b>Förbehåll:</b> makulerade order har kvantitet 0 i databasen och syns inte som väntande. Siffror för de senaste dagarna ändras tills orderna hunnit skickas.</li>\n";
 		echo "</ul></details></div>\n";
