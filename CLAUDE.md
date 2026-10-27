@@ -96,6 +96,14 @@ LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id
 WHERE p.value = $1
 ```
 
+### Which sales orders count
+
+A "customer order" means `c_order.c_doctype_id = 1000030` (Standard Order)
+with `docstatus IN ('CO','IP')` (Nils, 2026-10-27). `issotrx = 'Y'` alone also
+lets in non-binding offers (1000027, sit in IP), drafts (DR, doctype 0 until
+completed) and returns (1000029). `CSalesExport.php` filters on
+`DocSubTypeSO = 'SO'` instead, which in practice is the same set.
+
 ### Sales figures: use the ERP sales views
 
 For revenue, contribution, quantities, trade-in margin, web/manual and B2B/B2C
