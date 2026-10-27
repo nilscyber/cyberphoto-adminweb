@@ -61,7 +61,7 @@ sol AS (
   SELECT ol.c_orderline_id, ol.c_order_id, o.documentno order_no, ol.m_product_id, ol.qtyordered,
          ol.created ol_created, o.dateordered::date dateordered, o.c_bpartner_id
   FROM c_orderline ol JOIN c_order o ON o.c_order_id = ol.c_order_id
-  WHERE o.issotrx = 'Y' AND o.docstatus IN ('CO','CL','IP') AND ol.qtyordered > 0
+  WHERE o.issotrx = 'Y' AND o.c_doctype_id = 1000030 AND o.docstatus IN ('CO','IP') AND ol.qtyordered > 0  -- Standard Order only: no offers, drafts, returns
     AND o.m_warehouse_id = $1 AND o.dateordered >= $2::date - 365 AND o.dateordered < $3::date + 1
     AND ol.m_product_id IN (SELECT m_product_id FROM prods)
     AND NOT (ol.qtydelivered >= ol.qtyordered AND ol.updated < $2::date)  -- fully shipped before the period: cannot be open at any receipt

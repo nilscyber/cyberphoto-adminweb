@@ -150,7 +150,7 @@
 		// Metod
 		echo "<div class=\"gi-method\"><details><summary>Så är det räknat</summary><ul>\n";
 		echo "<li><b>Underlag:</b> färdigställda leverantörsinleveranser till Umeå (Standard) i perioden, bara varor. Direktleveranser och returlagret ingår inte. Inbyten från privatpersoner ingår (märkta \"inbyte\" i leverantörslistan).</li>\n";
-		echo "<li><b>Täckte en väntande order:</b> i inleveransögonblicket fanns en fullbordad kundorder på produkten som ännu inte skickats. Inlevererad kvantitet fördelas på de väntande orderraderna, äldst först.</li>\n";
+		echo "<li><b>Täckte en väntande order:</b> i inleveransögonblicket fanns en kundorder på produkten som ännu inte skickats. Bara vanliga kundorder (Standard Order) med status Slutförd eller Under bearbetning räknas; offerter, utkast och returer räknas inte. Inlevererad kvantitet fördelas på de väntande orderraderna, äldst först.</li>\n";
 		echo "<li><b>Ut inom 1 dag:</b> orderraden skickades samma dag eller dagen efter inleveransen.</li>\n";
 		echo "<li><b>Väntade på annan vara:</b> ordern hade fler öppna rader vid inleveransen och minst en av dem levererades in senare, innan ordern skickades. <b>Andra rader öppna:</b> fler rader var öppna men ingen inleverans registrerades för dem. <b>Komplett men skickad senare:</b> inget annat saknades.</li>\n";
 		echo "<li><b>Ej skickad:</b> beskrivs utifrån orderns läge just nu. <b>Ordern väntar på andra varor</b> = minst en annan varurad i ordern är inte fullt levererad. <b>Inget annat saknas i ordern</b> = varan kom in och inget annat i ordern saknas, men raden är ändå inte skickad; de är värda att titta på. <b>Raden ändrad</b> = raden har annullerats eller minskats efter inleveransen.</li>\n";
