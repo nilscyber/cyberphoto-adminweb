@@ -83,7 +83,7 @@
 			$out = CGoodsInflow::outcome($o);
 			echo "<tr data-b=\"" . CGoodsInflow::orderBucket($o) . "\" data-d=\"" . $dkey . "\" data-r=\"" . $h($out) . "\" data-q=\"" . (float)$o['alloc_qty'] . "\" hidden>"
 			   . "<td>" . $h($o['rdate']) . "</td><td>" . $h($o['product_value']) . "</td><td>" . $h($o['product_name']) . "</td>"
-			   . "<td><a href=\"customer_order.php?ordernr=" . $h($o['order_no']) . "\">" . $h($o['order_no']) . "</a></td><td>" . $h($o['dateordered']) . "</td><td>" . $h($o['customer']) . "</td>"
+			   . "<td><a href=\"/search_dispatch.php?mode=order&amp;page=1&amp;q=" . rawurlencode($o['order_no']) . "\" target=\"_blank\" rel=\"noopener\">" . $h($o['order_no']) . "</a></td><td>" . $h($o['dateordered']) . "</td><td>" . $h($o['customer']) . "</td>"
 			   . "<td class=\"n\">" . $nf($o['alloc_qty']) . "</td><td>" . $h($ship) . "</td><td class=\"n\">" . ($days === null ? '–' : $days) . "</td><td>" . $h($out) . "</td></tr>\n";
 		}
 		echo "</tbody></table></div>\n";
