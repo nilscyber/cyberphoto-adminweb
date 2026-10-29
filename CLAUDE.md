@@ -70,6 +70,11 @@ Standard page heading: `<h1>Page title</h1>` — styled by the global stylesheet
 ### Links
 - Internal admin URLs: use **relative paths** (`/search_dispatch.php?...`) so they work on both localhost and production.
 - Exception: links inside **e-mail notifications** must use the full absolute URL (`https://admin.cyberphoto.se/...`).
+- Standard detail links (open in a new tab, `target="_blank" rel="noopener"`; `customer_order.php` is retired):
+  - order: `/search_dispatch.php?mode=order&page=1&q=<documentno>` (POs are linked the same way)
+  - product: `/search_dispatch.php?mode=product&q=<value>&open=product&id=<m_product_id>`
+  - receipt / shipment / return (any M_InOut): `/search_dispatch.php?mode=inout&q=<documentno>`, rendered by `CInOutDetails` (drawer type `inout`; M_InOut numbers are unique across all types)
+- The drawer itself (footer.php, `window.openDrawer(type, id)`, links with class `drawer-link` + `data-type`/`data-id`) loads `ajax/drawer_details.php?type=customer|order|product|inout&id=…`.
 
 ## Pages to align with the design system
 All current pages use the shared design system. No known migration debt.
