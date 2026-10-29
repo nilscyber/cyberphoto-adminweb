@@ -92,7 +92,7 @@
 			$ship = $o['first_ship_after'] ? substr($o['first_ship_after'], 0, 16) : '–';
 			$out = CGoodsInflow::outcome($o);
 			echo "<tr data-b=\"" . CGoodsInflow::orderBucket($o) . "\" data-d=\"" . $dkey . "\" data-r=\"" . $h($out) . "\" data-q=\"" . (float)$o['alloc_qty'] . "\" hidden>"
-			   . "<td>" . $h($o['rdate']) . "</td><td>" . $h($o['product_value']) . "</td><td>" . $plink($o['product_value'], $o['m_product_id'], $o['product_name']) . $tbadge($o['istradein'] === 'Y') . "</td>"
+			   . "<td>" . $h($o['rdate']) . "</td><td>" . $plink($o['product_value'], $o['m_product_id'], $o['product_value']) . "</td><td>" . $plink($o['product_value'], $o['m_product_id'], $o['product_name']) . $tbadge($o['istradein'] === 'Y') . "</td>"
 			   . "<td><a href=\"/search_dispatch.php?mode=order&amp;page=1&amp;q=" . rawurlencode($o['order_no']) . "\" target=\"_blank\" rel=\"noopener\">" . $h($o['order_no']) . "</a></td><td>" . $h($o['dateordered']) . "</td><td>" . $h($o['customer']) . "</td>"
 			   . "<td class=\"n\">" . $nf($o['alloc_qty']) . "</td><td>" . $h($ship) . "</td><td class=\"n\">" . ($days === null ? '–' : $days) . "</td><td>" . $h($out) . "</td>"
 			   . "<td hidden>" . $h($o['receipt_no']) . "</td><td hidden>" . ($o['istradein'] === 'Y' ? 'Ja' : 'Nej') . "</td></tr>\n";
@@ -104,7 +104,7 @@
 			if ($tl <= 0) continue;
 			$fd = ($r['fifo_full_days'] === null || $r['fifo_full_days'] === '') ? '–' : (int)$r['fifo_full_days'];
 			echo "<tr data-b=\"" . CGoodsInflow::stockBucket($r) . "\" data-q=\"" . $tl . "\" hidden>"
-			   . "<td>" . $h($r['rdate']) . "</td><td>" . $h($r['receipt_no']) . "</td><td>" . $h($r['product_value']) . "</td><td>" . $plink($r['product_value'], $r['m_product_id'], $r['product_name']) . $tbadge($r['istradein'] === 'Y') . "</td><td>" . $h($r['vendor']) . "</td>"
+			   . "<td>" . $h($r['rdate']) . "</td><td>" . $h($r['receipt_no']) . "</td><td>" . $plink($r['product_value'], $r['m_product_id'], $r['product_value']) . "</td><td>" . $plink($r['product_value'], $r['m_product_id'], $r['product_name']) . $tbadge($r['istradein'] === 'Y') . "</td><td>" . $h($r['vendor']) . "</td>"
 			   . "<td class=\"n\">" . $nf($r['qty']) . "</td><td class=\"n\">" . $nf($tl) . "</td><td class=\"n\">" . $nf($r['onhand_before']) . "</td><td class=\"n\">" . $nf($r['ship_qty_after']) . "</td><td class=\"n\">" . $fd . "</td><td hidden>" . ($r['istradein'] === 'Y' ? 'Ja' : 'Nej') . "</td></tr>\n";
 		}
 		echo "</tbody></table></div>\n";
@@ -155,7 +155,7 @@
 		echo "<table class=\"table-list\" id=\"gi-prod-table\"><thead><tr><th>Artikelnr</th><th>Produkt</th><th>Kategori</th><th class=\"n\">Antal in</th><th class=\"n\">Lager före</th><th class=\"n\">Täckte order</th><th class=\"n\">Ut inom 1 dag</th><th class=\"n\">Väntade</th><th class=\"n\">Till lager</th><th class=\"n\">Dagar till slutsålt</th><th hidden>Inbyte</th></tr></thead><tbody>\n";
 		foreach ($agg['prod'] as $p) {
 			$fifo = count($p['fifo']) ? max($p['fifo']) : '–';
-			echo "<tr><td>" . $h($p['value']) . "</td><td>" . $plink($p['value'], $p['id'], $p['name']) . $tbadge($p['tradein']) . "</td><td>" . $h($p['cat']) . "</td><td class=\"n\">" . $nf($p['qty']) . "</td><td class=\"n\">" . $nf($p['onhand_before']) . "</td><td class=\"n\">" . $nf($p['alloc']) . "</td><td class=\"n\">" . $nf($p['a01']) . "</td><td class=\"n\">" . $nf($p['alloc'] - $p['a01']) . "</td><td class=\"n\">" . $nf($p['tl']) . "</td><td class=\"n\">" . $h($fifo) . "</td><td hidden>" . ($p['tradein'] ? 'Ja' : 'Nej') . "</td></tr>\n";
+			echo "<tr><td>" . $plink($p['value'], $p['id'], $p['value']) . "</td><td>" . $plink($p['value'], $p['id'], $p['name']) . $tbadge($p['tradein']) . "</td><td>" . $h($p['cat']) . "</td><td class=\"n\">" . $nf($p['qty']) . "</td><td class=\"n\">" . $nf($p['onhand_before']) . "</td><td class=\"n\">" . $nf($p['alloc']) . "</td><td class=\"n\">" . $nf($p['a01']) . "</td><td class=\"n\">" . $nf($p['alloc'] - $p['a01']) . "</td><td class=\"n\">" . $nf($p['tl']) . "</td><td class=\"n\">" . $h($fifo) . "</td><td hidden>" . ($p['tradein'] ? 'Ja' : 'Nej') . "</td></tr>\n";
 		}
 		echo "</tbody></table></details></div>\n";
 
