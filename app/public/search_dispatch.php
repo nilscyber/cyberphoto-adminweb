@@ -447,6 +447,46 @@ if ($mode === 'order') {
 }
 
 
+// ======================= IN-/UTLEVERANS-LÄGE (M_InOut) =======================
+if ($mode === 'inout') {
+
+    $docNo = trim($q);
+
+    echo '<div class="with-drawer-gutter">';
+
+    if ($docNo === '' || !ctype_digit($docNo)) {
+        echo '<div class="result-info" style="background:#fee2e2;border:1px solid #fecaca;">';
+        echo 'Ange ett inleverans- eller utleveransnummer (bara siffror)' . ($docNo !== '' ? ' &ndash; du angav <strong>&quot;'.$h($docNo).'&quot;</strong>' : '') . '.';
+        echo '</div>';
+        echo '</div>';
+        include_once "footer.php";
+        return;
+    }
+
+    echo '<div class="result-info">';
+    echo 'Visar detaljer för in-/utleverans <strong>'.$h($docNo).'</strong>.';
+    echo '</div>';
+
+    // Auto-öppna drawer_details med type=inout + id = dokumentnummer
+    $docNoJs = json_encode($docNo);
+    echo '<script>
+    (function(){
+        function openInOutDrawer(){ if (typeof window.openDrawer === "function") window.openDrawer("inout", '.$docNoJs.'); }
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", openInOutDrawer);
+        } else {
+            openInOutDrawer();
+        }
+    })();
+    </script>';
+
+    echo '</div>'; // .with-drawer-gutter
+
+    include_once "footer.php";
+    return;
+}
+
+
 // ======================= CUSTOMER-LÄGE =======================
 if ($mode === 'customer') {
 

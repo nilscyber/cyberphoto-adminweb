@@ -104,7 +104,7 @@
 			if ($tl <= 0) continue;
 			$fd = ($r['fifo_full_days'] === null || $r['fifo_full_days'] === '') ? '–' : (int)$r['fifo_full_days'];
 			echo "<tr data-b=\"" . CGoodsInflow::stockBucket($r) . "\" data-q=\"" . $tl . "\" hidden>"
-			   . "<td>" . $h($r['rdate']) . "</td><td>" . $h($r['receipt_no']) . "</td><td>" . $plink($r['product_value'], $r['m_product_id'], $r['product_value']) . "</td><td>" . $plink($r['product_value'], $r['m_product_id'], $r['product_name']) . $tbadge($r['istradein'] === 'Y') . "</td><td>" . $h($r['vendor']) . "</td>"
+			   . "<td>" . $h($r['rdate']) . "</td><td><a href=\"/search_dispatch.php?mode=inout&amp;q=" . rawurlencode($r['receipt_no']) . "\" target=\"_blank\" rel=\"noopener\">" . $h($r['receipt_no']) . "</a></td><td>" . $plink($r['product_value'], $r['m_product_id'], $r['product_value']) . "</td><td>" . $plink($r['product_value'], $r['m_product_id'], $r['product_name']) . $tbadge($r['istradein'] === 'Y') . "</td><td>" . $h($r['vendor']) . "</td>"
 			   . "<td class=\"n\">" . $nf($r['qty']) . "</td><td class=\"n\">" . $nf($tl) . "</td><td class=\"n\">" . $nf($r['onhand_before']) . "</td><td class=\"n\">" . $nf($r['ship_qty_after']) . "</td><td class=\"n\">" . $fd . "</td><td hidden>" . ($r['istradein'] === 'Y' ? 'Ja' : 'Nej') . "</td></tr>\n";
 		}
 		echo "</tbody></table></div>\n";

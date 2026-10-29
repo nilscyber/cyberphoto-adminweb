@@ -28,6 +28,10 @@ if ($type === 'customer') {
     // $id = ordernummer (documentno)
     echo CSearch::renderOrderDetailsAD($id);
     exit;
+} elseif ($type === 'inout') {
+    // id = dokumentnummer för in-/utleverans (M_InOut; numret är unikt över alla typer)
+    echo CInOutDetails::render(isset($_GET['id']) ? $_GET['id'] : '');
+    exit;
 } elseif ($type === 'product') {
 
     $conn = Db::getConnectionAD(false); // Postgres-RESOURCE
