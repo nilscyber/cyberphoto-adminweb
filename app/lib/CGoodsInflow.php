@@ -26,7 +26,7 @@ class CGoodsInflow {
         if ($this->ad_r) { @pg_set_client_encoding($this->ad_r, "UTF8"); }
     }
 
-    /** Gemensamma CTE:er. Parametrar: $1 = lager, $2 = från (datum), $3 = till (datum, inklusive). */
+    /** Gemensamma CTE:er. Parametrar: $1 = lager, $2 = från (datum), $3 = till (datum, inklusive), $4 = inbytesvaror all/exclude/only. */
     private function cte() {
         return <<<'SQL'
 WITH rcpt AS (
@@ -39,6 +39,7 @@ WITH rcpt AS (
   WHERE io.movementtype = 'V+' AND io.docstatus IN ('CO','CL') AND io.m_warehouse_id = $1
     AND io.movementdate >= $2::date AND io.movementdate < $3::date + 1
     AND p.producttype = 'I' AND l.movementqty > 0
+    AND ($4::text = 'all' OR p.istradein = CASE WHEN $4::text = 'only' THEN 'Y' ELSE 'N' END)  -- M_Product.IsTradeIn is Y/N, never null
   GROUP BY io.m_inout_id, io.documentno, io.movementdate::date, l.m_product_id, io.c_bpartner_id
 ),
 prods AS (SELECT DISTINCT m_product_id FROM rcpt),
@@ -92,7 +93,7 @@ SQL;
     /**
      * En rad per inleverans + produkt.
      */
-    function fetchReceipts($from, $to, $wh = 1000000) {
+    function fetchReceipts($from, $to, $wh = 1000000, $tradein = 'all') {
         $sql = $this->cte() . <<<'SQL'
 , agg AS (
   SELECT m_inoutline_id, sum(open_qty) backorder_qty, sum(alloc_qty) alloc_qty,
@@ -110,7 +111,7 @@ rc2 AS (
 )
 SELECT r.m_inoutline_id, r.documentno receipt_no, r.rdate, r.rtime, r.m_product_id, p.value product_value,
        CASE WHEN manu.name IS NOT NULL AND manu.name <> '' THEN manu.name || ' ' || p.name ELSE p.name END product_name,
-       pc.name product_category, bp.name vendor, bpg.name vendor_group,
+       pc.name product_category, bp.name vendor, bpg.name vendor_group, p.istradein,
        r.qty, r.onhand_before,
        (SELECT min(s.created) FROM ship s WHERE s.m_product_id = r.m_product_id AND s.created >= r.rtime AND s.cumq - r.shipped_base >= greatest(r.onhand_before, 0) + 1)::date - r.rdate fifo_first_days,
        (SELECT min(s.created) FROM ship s WHERE s.m_product_id = r.m_product_id AND s.created >= r.rtime AND s.cumq - r.shipped_base >= greatest(r.onhand_before, 0) + r.qty)::date - r.rdate fifo_full_days,
@@ -127,13 +128,13 @@ LEFT JOIN c_bp_group bpg ON bpg.c_bp_group_id = bp.c_bp_group_id
 LEFT JOIN agg a ON a.m_inoutline_id = r.m_inoutline_id
 ORDER BY r.rtime
 SQL;
-        return $this->run($sql, array((int)$wh, $from, $to));
+        return $this->run($sql, array((int)$wh, $from, $to, self::tradeinMode($tradein)));
     }
 
     /**
      * En rad per allokerad kundorderrad, med orsak när den inte gick ut direkt.
      */
-    function fetchOrders($from, $to, $wh = 1000000) {
+    function fetchOrders($from, $to, $wh = 1000000, $tradein = 'all') {
         $sql = $this->cte() . <<<'SQL'
 , alloc AS MATERIALIZED (SELECT * FROM dem2 WHERE alloc_qty > 0),
 sib AS MATERIALIZED (
@@ -150,7 +151,7 @@ sib AS MATERIALIZED (
   WHERE d.ship_days IS NULL OR d.ship_days > 1
   GROUP BY 1, 2
 )
-SELECT d.m_inoutline_id, r.documentno receipt_no, d.rdate, p.value product_value,
+SELECT d.m_inoutline_id, r.documentno receipt_no, d.rdate, d.m_product_id, p.istradein, p.value product_value,
        CASE WHEN manu.name IS NOT NULL AND manu.name <> '' THEN manu.name || ' ' || p.name ELSE p.name END product_name,
        d.c_order_id, d.order_no, d.dateordered, bp.name customer, d.open_qty, d.alloc_qty, d.first_ship_after, d.ship_days,
        COALESCE(s.open_siblings, 0) open_siblings, COALESCE(s.siblings_received_later, 0) siblings_received_later,
@@ -168,7 +169,7 @@ LEFT JOIN c_bpartner bp ON bp.c_bpartner_id = d.c_bpartner_id
 LEFT JOIN sib s ON s.m_inoutline_id = d.m_inoutline_id AND s.c_orderline_id = d.c_orderline_id
 ORDER BY d.rtime, d.dateordered
 SQL;
-        return $this->run($sql, array((int)$wh, $from, $to));
+        return $this->run($sql, array((int)$wh, $from, $to, self::tradeinMode($tradein)));
     }
 
     private function run($sql, $params) {
@@ -178,6 +179,16 @@ SQL;
         $out = array();
         while ($row = pg_fetch_assoc($res)) { $out[] = $row; }
         return $out;
+    }
+
+    /** Inbytesfiltret: all = ta med, exclude = uteslut, only = bara inbytesvaror. */
+    static function tradeinMode($s) {
+        return in_array($s, array('all', 'exclude', 'only'), true) ? $s : 'all';
+    }
+
+    /** Produktlänk på adminens vanliga sätt (sök + öppna produktkortet). */
+    static function productUrl($value, $id) {
+        return '/search_dispatch.php?mode=product&q=' . rawurlencode($value) . '&open=product&id=' . (int)$id;
     }
 
     /** Flödesnod för en allokerad orderrad (samma indelning som flödesdiagrammet). */
@@ -234,7 +245,7 @@ SQL;
             $k = $r['rdate']; if (!isset($day[$k])) $day[$k] = $z(); $add($day[$k], $r);
             $k = $r['product_category'] ?: '(okänd)'; if (!isset($cat[$k])) { $cat[$k] = $z(); $cat[$k]['name'] = $k; } $add($cat[$k], $r);
             $k = $r['product_value'];
-            if (!isset($prod[$k])) { $prod[$k] = $z(); $prod[$k]['value'] = $k; $prod[$k]['name'] = $r['product_name']; $prod[$k]['cat'] = $r['product_category']; $prod[$k]['onhand_before'] = (float)$r['onhand_before']; $prod[$k]['fifo'] = array(); }
+            if (!isset($prod[$k])) { $prod[$k] = $z(); $prod[$k]['value'] = $k; $prod[$k]['id'] = (int)$r['m_product_id']; $prod[$k]['tradein'] = ($r['istradein'] === 'Y'); $prod[$k]['name'] = $r['product_name']; $prod[$k]['cat'] = $r['product_category']; $prod[$k]['onhand_before'] = (float)$r['onhand_before']; $prod[$k]['fifo'] = array(); }
             $add($prod[$k], $r);
             if ($r['fifo_full_days'] !== null && $r['fifo_full_days'] !== '') $prod[$k]['fifo'][] = (int)$r['fifo_full_days'];
             $k = $r['vendor'] ?: '(okänd)'; if (!isset($vend[$k])) { $vend[$k] = $z(); $vend[$k]['name'] = $k; $vend[$k]['group'] = $r['vendor_group']; } $add($vend[$k], $r);

@@ -64,3 +64,10 @@
 .gi-det-scroll thead th { position: sticky; top: 0; z-index: 1; }
 .gi-det-scroll td { white-space: nowrap; }
 #gi-det-orders td:nth-child(3), #gi-det-stock td:nth-child(4) { white-space: normal; min-width: 220px; }
+/* export + inbytesfilter */
+.gi-form .filter-bar select { border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 6px; font: inherit; background: #fff; }
+.gi-detail-actions { margin-left: auto; display: flex; gap: 8px; }
+.gi-detail-actions .gi-detail-close { margin-left: 0; }
+.gi-export { background: #fff; color: #0f766e; border: 1px solid #0d9488; border-radius: 5px; padding: 3px 12px; font: inherit; cursor: pointer; }
+.gi-export:hover { background: #f0fdfa; }
+.gi-card-actions { float: right; margin-left: 12px; }

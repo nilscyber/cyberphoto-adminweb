@@ -67,6 +67,37 @@
   };
   function pickNode(id, label) { const m = NODE[id]; if (m) pick(m[0], 'b', m[1], label); }
 
+  // ---------- CSV-export: raderna som visas, semikolon + BOM så att svenskt Excel öppnar filen direkt.
+  // Celler med hidden-attribut är kolumner som bara finns i exporten.
+  function cellText(c) {
+    if (c.dataset.v !== undefined) return c.dataset.v;
+    const k = c.cloneNode(true); k.querySelectorAll('.badge').forEach(b => b.remove());
+    let s = k.textContent.replace(/\s+/g, ' ').trim();
+    if (s === '–') return '';
+    if (c.classList.contains('n')) s = s.replace(/ /g, '');
+    return s;
+  }
+  const csvField = s => /[";\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  const slug = s => s.toLowerCase().replace(/[åä]/g, 'a').replace(/ö/g, 'o').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  function exportTable(table, name) {
+    const lines = [[...table.querySelectorAll('thead th')].map(th => csvField(th.textContent.trim())).join(';')];
+    table.querySelectorAll('tbody tr').forEach(tr => { if (!tr.hidden) lines.push([...tr.cells].map(c => csvField(cellText(c))).join(';')); });
+    const blob = new Blob(['\ufeff' + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = ['inleveransflode', name, D.tradein === 'exclude' ? 'utan-inbyten' : (D.tradein === 'only' ? 'bara-inbyten' : ''), D.from, D.to].filter(Boolean).join('_') + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  document.querySelectorAll('.gi-export').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.target === 'detail') {
+      const box = ['gi-det-orders', 'gi-det-stock'].map(id => document.getElementById(id)).find(x => x && !x.hidden);
+      if (box) exportTable(box.querySelector('table'), (box.id === 'gi-det-orders' ? 'orderrader_' : 'inleveranser_') + slug(document.getElementById('gi-detail-title').textContent));
+    } else {
+      const t = document.getElementById(b.dataset.target); if (t) exportTable(t, b.dataset.name);
+    }
+  }));
+
   function niceMax(v) { if (v <= 0) return 10; const p = Math.pow(10, Math.floor(Math.log10(v))); const m = v / p; const n = m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10; return n * p; }
 
   // ---------- flöde

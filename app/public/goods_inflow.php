@@ -18,10 +18,15 @@
 		$from = date('Y-m-d', strtotime($to . ' -' . ($maxDays - 1) . ' days')); $clamped = true;
 	}
 	$wh = 1000000;
+	$tradein = CGoodsInflow::tradeinMode(isset($_GET['tradein']) ? $_GET['tradein'] : 'all');
+	$tradeinText = array('all' => '', 'exclude' => ', inbytesvaror uteslutna', 'only' => ', bara inbytesvaror');
 
 	$nf = function ($n) { return number_format((float)$n, 0, ',', ' '); };
 	$pct = function ($a, $b, $dec = 0) { return $b > 0 ? number_format(100 * $a / $b, $dec, ',', ' ') . ' %' : '–'; };
 	$h = function ($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); };
+	// produktnamn som länk till produktkortet + märke för inbytesvaror
+	$plink = function ($value, $id, $name) use ($h) { return "<a href=\"" . $h(CGoodsInflow::productUrl($value, $id)) . "\" target=\"_blank\" rel=\"noopener\">" . $h($name) . "</a>"; };
+	$tbadge = function ($yn) { return $yn ? " <span class=\"badge\">inbyte</span>" : ""; };
 
 	echo "<h1>Inleveransflöde</h1>\n";
 	echo "<p class=\"gi-intro\">Hur mycket av det som levereras in till Umeå (Standard) går ut direkt, hur mycket täcker en kundorder som ändå får vänta, och hur mycket läggs på hyllan. "
@@ -31,8 +36,13 @@
 	echo "<div class=\"filter-bar\">\n";
 	echo "<label>Från <input type=\"date\" name=\"from\" value=\"" . $h($from) . "\" max=\"" . $today->format('Y-m-d') . "\"></label>\n";
 	echo "<label>Till <input type=\"date\" name=\"to\" value=\"" . $h($to) . "\" max=\"" . $today->format('Y-m-d') . "\"></label>\n";
+	echo "<label>Inbytesvaror <select name=\"tradein\">";
+	foreach (array('all' => 'Ta med', 'exclude' => 'Uteslut', 'only' => 'Bara inbyten') as $k => $lab) {
+		echo "<option value=\"$k\"" . ($tradein === $k ? " selected" : "") . ">$lab</option>";
+	}
+	echo "</select></label>\n";
 	echo "<button type=\"submit\" class=\"gi-btn\">Visa</button>\n";
-	$q = function ($f, $t) { return $_SERVER['PHP_SELF'] . "?from=$f&to=$t"; };
+	$q = function ($f, $t) use ($tradein) { return $_SERVER['PHP_SELF'] . "?from=$f&amp;to=$t" . ($tradein !== 'all' ? "&amp;tradein=$tradein" : ""); };
 	$m1 = (clone $today)->modify('first day of last month')->format('Y-m-d'); $m2 = (clone $today)->modify('last day of last month')->format('Y-m-d');
 	echo "<span class=\"gi-quick\">Snabbval: <a href=\"" . $q($defFrom, $defTo) . "\">senaste veckan</a> · <a href=\"" . $q((clone $today)->modify('-30 days')->format('Y-m-d'), $defTo) . "\">senaste 30 dagarna</a> · <a href=\"" . $q($m1, $m2) . "\">förra månaden</a></span>\n";
 	echo "</div>\n";
@@ -40,13 +50,13 @@
 	if ($clamped) echo "<p class=\"gi-note\">Perioden är begränsad till $maxDays dagar; visar " . $h($from) . " – " . $h($to) . ".</p>\n";
 
 	$gi = new CGoodsInflow();
-	$rows = $gi->fetchReceipts($from, $to, $wh);
-	$orders = $gi->error ? array() : $gi->fetchOrders($from, $to, $wh);
+	$rows = $gi->fetchReceipts($from, $to, $wh, $tradein);
+	$orders = $gi->error ? array() : $gi->fetchOrders($from, $to, $wh, $tradein);
 
 	if ($gi->error) {
 		echo "<p class=\"gi-note\">Kunde inte läsa från ADempiere: " . $h($gi->error) . "</p>\n";
 	} elseif (count($rows) == 0) {
-		echo "<p class=\"gi-note\">Inga inleveranser " . $h($from) . " – " . $h($to) . ".</p>\n";
+		echo "<p class=\"gi-note\">Inga inleveranser " . $h($from) . " – " . $h($to) . $tradeinText[$tradein] . ".</p>\n";
 	} else {
 		$agg = $gi->aggregate($rows, $orders);
 		$T = $agg['tot'];
@@ -55,7 +65,7 @@
 		$waitQty = $T['alloc'] - $T['a01'];
 		$slut7 = $T['s1'] + $T['s7'];
 
-		echo "<p class=\"gi-period\">Period " . $h($from) . " – " . $h($to) . ", " . $agg['ndays'] . " dagar med inleverans. Status per " . date('Y-m-d H:i') . ".</p>\n";
+		echo "<p class=\"gi-period\">Period " . $h($from) . " – " . $h($to) . ", " . $agg['ndays'] . " dagar med inleverans" . $tradeinText[$tradein] . ". Status per " . date('Y-m-d H:i') . ".</p>\n";
 
 		// KPI
 		echo "<div class=\"gi-kpis\">\n";
@@ -74,27 +84,28 @@
 
 		// Detaljer bakom en klickad stapel (filtreras av goods_inflow.js)
 		echo "<div class=\"gi-card gi-detail\" id=\"gi-detail\" hidden>\n";
-		echo "<div class=\"gi-detail-head\"><h3 id=\"gi-detail-title\">Detaljer</h3><span class=\"gi-detail-count\" id=\"gi-detail-count\"></span><button type=\"button\" class=\"gi-detail-close\" id=\"gi-detail-close\">Stäng</button></div>\n";
-		echo "<div class=\"gi-det-scroll\" id=\"gi-det-orders\" hidden><table class=\"table-list\"><thead><tr><th>Inlev. datum</th><th>Artikelnr</th><th>Produkt</th><th>Ordernr</th><th>Orderdatum</th><th>Kund</th><th class=\"n\">Antal</th><th>Skickad</th><th class=\"n\">Dagar</th><th>Utfall</th></tr></thead><tbody>\n";
+		echo "<div class=\"gi-detail-head\"><h3 id=\"gi-detail-title\">Detaljer</h3><span class=\"gi-detail-count\" id=\"gi-detail-count\"></span><span class=\"gi-detail-actions\"><button type=\"button\" class=\"gi-export\" data-target=\"detail\" title=\"Raderna som visas, som CSV för Excel\">Exportera CSV</button><button type=\"button\" class=\"gi-detail-close\" id=\"gi-detail-close\">Stäng</button></span></div>\n";
+		echo "<div class=\"gi-det-scroll\" id=\"gi-det-orders\" hidden><table class=\"table-list\"><thead><tr><th>Inlev. datum</th><th>Artikelnr</th><th>Produkt</th><th>Ordernr</th><th>Orderdatum</th><th>Kund</th><th class=\"n\">Antal</th><th>Skickad</th><th class=\"n\">Dagar</th><th>Utfall</th><th hidden>Inleverans</th><th hidden>Inbyte</th></tr></thead><tbody>\n";
 		foreach ($orders as $o) {
 			$days = ($o['ship_days'] === null || $o['ship_days'] === '') ? null : (int)$o['ship_days'];
 			$dkey = $days === null ? 'ej' : (string)min($days, 15);
 			$ship = $o['first_ship_after'] ? substr($o['first_ship_after'], 0, 16) : '–';
 			$out = CGoodsInflow::outcome($o);
 			echo "<tr data-b=\"" . CGoodsInflow::orderBucket($o) . "\" data-d=\"" . $dkey . "\" data-r=\"" . $h($out) . "\" data-q=\"" . (float)$o['alloc_qty'] . "\" hidden>"
-			   . "<td>" . $h($o['rdate']) . "</td><td>" . $h($o['product_value']) . "</td><td>" . $h($o['product_name']) . "</td>"
+			   . "<td>" . $h($o['rdate']) . "</td><td>" . $h($o['product_value']) . "</td><td>" . $plink($o['product_value'], $o['m_product_id'], $o['product_name']) . $tbadge($o['istradein'] === 'Y') . "</td>"
 			   . "<td><a href=\"/search_dispatch.php?mode=order&amp;page=1&amp;q=" . rawurlencode($o['order_no']) . "\" target=\"_blank\" rel=\"noopener\">" . $h($o['order_no']) . "</a></td><td>" . $h($o['dateordered']) . "</td><td>" . $h($o['customer']) . "</td>"
-			   . "<td class=\"n\">" . $nf($o['alloc_qty']) . "</td><td>" . $h($ship) . "</td><td class=\"n\">" . ($days === null ? '–' : $days) . "</td><td>" . $h($out) . "</td></tr>\n";
+			   . "<td class=\"n\">" . $nf($o['alloc_qty']) . "</td><td>" . $h($ship) . "</td><td class=\"n\">" . ($days === null ? '–' : $days) . "</td><td>" . $h($out) . "</td>"
+			   . "<td hidden>" . $h($o['receipt_no']) . "</td><td hidden>" . ($o['istradein'] === 'Y' ? 'Ja' : 'Nej') . "</td></tr>\n";
 		}
 		echo "</tbody></table></div>\n";
-		echo "<div class=\"gi-det-scroll\" id=\"gi-det-stock\" hidden><table class=\"table-list\"><thead><tr><th>Inlev. datum</th><th>Inleverans</th><th>Artikelnr</th><th>Produkt</th><th>Leverantör</th><th class=\"n\">Antal in</th><th class=\"n\">Till lager</th><th class=\"n\">Lager före</th><th class=\"n\">Sålt sedan</th><th class=\"n\">Dagar till slutsålt</th></tr></thead><tbody>\n";
+		echo "<div class=\"gi-det-scroll\" id=\"gi-det-stock\" hidden><table class=\"table-list\"><thead><tr><th>Inlev. datum</th><th>Inleverans</th><th>Artikelnr</th><th>Produkt</th><th>Leverantör</th><th class=\"n\">Antal in</th><th class=\"n\">Till lager</th><th class=\"n\">Lager före</th><th class=\"n\">Sålt sedan</th><th class=\"n\">Dagar till slutsålt</th><th hidden>Inbyte</th></tr></thead><tbody>\n";
 		foreach ($rows as $r) {
 			$tl = (float)$r['qty'] - (float)$r['alloc_qty'];
 			if ($tl <= 0) continue;
 			$fd = ($r['fifo_full_days'] === null || $r['fifo_full_days'] === '') ? '–' : (int)$r['fifo_full_days'];
 			echo "<tr data-b=\"" . CGoodsInflow::stockBucket($r) . "\" data-q=\"" . $tl . "\" hidden>"
-			   . "<td>" . $h($r['rdate']) . "</td><td>" . $h($r['receipt_no']) . "</td><td>" . $h($r['product_value']) . "</td><td>" . $h($r['product_name']) . "</td><td>" . $h($r['vendor']) . "</td>"
-			   . "<td class=\"n\">" . $nf($r['qty']) . "</td><td class=\"n\">" . $nf($tl) . "</td><td class=\"n\">" . $nf($r['onhand_before']) . "</td><td class=\"n\">" . $nf($r['ship_qty_after']) . "</td><td class=\"n\">" . $fd . "</td></tr>\n";
+			   . "<td>" . $h($r['rdate']) . "</td><td>" . $h($r['receipt_no']) . "</td><td>" . $h($r['product_value']) . "</td><td>" . $plink($r['product_value'], $r['m_product_id'], $r['product_name']) . $tbadge($r['istradein'] === 'Y') . "</td><td>" . $h($r['vendor']) . "</td>"
+			   . "<td class=\"n\">" . $nf($r['qty']) . "</td><td class=\"n\">" . $nf($tl) . "</td><td class=\"n\">" . $nf($r['onhand_before']) . "</td><td class=\"n\">" . $nf($r['ship_qty_after']) . "</td><td class=\"n\">" . $fd . "</td><td hidden>" . ($r['istradein'] === 'Y' ? 'Ja' : 'Nej') . "</td></tr>\n";
 		}
 		echo "</tbody></table></div>\n";
 		echo "</div>\n";
@@ -139,17 +150,19 @@
 		echo "</div>\n";
 
 		// Per produkt
-		echo "<div class=\"gi-card\"><details><summary>Per produkt (" . count($agg['prod']) . " produkter, sorterat på antal)</summary>\n";
-		echo "<table class=\"table-list\"><thead><tr><th>Artikelnr</th><th>Produkt</th><th>Kategori</th><th class=\"n\">Antal in</th><th class=\"n\">Lager före</th><th class=\"n\">Täckte order</th><th class=\"n\">Ut inom 1 dag</th><th class=\"n\">Väntade</th><th class=\"n\">Till lager</th><th class=\"n\">Dagar till slutsålt</th></tr></thead><tbody>\n";
+		echo "<div class=\"gi-card\"><div class=\"gi-card-actions\"><button type=\"button\" class=\"gi-export\" data-target=\"gi-prod-table\" data-name=\"produkter\" title=\"Alla produkter, som CSV för Excel\">Exportera CSV</button></div>";
+		echo "<details><summary>Per produkt (" . count($agg['prod']) . " produkter, sorterat på antal)</summary>\n";
+		echo "<table class=\"table-list\" id=\"gi-prod-table\"><thead><tr><th>Artikelnr</th><th>Produkt</th><th>Kategori</th><th class=\"n\">Antal in</th><th class=\"n\">Lager före</th><th class=\"n\">Täckte order</th><th class=\"n\">Ut inom 1 dag</th><th class=\"n\">Väntade</th><th class=\"n\">Till lager</th><th class=\"n\">Dagar till slutsålt</th><th hidden>Inbyte</th></tr></thead><tbody>\n";
 		foreach ($agg['prod'] as $p) {
 			$fifo = count($p['fifo']) ? max($p['fifo']) : '–';
-			echo "<tr><td>" . $h($p['value']) . "</td><td>" . $h($p['name']) . "</td><td>" . $h($p['cat']) . "</td><td class=\"n\">" . $nf($p['qty']) . "</td><td class=\"n\">" . $nf($p['onhand_before']) . "</td><td class=\"n\">" . $nf($p['alloc']) . "</td><td class=\"n\">" . $nf($p['a01']) . "</td><td class=\"n\">" . $nf($p['alloc'] - $p['a01']) . "</td><td class=\"n\">" . $nf($p['tl']) . "</td><td class=\"n\">" . $h($fifo) . "</td></tr>\n";
+			echo "<tr><td>" . $h($p['value']) . "</td><td>" . $plink($p['value'], $p['id'], $p['name']) . $tbadge($p['tradein']) . "</td><td>" . $h($p['cat']) . "</td><td class=\"n\">" . $nf($p['qty']) . "</td><td class=\"n\">" . $nf($p['onhand_before']) . "</td><td class=\"n\">" . $nf($p['alloc']) . "</td><td class=\"n\">" . $nf($p['a01']) . "</td><td class=\"n\">" . $nf($p['alloc'] - $p['a01']) . "</td><td class=\"n\">" . $nf($p['tl']) . "</td><td class=\"n\">" . $h($fifo) . "</td><td hidden>" . ($p['tradein'] ? 'Ja' : 'Nej') . "</td></tr>\n";
 		}
 		echo "</tbody></table></details></div>\n";
 
 		// Metod
 		echo "<div class=\"gi-method\"><details><summary>Så är det räknat</summary><ul>\n";
-		echo "<li><b>Underlag:</b> färdigställda leverantörsinleveranser till Umeå (Standard) i perioden, bara varor. Direktleveranser och returlagret ingår inte. Inbyten från privatpersoner ingår (märkta \"inbyte\" i leverantörslistan).</li>\n";
+		echo "<li><b>Underlag:</b> färdigställda leverantörsinleveranser till Umeå (Standard) i perioden, bara varor. Direktleveranser och returlagret ingår inte. Inbytesvaror (produkter markerade som inbyte) ingår som standard och märks \"inbyte\" i listorna; filtret Inbytesvaror tar bort dem eller visar bara dem. I leverantörslistan märks kunder i gruppen Privatkund som \"inbyte\".</li>\n";
+		echo "<li><b>Export:</b> knappen Exportera CSV ger raderna som visas, med semikolon som avgränsare, så att filen öppnas direkt i Excel. Exporten har två extra kolumner som inte syns på sidan: inleveransnummer för orderraderna och om varan är ett inbyte.</li>\n";
 		echo "<li><b>Täckte en väntande order:</b> i inleveransögonblicket fanns en kundorder på produkten som ännu inte skickats. Bara vanliga kundorder (Standard Order) med status Slutförd eller Under bearbetning räknas; offerter, utkast och returer räknas inte. Inlevererad kvantitet fördelas på de väntande orderraderna, äldst först.</li>\n";
 		echo "<li><b>Ut inom 1 dag:</b> orderraden skickades samma dag eller dagen efter inleveransen.</li>\n";
 		echo "<li><b>Väntade på annan vara:</b> ordern hade fler öppna rader vid inleveransen och minst en av dem levererades in senare, innan ordern skickades. <b>Andra rader öppna:</b> fler rader var öppna men ingen inleverans registrerades för dem. <b>Komplett men skickad senare:</b> inget annat saknades.</li>\n";
@@ -158,7 +171,7 @@
 		echo "<li><b>Förbehåll:</b> makulerade order har kvantitet 0 i databasen och syns inte som väntande. Siffror för de senaste dagarna ändras tills orderna hunnit skickas.</li>\n";
 		echo "</ul></details></div>\n";
 
-		$js = array('tot' => $T, 'day' => $agg['day'], 'cat' => $agg['cat'], 'ship_hist' => $agg['ship_hist'], 'reason' => $agg['reason'], 'ndays' => $agg['ndays']);
+		$js = array('from' => $from, 'to' => $to, 'tradein' => $tradein, 'tot' => $T, 'day' => $agg['day'], 'cat' => $agg['cat'], 'ship_hist' => $agg['ship_hist'], 'reason' => $agg['reason'], 'ndays' => $agg['ndays']);
 		echo "<script>window.INFLOW = " . json_encode($js, JSON_UNESCAPED_UNICODE) . ";</script>\n";
 		echo "<div id=\"gi-tip\" hidden></div>\n";
 		echo "<script src=\"goods_inflow.js?ver=ad" . date("ynjGi") . "\"></script>\n";
