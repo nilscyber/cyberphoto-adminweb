@@ -7,7 +7,7 @@ $EXCL_ARTICLES = array(
 );
 
 $EXCL_LOCATORS = array(
-    1004170, 1004179, 1004216, 1004288
+    1004170, 1004179, 1004216, 1004256, 1004288
 );
 
 // Beteende för locator-exkludering:
