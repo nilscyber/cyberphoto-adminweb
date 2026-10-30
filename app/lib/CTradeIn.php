@@ -1538,7 +1538,7 @@ Class CTradeIn {
 		} elseif ($testprodukter) {
 			$select .= "AND mloc.m_locator_id IN (1004179) ";
 		} else {
-			$select .= "AND NOT mloc.m_locator_id IN (1000000,1004125,1003683,1003684,1003685,1004170,1004179,1004183,1004184,1004185,1004216,1004217,1004255,1004256) ";
+			$select .= "AND NOT mloc.m_locator_id IN (1000000,1004125,1003683,1003684,1003685,1004170,1004179,1004183,1004184,1004185,1004216,1004217,1004255,1004256,1004288) ";
 		}
 		if ($nostoreshelf) {
 			$select .= "AND prod.IsSelfService = 'Y' ";
@@ -2970,7 +2970,7 @@ WHERE pstock.m_warehouse_id = 1000000
   AND po.isactive         = 'Y'
   AND cbp.value           = '5555'
   AND prod_po.iscurrentvendor = 'Y'
-  AND mloc.m_locator_id NOT IN (1000000,1004125,1003683,1003684,1003685,1004170,1004179,1004183,1004184,1004185,1004216,1004217,1004255,1004256)
+  AND mloc.m_locator_id NOT IN (1000000,1004125,1003683,1003684,1003685,1004170,1004179,1004183,1004184,1004185,1004216,1004217,1004255,1004256,1004288)
   AND prod.IsSelfService = 'N'
   AND prod.salestart IS NOT NULL
   AND DATE(prod.salestart) >= CURRENT_DATE
@@ -3058,7 +3058,7 @@ WHERE pstock.m_warehouse_id = 1000000
   AND po.isactive         = 'Y'
   AND cbp.value           = '5555'
   AND prod_po.iscurrentvendor = 'Y'
-  AND mloc.m_locator_id NOT IN (1000000,1004125,1003683,1003684,1003685,1004170,1004179,1004183,1004184,1004185,1004216,1004217,1004255,1004256)
+  AND mloc.m_locator_id NOT IN (1000000,1004125,1003683,1003684,1003685,1004170,1004179,1004183,1004184,1004185,1004216,1004217,1004255,1004256,1004288)
   AND prod.IsSelfService = 'N'
   AND prod.salestart IS NOT NULL
   AND prod.salestart - prod.created < INTERVAL '1 day' AND prod.created >= DATE '2025-09-01'
@@ -3186,7 +3186,7 @@ WHERE pstock.m_warehouse_id = 1000000
   AND po.isactive         = 'Y'
   AND cbp.value           = '5555'
   AND prod_po.iscurrentvendor = 'Y'
-  AND mloc.m_locator_id NOT IN (1000000,1004125,1003683,1003684,1003685,1004170,1004179,1004183,1004184,1004185,1004216,1004217,1004255,1004256)
+  AND mloc.m_locator_id NOT IN (1000000,1004125,1003683,1003684,1003685,1004170,1004179,1004183,1004184,1004185,1004216,1004217,1004255,1004256,1004288)
   AND TRIM(mloc.value) !~* '^(kortputs|l.ngputs|butikshylla.*|golvyta.*|butikssk.p *[0-9]*)$'
   AND prod.IsSelfService = 'N'
   AND prod.salestart IS NOT NULL
