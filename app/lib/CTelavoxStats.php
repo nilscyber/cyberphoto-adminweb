@@ -69,6 +69,36 @@ class CTelavoxStats
     }
 
     /**
+     * Nyckeltal per halvtimme på dygnet (call_time = samtalets start), för urvalet.
+     * Varje rad har slot (0-47, 0 = 00:00-00:29), days (antal dagar med samtal i
+     * urvalet, för snitt per dag) samt de vanliga aggregaten.
+     */
+    public static function perHalfHour(array $filter)
+    {
+        $types = ''; $params = array();
+        $sql = "SELECT HOUR(c.call_time) * 2 + (MINUTE(c.call_time) >= 30) AS slot,
+                       " . self::aggregates($types, $params) . "
+                FROM telavox_calls c
+                WHERE " . self::where($filter, $types, $params) . "
+                GROUP BY slot
+                ORDER BY slot";
+        $rows = array_map(array(__CLASS__, 'finish'), CTelavoxRepository::select($sql, $types, $params));
+
+        // Antal dagar med samtal i urvalet (alla tider), nämnare för snitt per dag
+        $types = ''; $params = array();
+        $day = CTelavoxRepository::selectOne("SELECT COUNT(DISTINCT c.call_date) AS days
+                FROM telavox_calls c WHERE " . self::where($filter, $types, $params), $types, $params);
+        $days = $day ? (int)$day['days'] : 0;
+
+        foreach ($rows as &$row) {
+            $row['slot'] = (int)$row['slot'];
+            $row['days'] = $days;
+        }
+        unset($row);
+        return $rows;
+    }
+
+    /**
      * Nyckeltal per agent. Samtal vars anknytning saknar koppling grupperas
      * per anknytning (agent_id NULL). Samtal utan anknytning (t.ex. övergivna)
      * ingår inte.

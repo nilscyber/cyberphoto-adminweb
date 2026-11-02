@@ -186,6 +186,33 @@ Class CButiken {
 		return $data;
 	}
 
+	/**
+	 * Plingar per halvtimme på dygnet för ett datumintervall (YYYY-MM-DD, inklusive).
+	 * Returnerar array('slots' => [0-47 => antal], 'days' => antal dagar med pling).
+	 */
+	function getPlingPerHalfHour($from, $to) {
+		$db   = Db::getConnection();
+		$from = mysqli_real_escape_string($db, $from);
+		$to   = mysqli_real_escape_string($db, $to);
+		$where = "WHERE plingTime >= '$from' AND plingTime < DATE_ADD('$to', INTERVAL 1 DAY) ";
+
+		$data = array('slots' => array_fill(0, 48, 0), 'days' => 0);
+
+		$select  = "SELECT HOUR(plingTime) * 2 + (MINUTE(plingTime) >= 30) AS slot, COUNT(plingID) AS Antal ";
+		$select .= "FROM cyberadmin.dorrpling " . $where . "GROUP BY slot";
+		$res = mysqli_query($db, $select);
+		while ($res && $row = mysqli_fetch_object($res)) {
+			$data['slots'][(int)$row->slot] = (int)$row->Antal;
+		}
+
+		$res = mysqli_query($db, "SELECT COUNT(DISTINCT DATE(plingTime)) AS days FROM cyberadmin.dorrpling " . $where);
+		if ($res && $row = mysqli_fetch_object($res)) {
+			$data['days'] = (int)$row->days;
+		}
+
+		return $data;
+	}
+
 	function getTurnoverButikenData($year=false) {
 		global $dagensdatum;
 		

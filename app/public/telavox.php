@@ -57,6 +57,7 @@ try {
     $perQueue  = CTelavoxStats::perQueue($filter);
     $perMonth  = CTelavoxStats::perMonth($filter);
     $perAgent  = CTelavoxStats::perAgent($filter);
+    $perSlot   = CTelavoxStats::perHalfHour($filter);
     $outcomes  = CTelavoxStats::perOutcome($filter);
     $byYear    = CTelavoxStats::totalsByYearMonth($filter + array('outcome_class' => $yearType));
 } catch (\Throwable $e) {
@@ -91,6 +92,21 @@ foreach ($perMonth as $m) {
 }
 
 // Årsjämförelse: de fem senaste åren, en serie per år med tolv månadsvärden (null = ingen data)
+// Samtal per halvtimme: alla 48 intervall, tomma får 0
+$slots = array();
+for ($i = 0; $i < 48; $i++) {
+    $slots[$i] = array('total' => 0, 'answered' => 0, 'abandoned' => 0, 'days' => 0);
+}
+foreach ($perSlot as $s) {
+    $slots[$s['slot']] = array('total' => $s['total'], 'answered' => $s['answered'], 'abandoned' => $s['abandoned'], 'days' => $s['days']);
+}
+$chart['slotLabels'] = array();
+$chart['slotAvg']    = array();
+foreach ($slots as $i => $s) {
+    $chart['slotLabels'][] = sprintf('%02d:%02d', intdiv($i, 2), ($i % 2) * 30);
+    $chart['slotAvg'][]    = $s['days'] > 0 ? round($s['total'] / $s['days'], 1) : 0;
+}
+
 $chart['months'] = array_slice($monthNames, 1);
 $chart['years']  = array();
 foreach (array_slice($byYear, -5, null, true) as $year => $months) {
@@ -107,6 +123,7 @@ foreach (array_slice($byYear, -5, null, true) as $year => $months) {
 .tvx-wrap h2.tvx-heading { font-size: 20px; margin: 4px 0 12px; padding-left: 14px; color: #111; }
 .tvx-wrap h2.tvx-heading span { font-weight: 400; color: #6b7280; margin-left: 6px; }
 .tvx-wrap .table-list tr.tvx-diff td { border-top: 2px solid #e5e7eb; font-style: italic; }
+.tvx-wrap .table-list tr.tvx-diff-pct td { font-style: italic; }
 .tvx-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 0 0 18px; }
 .tvx-kpi { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 14px; }
 .tvx-kpi .tvx-kpi-label { font-size: 12px; color: #6b7280; }
@@ -266,6 +283,16 @@ foreach (array_slice($byYear, -5, null, true) as $year => $months) {
         <td class="num nowrap" title="Summa för månaderna som finns båda åren"><b><?php echo tvx_signed($diffSum); ?></b><?php
             if ($prevSum > 0) { echo ' <span class="muted">(' . tvx_signed($diffSum / $prevSum * 100, 1) . '&nbsp;%)</span>'; } ?></td>
       </tr>
+      <tr class="tvx-diff-pct">
+        <td>Diff i %</td>
+        <?php for ($i = 0; $i < 12; $i++):
+            if ($cur['values'][$i] === null || $prev['values'][$i] === null || $prev['values'][$i] <= 0) {
+                echo '<td class="num"><span class="muted">&ndash;</span></td>';
+                continue;
+            }
+        ?><td class="num"><?php echo tvx_signed(($cur['values'][$i] - $prev['values'][$i]) / $prev['values'][$i] * 100, 1); ?> %</td><?php endfor; ?>
+        <td class="num nowrap"><b><?php echo $prevSum > 0 ? tvx_signed($diffSum / $prevSum * 100, 1) . '&nbsp;%' : '&ndash;'; ?></b></td>
+      </tr>
     <?php endif; ?>
     </tbody>
   </table>
@@ -282,7 +309,40 @@ foreach (array_slice($byYear, -5, null, true) as $year => $months) {
   </div>
 </div>
 
-<h2>Per månad</h2>
+<h2>Per halvtimme <span class="muted" style="font-weight:400">&ndash; <?php echo tvx_h($heading); ?></span></h2>
+<div class="tvx-chart" style="margin-bottom:12px">
+  <div class="tvx-chart-title">Snitt antal samtal per halvtimme <span class="muted" style="font-weight:400">&ndash; valt urval, samtalets starttid, snitt över dagar med samtal</span></div>
+  <div class="tvx-chart-canvas"><canvas id="tvx-chart-slots"></canvas></div>
+</div>
+<table class="table-list">
+  <thead>
+    <tr>
+      <th>Tid</th>
+      <th class="num">Samtal</th>
+      <th class="num">Snitt per dag</th>
+      <th class="num">Besvarade</th>
+      <th class="num">Övergivna</th>
+    </tr>
+  </thead>
+  <tbody>
+  <?php foreach ($slots as $i => $s):
+      if ($s['total'] === 0) { continue; }
+      $start = sprintf('%02d:%02d', intdiv($i, 2), ($i % 2) * 30);
+      $end   = sprintf('%02d:%02d', intdiv($i + 1, 2) % 24, (($i + 1) % 2) * 30);
+  ?>
+    <tr>
+      <td><?php echo $start . ' &ndash; ' . $end; ?></td>
+      <td class="num"><?php echo tvx_number($s['total']); ?></td>
+      <td class="num"><?php echo number_format($s['total'] / $s['days'], 1, ',', ' '); ?></td>
+      <td class="num"><?php echo tvx_number($s['answered']); ?></td>
+      <td class="num"><?php echo tvx_number($s['abandoned']); ?></td>
+    </tr>
+  <?php endforeach; ?>
+  </tbody>
+</table>
+<p class="muted" style="font-size:12px">Snitt per dag = samtal i intervallet delat med antal dagar i urvalet som har samtal (helger utan samtal räknas alltså inte med). Välj period och kö i filtret ovan.</p>
+
+<h2>Per månad <span class="muted" style="font-weight:400">&ndash; <?php echo tvx_h($heading); ?></span></h2>
 <table class="table-list">
   <thead>
     <tr>
@@ -442,6 +502,22 @@ foreach (array_slice($byYear, -5, null, true) as $year => $months) {
       scales: {
         x: { grid: { display: false } },
         y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: grid }, border: { display: false } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('tvx-chart-slots'), {
+    type: 'bar',
+    data: {
+      labels: data.slotLabels,
+      datasets: [{ label: 'Snitt samtal per dag', data: data.slotAvg, backgroundColor: '#2a78d6', maxBarThickness: 24, borderRadius: { topLeft: 3, topRight: 3 } }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 90, autoSkip: false } },
+        y: { beginAtZero: true, grid: { color: grid }, border: { display: false } }
       }
     }
   });
