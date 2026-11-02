@@ -280,8 +280,7 @@ foreach (array_slice($byYear, -5, null, true) as $year => $months) {
             $prevSum += $prev['values'][$i];
             $pct = $prev['values'][$i] > 0 ? ' (' . tvx_signed($d / $prev['values'][$i] * 100, 1) . ' %)' : '';
         ?><td class="num" title="<?php echo tvx_h(tvx_signed($d) . $pct); ?>"><?php echo tvx_signed($d); ?></td><?php endfor; ?>
-        <td class="num nowrap" title="Summa för månaderna som finns båda åren"><b><?php echo tvx_signed($diffSum); ?></b><?php
-            if ($prevSum > 0) { echo ' <span class="muted">(' . tvx_signed($diffSum / $prevSum * 100, 1) . '&nbsp;%)</span>'; } ?></td>
+        <td class="num nowrap" title="Summa för månaderna som finns båda åren"><b><?php echo tvx_signed($diffSum); ?></b></td>
       </tr>
       <tr class="tvx-diff-pct">
         <td>Diff i %</td>
