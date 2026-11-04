@@ -130,6 +130,34 @@ class CTelavoxStats
         return CTelavoxRepository::select($sql, $types, $params);
     }
 
+    /**
+     * Sök samtal på (del av) telefonnummer, över alla importerade datum.
+     * $digits = bara siffror. Ett inledande 0 provas även utan (070... = +4670...).
+     * Nyast först; $limit + 1 rader hämtas så anroparen kan se om träffarna kapats.
+     */
+    public static function searchByNumber($digits, $limit = 200)
+    {
+        $patterns = array('%' . $digits . '%');
+        if (strlen($digits) > 4 && $digits[0] === '0') {
+            $patterns[] = '%' . substr($digits, 1) . '%';
+        }
+        $types = ''; $params = array(); $like = array();
+        foreach ($patterns as $p) {
+            $like[] = "c.caller_id LIKE ?";
+            $types .= 's';
+            $params[] = $p;
+        }
+        $sql = "SELECT c.call_date, c.call_time, c.caller_id, c.outcome, q.name AS queue_name,
+                       c.agent_extension, a.name AS agent_name, c.queue_time_seconds, c.handle_time_seconds
+                FROM telavox_calls c
+                JOIN telavox_queues q ON q.id = c.queue_id
+                LEFT JOIN telavox_agents a ON a.id = c.agent_id
+                WHERE " . implode(' OR ', $like) . "
+                ORDER BY c.call_date DESC, c.call_time DESC
+                LIMIT " . ((int)$limit + 1);
+        return CTelavoxRepository::select($sql, $types, $params);
+    }
+
     /** Första och sista samtalsdatum i databasen, eller null om den är tom. */
     public static function dateRange()
     {

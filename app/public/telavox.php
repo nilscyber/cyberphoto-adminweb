@@ -571,5 +571,74 @@ foreach (array_slice($byYear, -5, null, true) as $year => $months) {
 <?php endif; ?>
 
 <?php
+// Sök samtal på (del av) telefonnummer, över alla importerade datum
+$numberQuery  = trim((string)($_GET['nr'] ?? ''));
+$numberDigits = preg_replace('/\D+/', '', $numberQuery);
+$numberLimit  = 200;
+$numberRows   = null;
+$numberError  = '';
+if ($numberQuery !== '') {
+    if (strlen($numberDigits) < 4) {
+        $numberError = 'Ange minst fyra siffror.';
+    } else {
+        try {
+            $numberRows = CTelavoxStats::searchByNumber($numberDigits, $numberLimit);
+        } catch (\Throwable $e) {
+            error_log('telavox nummersök: ' . $e->getMessage());
+            $numberError = 'Sökningen misslyckades.';
+        }
+    }
+}
+?>
+<h2 id="nummersok">Sök telefonnummer</h2>
+<form method="get" action="#nummersok" class="tvx-filter">
+  <?php foreach (array('period', 'from', 'to', 'queue_id', 'agent_id', 'type') as $keep): if (isset($_GET[$keep])): ?>
+  <input type="hidden" name="<?php echo $keep; ?>" value="<?php echo tvx_h($_GET[$keep]); ?>">
+  <?php endif; endforeach; ?>
+  <div>
+    <label for="tvx-nr">Telefonnummer (hela eller del av)</label>
+    <input type="text" id="tvx-nr" name="nr" value="<?php echo tvx_h($numberQuery); ?>" placeholder="t.ex. 070123 eller 9012345" size="28">
+  </div>
+  <button type="submit" class="tvx-btn">Sök</button>
+</form>
+<?php if ($numberError !== ''): ?>
+  <div class="tvx-msg error"><?php echo tvx_h($numberError); ?></div>
+<?php elseif ($numberRows !== null): ?>
+  <?php if (empty($numberRows)): ?>
+    <p class="muted">Inga samtal hittades för &rdquo;<?php echo tvx_h($numberQuery); ?>&rdquo;.</p>
+  <?php else:
+      $truncated = count($numberRows) > $numberLimit;
+      $numberRows = array_slice($numberRows, 0, $numberLimit);
+  ?>
+  <table class="table-list">
+    <thead>
+      <tr>
+        <th>Datum</th><th>Tid</th><th>Nummer</th><th>Kö</th><th>Pratade med</th><th>Utfall</th>
+        <th class="num">Kötid</th><th class="num">Samtalstid</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($numberRows as $r): ?>
+      <tr>
+        <td><?php echo tvx_h($r['call_date']); ?></td>
+        <td><?php echo tvx_h(substr($r['call_time'], 0, 5)); ?></td>
+        <td><?php echo tvx_h($r['caller_id']); ?></td>
+        <td><?php echo tvx_h($r['queue_name']); ?></td>
+        <td><?php
+            if ($r['agent_name'] !== null) { echo tvx_h($r['agent_name']); }
+            elseif ($r['agent_extension'] !== null && $r['agent_extension'] !== '') { echo tvx_h($r['agent_extension']); }
+            else { echo '<span class="muted">&ndash;</span>'; } ?></td>
+        <td><?php echo tvx_h(CTelavoxOutcome::label($r['outcome'])); ?></td>
+        <td class="num"><?php echo tvx_seconds($r['queue_time_seconds']); ?></td>
+        <td class="num"><?php echo tvx_seconds($r['handle_time_seconds']); ?></td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
+  <p class="muted" style="font-size:12px"><?php echo $truncated ? 'Visar de ' . $numberLimit . ' senaste träffarna, förfina sökningen för att se fler.' : count($numberRows) . ' träffar.'; ?> Sökningen gäller alla importerade datum, oberoende av datumfiltret.</p>
+  <?php endif; ?>
+<?php endif; ?>
+
+<?php
 echo "</div>";
 include_once("footer.php");
