@@ -2593,7 +2593,7 @@ Class CWebADInternSuplier {
 			$select .= "JOIN c_order o ON col.c_order_id = o.c_order_id ";
 			$select .= "JOIN m_product p ON col.m_product_id = p.m_product_id ";
 			$select .= "JOIN Ad_User au ON au.Ad_User_id = bp.salesrep_id ";
-			$select .= "WHERE o.c_doctype_id = 1000016 AND NOT o.docstatus IN ('VO') AND col.qtyordered > col.qtydelivered ";
+			$select .= "WHERE o.c_doctype_id = 1000016 AND NOT o.docstatus IN ('VO', 'DR') AND col.qtyordered > col.qtydelivered ";
 			$select .= "AND col.datepromised < '$dagensdatum 23:59:59' ";
 			$select .= "AND NOT col.datepromisedprecision = 'U' ";
 			$select .= "GROUP BY bp.name, bp.value, au.name ";
@@ -2678,7 +2678,7 @@ Class CWebADInternSuplier {
 			$select .= "JOIN m_product p ON col.m_product_id = p.m_product_id ";
 			$select .= "JOIN m_product_po ppo ON p.m_product_id = ppo.m_product_id ";
 			$select .= "LEFT JOIN xc_manufacturer manu ON manu.xc_manufacturer_id = p.xc_manufacturer_id ";
-			$select .= "WHERE o.c_doctype_id = 1000016 AND NOT o.docstatus IN ('VO') AND col.qtyordered > col.qtydelivered ";
+			$select .= "WHERE o.c_doctype_id = 1000016 AND NOT o.docstatus IN ('VO', 'DR') AND col.qtyordered > col.qtydelivered ";
 			$select .= "AND col.datepromised < '$dagensdatum 23:59:59' ";
 			$select .= "AND NOT col.datepromisedprecision = 'U' AND ppo.iscurrentvendor = 'Y' AND bp.value = '$supID' ";
 			$select .= "ORDER BY bp.name ASC, col.datepromised ASC ";
