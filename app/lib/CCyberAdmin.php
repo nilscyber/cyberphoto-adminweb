@@ -127,6 +127,8 @@ Class CCyberAdmin {
 		} elseif (preg_match("/sales_export\.php/i", $_SERVER['PHP_SELF'])) {
 			echo "<title>Försäljningsexport - CyberPhoto</title>
 ";
+		} elseif (preg_match("/otrs_undelivered\.php/i", $_SERVER['PHP_SELF'])) {
+			echo "<title>Otrs - ärenden som behöver hanteras - CyberPhoto</title>\n";
 		} elseif (preg_match("/goods_inflow\.php/i", $_SERVER['PHP_SELF'])) {
 			echo "<title>Inleveransflöde - CyberPhoto</title>\n";
 		} elseif (preg_match("/menu_web\.php/i", $_SERVER['PHP_SELF'])) {

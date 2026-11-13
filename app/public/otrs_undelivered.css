@@ -1,0 +1,25 @@
+/* Otrs - ärenden som behöver hanteras (otrs_undelivered.php) – layout runt tabellerna. Tabeller kommer från admin_core.css. */
+.ou-intro { max-width: 80ch; color: #374151; margin: 0 0 10px; }
+.ou-form { margin-bottom: 8px; }
+.ou-form .filter-bar input[type="datetime-local"] { border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 6px; font: inherit; }
+.ou-form .filter-bar input[type="datetime-local"]:focus { outline: 2px solid #2dd4bf; outline-offset: 1px; }
+.ou-btn { background: #0d9488; color: #fff; border: none; border-radius: 5px; padding: 5px 14px; font: inherit; cursor: pointer; }
+.ou-btn:hover { background: #0f766e; }
+.ou-quick, .ou-updated { color: #6b7280; font-size: 12px; margin-left: 8px; }
+.ou-note { color: #92400e; background: #fef3c7; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 12px; display: inline-block; }
+.ou-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 8px 0 4px; max-width: 760px; }
+.ou-kpi { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 14px 10px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.ou-kpi .v { font-size: 30px; font-weight: 600; line-height: 1.05; color: #111; }
+.ou-kpi .l { font-size: 13px; color: #374151; margin-top: 5px; }
+.ou-kpi.alert { border-color: #fca5a5; background: #fef2f2; }
+.ou-kpi.alert .v { color: #b91c1c; }
+.ou-kpi.ok .v { color: #047857; }
+.ou-h2 { font-size: 17px; margin: 22px 0 4px; }
+.ou-sub { color: #4b5563; margin: 0 0 10px; max-width: 90ch; font-size: 13px; }
+.ou-by { color: #374151; font-size: 13px; margin: 0 0 8px; }
+.ou-wrap { overflow-x: auto; margin-bottom: 12px; }
+.ou-wrap .table-list { width: 100%; }
+.ou-wrap td { vertical-align: top; }
+.ou-reason { cursor: help; border-bottom: 1px dotted #9ca3af; }
+.ou-warn { color: #b91c1c; font-weight: 600; }
+.ou-details summary { cursor: pointer; font-size: 17px; font-weight: 600; margin: 22px 0 8px; }

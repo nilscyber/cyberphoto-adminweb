@@ -113,6 +113,12 @@
 	</ul>
 </li>
 
+<li><span class="menu-cat-icon">🎧</span> Kundtjänst
+	<ul>
+    <li><a href="otrs_undelivered.php" <?php if (preg_match("/otrs_undelivered\.php/i", $_SERVER['PHP_SELF'])) { ?>id="current"<?php } ?>>Otrs - ärenden som behöver hanteras</a></li>
+	</ul>
+</li>
+
 <?php if ($_COOKIE['login_mail'] == 'markus@cyberphoto.nu') { ?>
 <li><span class="menu-cat-icon">🔬</span> Tekniska data
 	<ul>
