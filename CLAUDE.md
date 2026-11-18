@@ -155,10 +155,17 @@ Every page is a flat PHP file in `app/public/`, no router. Skeleton:
 - When a query is driven by a small id set that the planner cannot estimate (e.g. "orders with an undelivered line" = a seq scan over `c_orderline`), fetch the ids in a first query and pass them as `= ANY($1::int[])`. With the set as a CTE/subquery the planner estimated 268k rows, hashed all 1.15M orders and chose a 2.3M-row index scan on `fact_acct`; with the array it nested-loops on the primary keys (22 s → 5 s, `CSalesExport::query()` open mode).
 - Warehouse ids: 1000000 = Umeå (Standard), 1000001 = Returavdelningen, 1000003 = Direktleverans, 1000006 = Butiken. `m_locator.m_warehouse_id` is the join from `m_storage`/`m_transaction` to a warehouse.
 - Stock history = `m_transaction` (`movementtype` V+/V-/C+/C-/M+/M-/I+/I-, `created` is the completion timestamp, `movementdate` is date-only). Current stock = `m_storage.qtyonhand`.
+- **Stock as it was at a point in time** is not stored anywhere; `COrderFlow::fetch()` reconstructs it in one query: current `m_storage` minus every later `m_transaction` gives on hand then, and current `qtyreserved` minus later order lines plus later shipments (`C-`) gives reserved then, per product and warehouse. Reserved is approximate (voided or shortened lines are not replayed) — treat "promised to earlier orders" as an indication, on hand as reliable.
+
+## The two flow pages (Logistik)
+
+- `goods_inflow.php` (Inleveransflöde) and `order_flow.php` (Orderflöde, class `COrderFlow`) share one pattern: PHP builds every aggregate and writes the row-level data once as `window.INFLOW` / `window.OFLOW`; the page JS draws the SVG charts and opens the list under whatever was clicked (`a.of-pick` with `data-*` filters, or a chart mark). `order_flow.php` reuses `goods_inflow.css` for layout (`gi-*` classes) and adds `order_flow.css`.
+- Orderflöde rules (all in `COrderFlow::build`): customer order = doc type 1000030 in CO/IP; web order = `SalesRep_ID` 1652736, everything else is manual; line status at purchase S free / P in stock but promised / N missing / D drop-ship line (warehouse 1000003); an order takes its worst line; working days = Mon–Fri minus Swedish holidays, an order created at 17:00 or later counts from the next working day; orders with a product not yet released (`salestart`/`launchdate` after the order date) are dropped by default. Max period 93 days (about 3 s).
+- Date arithmetic on `strtotime()` differences must be rounded (`round(($b - $a) / 86400)`): the day the clocks change is 23 or 25 hours.
 
 ## Local run, test and deploy
 
-- `docker compose up -d` here → http://localhost:8091 (also https://localhost:8443, self-signed). Needs the external `proxy-net` docker network and `.env` (gitignored; `.env.example` lists the keys). `.env` points at the real MariaDB and the real AD read host, so local = live data.
+- `docker compose up -d` here → http://localhost:8091 (also https://localhost:8443, self-signed; the Claude browser pane refuses that certificate, use 8091 there). Needs the external `proxy-net` docker network and `.env` (gitignored; `.env.example` lists the keys). `.env` points at the real MariaDB and the real AD read host, so local = live data.
 - Syntax check inside the container (Git Bash mangles `/var/...` paths unless you set `MSYS_NO_PATHCONV=1`):
   ```bash
   MSYS_NO_PATHCONV=1 docker exec cyberphoto-adminweb php -l /var/www/html/public/<page>.php

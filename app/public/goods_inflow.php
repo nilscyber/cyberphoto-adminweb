@@ -14,7 +14,7 @@
 	$to   = (isset($_GET['to'])   && $validDate($_GET['to']))   ? $_GET['to']   : $defTo;
 	if ($from > $to) { $tmp = $from; $from = $to; $to = $tmp; }
 	$maxDays = 93; $clamped = false;
-	if ((strtotime($to) - strtotime($from)) / 86400 > $maxDays - 1) {
+	if (round((strtotime($to) - strtotime($from)) / 86400) > $maxDays - 1) {	// round: dygnet då klockan ställs om är inte 24 timmar
 		$from = date('Y-m-d', strtotime($to . ' -' . ($maxDays - 1) . ' days')); $clamped = true;
 	}
 	$wh = 1000000;
