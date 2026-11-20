@@ -1450,12 +1450,12 @@ Class CTradeIn {
 		mysqli_query(Db::getConnection(true), $updt);
 	}
 
-	function findDoubleTradeInBooking() {
+	function findDoubleTradeInBooking($modern = false) {
 		global $dagensdatum;
 		
 		$countrow = 0;
 
-		$select = "SELECT DISTINCT col.created, o.documentno, t.name as tillverkare, p.name as beskrivning, p.value as artnr, col.qtyallocated, col.qtyordered, col.qtyreserved, col.qtydelivered ";
+		$select = "SELECT DISTINCT col.created, o.documentno, p.m_product_id, t.name as tillverkare, p.name as beskrivning, p.value as artnr, col.qtyallocated, col.qtyordered, col.qtyreserved, col.qtydelivered ";
 		$select .= "FROM c_orderline col ";
 		$select .= "JOIN c_order o ON o.c_order_id = col.c_order_id ";
 		$select .= "JOIN m_product p ON col.m_product_id = p.m_product_id ";
@@ -1464,6 +1464,7 @@ Class CTradeIn {
 		$select .= "JOIN c_bpartner bp ON bp.c_bpartner_id = po.c_bpartner_id ";
 		$select .= "WHERE o.docstatus IN ('CO','IP') AND o.deliveryViaRule IN ('S','P') AND o.isSOTrx = 'Y' AND o.isActive='Y' AND o.AD_Client_ID=1000000 ";
 		$select .= "AND bp.value = '5555' AND col.qtyallocated < col.qtyordered AND col.qtydelivered = 0 ";
+		$select .= "AND col.qtyreserved > 0 ";  // kunden måste faktiskt ha reserverat produkten på ordern
 		$select .= "AND NOT o.c_doctypetarget_id IN(1000027) ";  // tar bort om offert
 		$select .= "AND p.producttype = 'I' ";  // endast produkter, EJ tj�nster
 		$select .= "ORDER BY col.created DESC ";
@@ -1478,10 +1479,14 @@ Class CTradeIn {
 			echo ($res ? pg_num_rows($res) : 0);
 			// exit;
 		}
-		
-		
+
+		if ($modern) {
+			$this->renderDoubleBookingModern($res);
+			return;
+		}
+
 		if ($res && pg_num_rows($res) > 0) {
-		
+
 			echo "<div class=\"count_data bold italic\">Dubbelbokade produkter som måste åtgärdas omedelbart!</div>\n";
 			echo "<table id=\"begg_double\" width=\"95%\" border=\"0\" cellpadding=\"2\" cellspacing=\"1\">\n";
 		
@@ -1509,6 +1514,33 @@ Class CTradeIn {
 		
 		}
 			
+	}
+
+	// Modern variant of the double-booking alert (used by inbyte_booked_not_shipped.php).
+	// The /tradein board keeps the legacy markup in findDoubleTradeInBooking().
+	private function renderDoubleBookingModern($res) {
+		if (!$res || pg_num_rows($res) == 0) return;
+
+		$h = function($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); };
+		$n = pg_num_rows($res);
+
+		echo '<div class="alert-box alert-danger">';
+		echo '<div class="alert-head"><span class="alert-icon">!</span> Dubbelbokning &ndash; ' . $n . ' st m&aring;ste &aring;tg&auml;rdas omedelbart</div>';
+		echo '<div class="alert-sub">Kunden har reserverat produkten p&aring; ordern, men ingen finns i lager.</div>';
+		echo '<table class="table-list"><thead><tr><th>Datum</th><th>Order</th><th>Artnr</th><th>Produkt</th><th class="num">Antal</th></tr></thead><tbody>';
+		while ($row = pg_fetch_object($res)) {
+			$produkt = trim($row->tillverkare . ' ' . $row->beskrivning);
+			$orderUrl = '/search_dispatch.php?mode=order&page=1&q=' . rawurlencode($row->documentno);
+			$produktUrl = '/search_dispatch.php?mode=product&q=' . rawurlencode($row->artnr) . '&open=product&id=' . (int)$row->m_product_id;
+			echo '<tr>';
+			echo '<td class="muted nowrap">' . $h(date('Y-m-d H:i', strtotime($row->created))) . '</td>';
+			echo '<td><a href="' . $h($orderUrl) . '" target="_blank" rel="noopener">' . $h($row->documentno) . '</a></td>';
+			echo '<td>' . $h($row->artnr) . '</td>';
+			echo '<td><a href="' . $h($produktUrl) . '" target="_blank" rel="noopener">' . $h($produkt) . '</a></td>';
+			echo '<td class="num">' . (int)$row->qtyreserved . '</td>';
+			echo '</tr>';
+		}
+		echo '</tbody></table></div>';
 	}
 
 	function findReadyForSale($reparationer = false, $nostoreshelf = false, $sok = false, $possible = false) {

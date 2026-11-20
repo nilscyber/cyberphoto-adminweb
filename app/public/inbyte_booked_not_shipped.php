@@ -1,9 +1,10 @@
 <?php 
 	include_once("top.php");
 	include_once("header.php");
-	
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"admin_core.css?ver=ad" . date("ynjGi") . "\">\n";
+
 	// echo "<h1>Sista beställningstid från oss</h1>\n";
-	$tradein->findDoubleTradeInBooking();
+	$tradein->findDoubleTradeInBooking(true);
 	$tradein->bookedNotShippedV2();
 	// $tradein->bookedNotShipped(); // gammal version
 	// $tradein->findReadyForSale(true); // skickade på reparation
